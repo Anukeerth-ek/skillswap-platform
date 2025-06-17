@@ -16,7 +16,8 @@
     "express": "^5.1.0"
   },
   "devDependencies": {
-    "@types/express": "^5.0.2",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^5.0.3",
     "@types/node": "^22.15.29",
     "prisma": "^6.9.0",
     "ts-node": "^10.9.2",
