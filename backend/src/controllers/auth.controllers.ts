@@ -1,25 +1,41 @@
-import {Request, Response} from 'express'
-import prisma from '../prismaClient'
-import { hashPassword } from '../utils/hash.utils'
+import { Request, Response } from "express";
+import prisma from "../prismaClient";
+import { comparePassword, hashPassword } from "../utils/hash.utils";
 
-export const signup = async(req:Request, res: Response)=> {
-    const {name, email, password} = req.body;
+export const signup = async (req: Request, res: Response) => {
+     const { name, email, password } = req.body;
 
-    if(!email || !password) {
-        return res.status(400).json({message: "Email and passsword is required"});
-    }
+     if (!email || !password) {
+          return res.status(400).json({ message: "Email and passsword is required" });
+     }
 
-    const existingUser = await prisma.user.findUnique({where: email})
+     const existingUser = await prisma.user.findUnique({ where: email });
 
-    if(existingUser) {
-        return res.status(409).json({message: 'User already exist'})
-    }
+     if (existingUser) {
+          return res.status(409).json({ message: "User already exist" });
+     }
 
-    const hashdedUserPassword = await hashPassword(password)
+     const hashdedUserPassword = await hashPassword(password);
 
-    const newUser = await prisma.user.create({
-        data: {name, email, password: hashdedUserPassword},
-    })
+     const newUser = await prisma.user.create({
+          data: { name, email, password: hashdedUserPassword },
+     });
 
-    res.status(201).json({message: "user created", userId: newUser.id})
-}
+     res.status(201).json({ message: "user created", userId: newUser.id });
+};
+
+export const login = async (req: Request, res: Response) => {
+     const { email, passsword } = req.body;
+
+     const user = await prisma.user.findUnique({ where: email });
+
+     if (!user) {
+          return res.status(404).json({ message: "User not found" });
+     }
+
+     const isValid = await comparePassword(passsword, user?.password);
+
+     if(!isValid) {
+        return res.status(404).json({message: "Invalid Credientials"})
+     }
+};
