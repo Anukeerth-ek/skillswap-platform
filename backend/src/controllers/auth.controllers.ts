@@ -11,7 +11,9 @@ export const signup = async (req: Request, res: Response) => {
           return res.status(400).json({ message: "Email and passsword is required" });
      }
 
-     const existingUser = await prisma.user.findUnique({ where: email });
+     const existingUser = await prisma.user.findUnique({
+          where: { email },
+     });
 
      if (existingUser) {
           return res.status(409).json({ message: "User already exist" });
