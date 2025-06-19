@@ -16,17 +16,18 @@ datasource db {
 
 
 model User {
-  id           String   @id @default(uuid())
-  name         String
-  email        String   @unique
-  password     String   // Hashed
-  bio          String?
-  avatarUrl    String?
-  skillsOffered Skill[] @relation("SkillsOffered")
-  skillsWanted  Skill[] @relation("SkillsWanted")
-  sessionsAsMentor Session[] @relation("MentorSessions")
-  sessionsAsLearner Session[] @relation("LearnerSessions")
-  createdAt    DateTime @default(now())
+  id                 String     @id @default(uuid())
+  name               String
+  email              String     @unique
+  password           String
+  bio                String?
+  avatarUrl          String?
+  role               Role       @default(LEARNER)
+  skillsOffered      Skill[]    @relation("SkillsOffered")
+  skillsWanted       Skill[]    @relation("SkillsWanted")
+  sessionsAsMentor   Session[]  @relation("MentorSessions")
+  sessionsAsLearner  Session[]  @relation("LearnerSessions")
+  createdAt          DateTime   @default(now())
 }
 
 model Skill {
@@ -35,19 +36,21 @@ model Skill {
   category  String?
   offeredBy User[]  @relation("SkillsOffered")
   wantedBy  User[]  @relation("SkillsWanted")
+  sessions  Session[] @relation("SkillSessions")
 }
 
 model Session {
-  id          String   @id @default(uuid())
-  mentor      User     @relation("MentorSessions", fields: [mentorId], references: [id])
+  id          String         @id @default(uuid())
+  mentor      User           @relation("MentorSessions", fields: [mentorId], references: [id])
   mentorId    String
-  learner     User     @relation("LearnerSessions", fields: [learnerId], references: [id])
+  learner     User           @relation("LearnerSessions", fields: [learnerId], references: [id])
   learnerId   String
-  skill       String   // e.g., "JavaScript"
+  skill       Skill          @relation("SkillSessions", fields: [skillId], references: [id]) // ✅ MATCH relation name here
+  skillId     String
   scheduledAt DateTime
-  status      SessionStatus @default(PENDING)
+  status      SessionStatus  @default(PENDING)
   feedback    String?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime       @default(now())
 }
 
 enum SessionStatus {
@@ -55,4 +58,10 @@ enum SessionStatus {
   CONFIRMED
   COMPLETED
   CANCELLED
+}
+
+enum Role {
+  MENTOR
+  LEARNER
+  BOTH
 }
