@@ -10,11 +10,12 @@ const skillSchema = z.object({
 });
 
 // POST /api/skills - Add new skill
-export const addSkill = async (req: Request, res: Response) => {
+export const addSkill = async (req: Request, res: Response): Promise<void> => {
      const validation = skillSchema.safeParse(req.body);
 
      if (!validation.success) {
-          return res.status(400).json({ error: validation.error.errors });
+          res.status(400).json({ error: validation.error.errors });
+          return;
      }
 
      const { name } = validation.data;
@@ -22,24 +23,29 @@ export const addSkill = async (req: Request, res: Response) => {
      try {
           const existingSkill = await prisma.skill.findFirst({ where: { name } });
           if (existingSkill) {
-               return res.status(409).json({ message: "Skill already exists" });
+               res.status(409).json({ message: "Skill already exists" });
+               return;
           }
 
           const newSkill = await prisma.skill.create({ data: { name } });
-          return res.status(201).json(newSkill);
+          res.status(201).json(newSkill);
+          return;
      } catch (error) {
           console.error("Error adding skill:", error);
-          return res.status(500).json({ message: "Internal server error" });
+          res.status(500).json({ message: "Internal server error" });
+          return;
      }
 };
 
 // GET /api/skills - List all skills
-export const listSkills = async (_req: Request, res: Response) => {
+export const listSkills = async (_req: Request, res: Response): Promise<void> => {
      try {
           const skills = await prisma.skill.findMany();
-          return res.status(200).json(skills);
+          res.status(200).json(skills);
+          return;
      } catch (error) {
           console.error("Error fetching skills:", error);
-          return res.status(500).json({ message: "Internal server error" });
+          res.status(500).json({ message: "Internal server error" });
+          return;
      }
 };
