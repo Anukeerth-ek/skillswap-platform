@@ -1,6 +1,6 @@
-import { Express } from "express"
+import express from 'express'
 import { bookSession  } from "../controllers/sessionController";
-const router = express.router()
+const router = express.Router()
 
 router.post("/", bookSession );
 
