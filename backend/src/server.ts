@@ -1,9 +1,9 @@
 import express = require("express");
 import dotenv = require("dotenv");
 import skillRoutes from "./routes/skillRoutes";
-import { bookSession } from "./controllers/sessionController";
 import userRoutes from "./routes/userRoutes";
-const authRoutes = require("./routes/authRoutes");
+import sessionRoutes from "./routes/sessionRoutes"
+import authRoutes from "./routes/authRoutes"
 
 dotenv.config();
 
@@ -13,7 +13,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/skills", skillRoutes);
-app.use("/api/bookSession", bookSession);
+app.use("/api/bookSession", sessionRoutes);
 app.use("/api/userProfile", userRoutes);
 
 const PORT = process.env.PORT || 4500;
