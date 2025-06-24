@@ -1,9 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 const jwt = require("jsonwebtoken");
 
-interface AuthRequest extends Request {
-     user?: any;
+interface JwtPayload {
+  id: string; // Add more fields if needed
+  // email?: string;
 }
+
+interface AuthRequest extends Request {
+  user?: JwtPayload;
+}
+
 
 export const authenticateUser = (req: AuthRequest, res: Response, next: NextFunction): void => {
      try {
