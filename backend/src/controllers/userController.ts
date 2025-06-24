@@ -1,56 +1,43 @@
 import { Request, Response } from "express";
+import { z } from "zod";
 import prisma from "../lib/prisma";
 
-export const getUserProfile = async (req: Request, res: Response) => {
-     const { id } = req.params;
+const statusSchema = z.object({
+  status: z.enum(["ACCEPTED", "REJECTED", "COMPLETED"]),
+});
 
-     try {
-          const user = await prisma.user.findUnique({
-               where: { id },
-               select: {
-                    id: true,
-                    name: true,
-                    email: true,
-                    bio: true,
-                    avatarUrl: true,
-                    role: true,
-                    createdAt: true,
-               },
-          });
+interface AuthenticatedRequest extends Request {
+  user?: { id: string };
+}
 
-          if (!user) {
-               res.status(404).json({ message: "User not found" });
-               return;
-          }
+export const updateSessionStatus = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  const mentorId = req.user?.id;
+  const { id } = req.params;
 
-          res.json(user);
-          return;
-     } catch (err) {
-          console.error(err);
-          res.status(500).json({ message: "Server error" });
-          return;
-     }
-};
+  const parsed = statusSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ message: "Invalid status", errors: parsed.error.format() });
+    return;
+  }
 
-export const updateUserProfile = async (req: Request, res: Response) => {
-     const { id } = req.params;
-     const { name, bio, avatarUrl } = req.body;
+  const { status } = parsed.data;
 
-     try {
-          const updatedUser = await prisma.user.update({
-               where: { id },
-               data: {
-                    name,
-                    bio,
-                    avatarUrl,
-               },
-          });
+  const session = await prisma.session.findFirst({
+    where: { id, mentorId },
+  });
 
-          res.json(updatedUser);
-          return;
-     } catch (err) {
-          console.error(err);
-          res.status(500).json({ message: "Error updating user" });
-          return;
-     }
+  if (!session) {
+    res.status(404).json({ message: "Session not found or unauthorized" });
+    return;
+  }
+
+  const updatedSession = await prisma.session.update({
+    where: { id },
+    data: { status },
+  });
+
+  res.status(200).json({ session: updatedSession });
 };

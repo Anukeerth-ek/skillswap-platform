@@ -2,7 +2,7 @@ import express = require("express");
 import dotenv = require("dotenv");
 import skillRoutes from "./routes/skillRoutes";
 import userRoutes from "./routes/userRoutes";
-import sessionRoutes from "./routes/sessionRoutes"
+import sessionRoutes from "./routes/bookSessionRoutes"
 import authRoutes from "./routes/authRoutes"
 import learnerRoutes from "./routes/learnerRoutes"
 import mentorRoutes from "./routes/mentorRoutes"

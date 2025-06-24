@@ -1,28 +1,43 @@
 import { Request, Response } from "express";
+import { z } from "zod";
 import prisma from "../lib/prisma";
 
-export const bookSession  = async (req: Request, res: Response) => {
-     try {
-          const { mentorId, learnerId, skillId, scheduledAt } = req.body;
+const statusSchema = z.object({
+  status: z.enum(["ACCEPTED", "REJECTED", "COMPLETED"]),
+});
 
-          if (!mentorId || !learnerId || !skillId || !scheduledAt) {
-               res.status(400).json({ message: "All fields are required" });
-               return
-          }
+interface AuthenticatedRequest extends Request {
+  user?: { id: string };
+}
 
-          const session = prisma.session.create({
-               data: {
-                    mentorId,
-                    learnerId,
-                    skillId,
-                    scheduledAt: new Date(scheduledAt),
-               },
-          });
+export const updateSessionStatus = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  const mentorId = req.user?.id;
+  const { id } = req.params;
 
-          res.status(200).json(session);
-          return
-     } catch (error: any) {
-          Error(error);
-          console.log("There is a problem while fetching...", error);
-     }
+  const parsed = statusSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({ message: "Invalid status", errors: parsed.error.format() });
+    return;
+  }
+
+  const { status } = parsed.data;
+
+  const session = await prisma.session.findFirst({
+    where: { id, mentorId },
+  });
+
+  if (!session) {
+    res.status(404).json({ message: "Session not found or unauthorized" });
+    return;
+  }
+
+  const updatedSession = await prisma.session.update({
+    where: { id },
+    data: { status },
+  });
+
+  res.status(200).json({ session: updatedSession });
 };
