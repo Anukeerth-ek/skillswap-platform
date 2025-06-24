@@ -4,6 +4,7 @@ import skillRoutes from "./routes/skillRoutes";
 import userRoutes from "./routes/userRoutes";
 import sessionRoutes from "./routes/sessionRoutes"
 import authRoutes from "./routes/authRoutes"
+import learnerRoutes from "./routes/learnerRoutes"
 
 dotenv.config();
 
@@ -15,6 +16,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/bookSession", sessionRoutes);
 app.use("/api/userProfile", userRoutes);
+app.use("/api/learnersBooking", learnerRoutes)
 
 const PORT = process.env.PORT || 4500;
 
