@@ -15,18 +15,23 @@ datasource db {
 }
 
 model User {
-  id                String    @id @default(uuid())
+  id                String     @id @default(uuid())
   name              String
-  email             String    @unique
+  email             String     @unique
   password          String
   bio               String?
   avatarUrl         String?
-  role              Role      @default(LEARNER)
-  skillsOffered     Skill[]   @relation("SkillsOffered")
-  skillsWanted      Skill[]   @relation("SkillsWanted")
-  sessionsAsMentor  Session[] @relation("MentorSessions")
-  sessionsAsLearner Session[] @relation("LearnerSessions")
-  createdAt         DateTime  @default(now())
+  role              Role       @default(LEARNER)
+  timeZone          String?
+  createdAt         DateTime   @default(now())
+  skillsOffered     Skill[]    @relation("SkillsOffered")
+  skillsWanted      Skill[]    @relation("SkillsWanted")
+  sessionsAsMentor  Session[]  @relation("MentorSessions")
+  sessionsAsLearner Session[]  @relation("LearnerSessions")
+  sentConnections     Connection[] @relation("SentConnections")
+  receivedConnections Connection[] @relation("ReceivedConnections")
+  followers Follow[] @relation("Followers")
+  following Follow[] @relation("Following")
 }
 
 model Skill {
@@ -36,6 +41,27 @@ model Skill {
   offeredBy User[]    @relation("SkillsOffered")
   wantedBy  User[]    @relation("SkillsWanted")
   sessions  Session[] @relation("SkillSessions")
+}
+
+model Connection {
+  id         String            @id @default(uuid())
+  sender     User              @relation("SentConnections", fields: [senderId], references: [id])
+  senderId   String
+  receiver   User              @relation("ReceivedConnections", fields: [receiverId], references: [id])
+  receiverId String
+  status     ConnectionStatus  @default(PENDING)
+  createdAt  DateTime          @default(now())
+}
+
+model Follow {
+  id         String  @id @default(uuid())
+  follower   User    @relation("Following", fields: [followerId], references: [id])
+  followerId String
+  following  User    @relation("Followers", fields: [followingId], references: [id])
+  followingId String
+  createdAt  DateTime @default(now())
+
+  @@unique([followerId, followingId]) // Prevent duplicate follows
 }
 
 model Session {
@@ -52,15 +78,22 @@ model Session {
   createdAt   DateTime      @default(now())
 }
 
+enum Role {
+  MENTOR
+  LEARNER
+  BOTH
+}
+
+enum ConnectionStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
 enum SessionStatus {
   PENDING
   CONFIRMED
   COMPLETED
   CANCELLED
 }
-
-enum Role {
-  MENTOR
-  LEARNER
-  BOTH
-}
+ 
