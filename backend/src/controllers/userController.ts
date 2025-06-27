@@ -64,15 +64,17 @@ export const createUserProfile = async (req: AuthenticatedRequest, res: Response
      const userId = req.user?.id;
 
      if (!userId) {
-          return res.status(401).json({ message: "Unauthorized" });
+          res.status(401).json({ message: "Unauthorized" });
+          return;
      }
 
      const parsed = profileSchema.safeParse(req.body);
      if (!parsed.success) {
-          return res.status(400).json({
+          res.status(400).json({
                message: "Invalid profile data",
                errors: parsed.error.format(),
           });
+          return;
      }
 
      const { name, bio, avatarUrl, timeZone, skillsOffered, skillsNeeded } = parsed.data;
@@ -112,7 +114,8 @@ export const createUserProfile = async (req: AuthenticatedRequest, res: Response
           return;
      } catch (error) {
           console.error("Error creating/updating profile:", error);
-          return res.status(500).json({ message: "Server error" });
+          res.status(500).json({ message: "Server error" });
+          return;
      }
 };
 
