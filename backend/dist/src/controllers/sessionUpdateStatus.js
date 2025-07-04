@@ -37,7 +37,9 @@ const updateSessionStatus = (req, res) => __awaiter(void 0, void 0, void 0, func
     }
     const updatedSession = yield prisma_1.default.session.update({
         where: { id },
-        data: { status },
+        data: {
+            status: { set: status },
+        },
     });
     res.status(200).json({ session: updatedSession });
 });

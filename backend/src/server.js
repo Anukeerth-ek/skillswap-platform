@@ -17,10 +17,10 @@ app.use(express.json());
 app.use("/api/auth", authRoutes_1.default);
 app.use("/api/skills", skillRoutes_1.default);
 app.use("/api/bookSession", bookSessionRoutes_1.default);
-app.use("/api/userProfile", userRoutes_1.default);
+app.use("/api/profile", userRoutes_1.default);
 app.use("/api/learnersBooking", learnerRoutes_1.default);
 app.use("/api/mentorBooking", mentorRoutes_1.default);
-const PORT = process.env.PORT || 4500;
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
     console.log(`Server listening on port ${PORT}`);
 });

@@ -61,7 +61,8 @@ export const updateSessionStatus = async (req: AuthenticatedRequest, res: Respon
 };
 
 export const createUserProfile = async (req: AuthenticatedRequest, res: Response) => {
-     const userId = req.user?.id;
+     console.log("we are here in backend boyy")
+     const userId = "1a3anx-29fdfj";
 
      if (!userId) {
           res.status(401).json({ message: "Unauthorized" });

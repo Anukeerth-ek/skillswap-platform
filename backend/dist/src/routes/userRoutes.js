@@ -8,5 +8,5 @@ const userController_1 = require("../controllers/userController");
 const router = express_1.default.Router();
 router.get("/:id", userController_1.getUserProfile);
 router.put("/:id", userController_1.updateSessionStatus);
-router.post("/profile", userController_1.createUserProfile);
+router.post("/", userController_1.createUserProfile);
 exports.default = router;

@@ -104,8 +104,9 @@ const ProfileCreatePage = () => {
     setIsSubmitting(true);
 
     try {
+      console.log("we are in frontend boyy")
       // Here you would make the API call to your backend
-      const response: ApiResponse = await fetch('http://localhost:4000/api/user', {
+      const response: ApiResponse = await fetch('http://localhost:4000/api/profile', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

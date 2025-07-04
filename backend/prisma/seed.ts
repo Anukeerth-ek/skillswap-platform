@@ -50,7 +50,8 @@ async function main() {
           data: {
                mentorId: mentor.id,
                learnerId: learner.id,
-               skill: "React",
+               skillId: reactSkill.id,
+
                scheduledAt: new Date(Date.now() + 24 * 60 * 60 * 1000), // tomorrow
                status: "CONFIRMED",
                feedback: null,

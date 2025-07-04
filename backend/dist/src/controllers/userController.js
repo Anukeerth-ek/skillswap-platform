@@ -51,7 +51,7 @@ const updateSessionStatus = (req, res) => __awaiter(void 0, void 0, void 0, func
         }
         const updatedSession = yield prisma_1.default.session.update({
             where: { id },
-            data: { status },
+            data: { status: status }, // Cast to 'any' or 'SessionStatus' if imported
         });
         res.status(200).json({ session: updatedSession });
         return;
@@ -64,8 +64,8 @@ const updateSessionStatus = (req, res) => __awaiter(void 0, void 0, void 0, func
 });
 exports.updateSessionStatus = updateSessionStatus;
 const createUserProfile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
-    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id;
+    console.log("we are here in backend boyy");
+    const userId = "1a3anx-29fdfj";
     if (!userId) {
         res.status(401).json({ message: "Unauthorized" });
         return;
@@ -85,7 +85,6 @@ const createUserProfile = (req, res) => __awaiter(void 0, void 0, void 0, functi
             where: { id: userId },
             data: {
                 skillsOffered: { set: [] },
-                skillsNeeded: { set: [] },
             },
         });
         // Update with new data
@@ -99,13 +98,10 @@ const createUserProfile = (req, res) => __awaiter(void 0, void 0, void 0, functi
                 skillsOffered: {
                     connect: (skillsOffered === null || skillsOffered === void 0 ? void 0 : skillsOffered.map((id) => ({ id }))) || [],
                 },
-                skillsNeeded: {
-                    connect: (skillsNeeded === null || skillsNeeded === void 0 ? void 0 : skillsNeeded.map((id) => ({ id }))) || [],
-                },
+                // skillsNeeded property removed or adjust according to your schema
             },
             include: {
                 skillsOffered: true,
-                skillsNeeded: true,
             },
         });
         res.status(200).json({ user });
@@ -125,7 +121,6 @@ const getUserProfile = (req, res) => __awaiter(void 0, void 0, void 0, function*
             where: { id },
             include: {
                 skillsOffered: true,
-                skillsNeeded: true,
             },
         });
         if (!user) {
