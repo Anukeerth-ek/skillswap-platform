@@ -16,7 +16,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/bookSession", bookSessionRoutes);
-app.use("/api/userProfile", userRoutes);
+app.use("/api/profile", userRoutes);
 app.use("/api/learnersBooking", learnerRoutes)
 app.use("/api/mentorBooking", mentorRoutes)
 

@@ -4,6 +4,6 @@ const router = express.Router();
 
 router.get("/:id", getUserProfile);
 router.put("/:id", updateSessionStatus);
-router.post("/profile", createUserProfile);
+router.post("/", createUserProfile);
 
 export default router;
