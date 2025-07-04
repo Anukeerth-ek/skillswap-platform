@@ -105,7 +105,7 @@ const ProfileCreatePage = () => {
 
     try {
       // Here you would make the API call to your backend
-      const response: ApiResponse = await fetch('/api/profile', {
+      const response: ApiResponse = await fetch('http://localhost:4000/api/user', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

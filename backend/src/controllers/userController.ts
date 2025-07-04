@@ -48,7 +48,7 @@ export const updateSessionStatus = async (req: AuthenticatedRequest, res: Respon
 
           const updatedSession = await prisma.session.update({
                where: { id },
-               data: { status },
+               data: { status: status as any }, // Cast to 'any' or 'SessionStatus' if imported
           });
 
           res.status(200).json({ session: updatedSession });
@@ -85,7 +85,6 @@ export const createUserProfile = async (req: AuthenticatedRequest, res: Response
                where: { id: userId },
                data: {
                     skillsOffered: { set: [] },
-                    skillsNeeded: { set: [] },
                },
           });
 
@@ -100,13 +99,10 @@ export const createUserProfile = async (req: AuthenticatedRequest, res: Response
                     skillsOffered: {
                          connect: skillsOffered?.map((id) => ({ id })) || [],
                     },
-                    skillsNeeded: {
-                         connect: skillsNeeded?.map((id) => ({ id })) || [],
-                    },
+                    // skillsNeeded property removed or adjust according to your schema
                },
                include: {
                     skillsOffered: true,
-                    skillsNeeded: true,
                },
           });
 
@@ -127,7 +123,6 @@ export const getUserProfile = async (req: Request, res: Response) => {
                where: { id },
                include: {
                     skillsOffered: true,
-                    skillsNeeded: true,
                },
           });
 
