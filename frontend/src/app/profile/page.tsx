@@ -120,6 +120,7 @@ const ProfileCreatePage = () => {
 
       if (response.ok) {
         // Handle success - redirect or show success message
+        console.log("anuke", response)
         console.log('Profile created successfully!');
       } else {
         // Handle error
