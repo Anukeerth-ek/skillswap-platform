@@ -99,40 +99,43 @@ const ProfileCreatePage = () => {
     // Add more fields if your API returns them
   }
 
-  const handleSubmit = async (e: HandleSubmitEvent): Promise<void> => {
-    e.preventDefault();
-    setIsSubmitting(true);
+const handleSubmit = async (e: HandleSubmitEvent): Promise<void> => {
+  e.preventDefault();
+  setIsSubmitting(true);
 
-    try {
-      console.log("we are in frontend boyy")
-      // Here you would make the API call to your backend
-      const response: ApiResponse = await fetch('http://localhost:4000/api/profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          // Convert skill names to IDs if needed
-          skillsOffered: formData.skillsOffered.map((skill: string) => skill), // Adjust based on your skill ID logic
-          skillsNeeded: formData.skillsNeeded.map((skill: string) => skill)
-        })
-      }) as unknown as ApiResponse;
+  try {
+    const token = localStorage.getItem("token"); // ⬅️ Get token
 
-      if (response.ok) {
-        // Handle success - redirect or show success message
-        console.log("anuke", response)
-        console.log('Profile created successfully!');
-      } else {
-        // Handle error
-        console.error('Failed to create profile');
-      }
-    } catch (error) {
-      console.error('Error creating profile:', error);
-    } finally {
-      setIsSubmitting(false);
+    if (!token) {
+      console.error("No auth token found");
+      return;
     }
-  };
+
+    const response = await fetch("http://localhost:4000/api/profile", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // ⬅️ Pass token here
+      },
+      body: JSON.stringify({
+        ...formData,
+        skillsOffered: formData.skillsOffered,
+        skillsNeeded: formData.skillsNeeded,
+      }),
+    });
+
+    if (response.ok) {
+      console.log("Profile created successfully!");
+    } else {
+      console.error("Failed to create profile");
+    }
+  } catch (error) {
+    console.error("Error creating profile:", error);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">

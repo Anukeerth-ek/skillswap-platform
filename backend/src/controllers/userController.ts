@@ -61,8 +61,8 @@ export const updateSessionStatus = async (req: AuthenticatedRequest, res: Respon
 };
 
 export const createUserProfile = async (req: AuthenticatedRequest, res: Response) => {
-     console.log("we are here in backend boyy")
-     const userId = "1a3anx-29fdfj";
+     console.log("we are here in backend boyy");
+     const userId = req.user?.id;
 
      if (!userId) {
           res.status(401).json({ message: "Unauthorized" });
@@ -81,6 +81,12 @@ export const createUserProfile = async (req: AuthenticatedRequest, res: Response
      const { name, bio, avatarUrl, timeZone, skillsOffered, skillsNeeded } = parsed.data;
 
      try {
+          const existingUser = await prisma.user.findUnique({ where: { id: userId } });
+
+          if (!existingUser) {
+               return res.status(404).json({ message: "User not found" });
+          }
+
           // Disconnect existing skills to avoid duplication
           await prisma.user.update({
                where: { id: userId },
@@ -106,6 +112,8 @@ export const createUserProfile = async (req: AuthenticatedRequest, res: Response
                     skillsOffered: true,
                },
           });
+
+          console.log("we got it ", user)
 
           res.status(200).json({ user });
           return;
