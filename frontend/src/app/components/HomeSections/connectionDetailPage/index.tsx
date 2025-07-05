@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Share2, Bookmark } from 'lucide-react';
 
-export const RightSidebar = () => {
+export const ConnectionDetailSideBar = () => {
   return (
     <div className="w-80 bg-gray-900 text-white p-6">
       <div className="flex items-center justify-between mb-6">
