@@ -8,7 +8,7 @@ export const signup = async (req: Request, res: Response) => {
      const { name, email, password } = req.body;
 
      if (!email || !password) {
-          return res.status(400).json({ message: "Email and passsword is required" });
+          return res.status(400).json({ message: "Email and password is required" });
      }
 
      const existingUser = await prisma.user.findUnique({
@@ -25,22 +25,22 @@ export const signup = async (req: Request, res: Response) => {
           data: { name, email, password: hashdedUserPassword },
      });
 
-     res.status(201).json({ message: "user created", user: { id: newUser.id, email: newUser.password } });
+     res.status(201).json({ message: "user created", user: { id: newUser.id, email: newUser.email } });
 };
 
 export const login = async (req: Request, res: Response) => {
-     const { email, passsword } = req.body;
+     const { email, password } = req.body; // Fixed typo
 
-     const user = await prisma.user.findUnique({ where: email });
+     const user = await prisma.user.findUnique({ where: { email } }); // Fixed syntax
 
      if (!user) {
           return res.status(404).json({ message: "User not found" });
      }
 
-     const isValid = await comparePassword(passsword, user?.password);
+     const isValid = await comparePassword(password, user?.password); // Fixed variable name
 
      if (!isValid) {
-          return res.status(404).json({ message: "Invalid Credientials" });
+          return res.status(404).json({ message: "Invalid Credentials" });
      }
 
      const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: "1day" });
