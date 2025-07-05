@@ -14,7 +14,7 @@ interface TeacherCardProps {
   isBookmarked?: boolean;
 }
 
-export const TeacherCard: React.FC<TeacherCardProps> = ({
+export const ConnectionCard: React.FC<TeacherCardProps> = ({
   name,
   role,
   avatar,
