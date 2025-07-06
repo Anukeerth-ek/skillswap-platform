@@ -1,11 +1,13 @@
 import express from "express";
 import { getUserProfile, updateSessionStatus, createUserProfile} from "../controllers/userController";
+import { authenticateUser } from "../middleware/authMiddleware";
 const router = express.Router();
 
-router.get("/:id", getUserProfile);
+router.get("/me", authenticateUser, getUserProfile);
 
-router.put("/:id", updateSessionStatus as unknown as express.RequestHandler);
+// ✅ FIXED: apply `authenticateUser` here too
+router.post("/", authenticateUser, createUserProfile);
 
-router.post("/", createUserProfile as unknown as express.RequestHandler);
+router.put("/:id", authenticateUser, updateSessionStatus as unknown as express.RequestHandler);
 
 export default router;

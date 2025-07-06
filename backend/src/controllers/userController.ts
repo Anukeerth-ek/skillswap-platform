@@ -62,6 +62,8 @@ export const updateSessionStatus = async (req: AuthenticatedRequest, res: Respon
 
 export const createUserProfile = async (req: AuthenticatedRequest, res: Response) => {
      console.log("we are here in backend boyy");
+     console.log("Decoded user ID:", req.userId);
+
      const userId = req.user?.id;
 
      if (!userId) {
@@ -84,7 +86,8 @@ export const createUserProfile = async (req: AuthenticatedRequest, res: Response
           const existingUser = await prisma.user.findUnique({ where: { id: userId } });
 
           if (!existingUser) {
-               return res.status(404).json({ message: "User not found" });
+               res.status(404).json({ message: "User not found" });
+               return 
           }
 
           // Disconnect existing skills to avoid duplication
@@ -124,27 +127,30 @@ export const createUserProfile = async (req: AuthenticatedRequest, res: Response
      }
 };
 
-export const getUserProfile = async (req: Request, res: Response) => {
-     const { id } = req.params;
+interface AuthenticatedRequest extends Request {
+  userId?: string;
+}
 
-     try {
-          const user = await prisma.user.findUnique({
-               where: { id },
-               include: {
-                    skillsOffered: true,
-               },
-          });
+export const getUserProfile = async (req: AuthenticatedRequest, res: Response) => {
+  const userId = req.userId;
 
-          if (!user) {
-               res.status(404).json({ message: "User not found" });
-               return;
-          }
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      include: {
+        skillsOffered: true,
+        skillsWanted: true,
+      },
+    });
 
-          res.status(200).json({ user });
-          return;
-     } catch (error) {
-          console.error("Error fetching user profile:", error);
-          res.status(500).json({ message: "Server error" });
-          return;
-     }
+    if (!user) {
+         res.status(404).json({ message: "User not found" });
+      return 
+    }
+
+    res.status(200).json({ user });
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 };
