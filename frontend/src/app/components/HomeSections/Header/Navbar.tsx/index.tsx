@@ -1,9 +1,17 @@
+"use client"
+
 import React from 'react';
 import { Home, UserPlus, BookOpen, Users, MessageCircle, Bell } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useAuthUser } from '@/app/hooks/useAuth';
 
 export const Navbar = () => {
+    const { user, loading } = useAuthUser();
+    console.log("user", user)
+      const displayName = loading ? "Loading..." : user?.name || "Guest";
+  const avatarLetter = user?.name?.charAt(0)?.toUpperCase() || "G";
+  const avatarUrl = user?.avatarUrl || "/default-avatar.png";
   return (
     <nav className="bg-gray-900 text-white px-6 py-4 flex items-center justify-between">
       <div className="flex items-center space-x-8">
@@ -39,14 +47,17 @@ export const Navbar = () => {
       </div>
       
       <div className="flex items-center space-x-4">
-        <Button variant="ghost" size="icon">
-          <Bell className="w-5 h-5" />
-        </Button>
-        <Avatar className="w-8 h-8">
-          <AvatarImage src="/api/placeholder/32/32" />
-          <AvatarFallback>U</AvatarFallback>
-        </Avatar>
-      </div>
+      <span className="text-sm text-gray-300 hidden sm:inline">Hi, {displayName}</span>
+
+      <Button variant="ghost" size="icon">
+        <Bell className="w-5 h-5" />
+      </Button>
+
+      <Avatar className="w-8 h-8">
+        <AvatarImage src={avatarUrl} />
+        <AvatarFallback>{avatarLetter}</AvatarFallback>
+      </Avatar>
+    </div>
     </nav>
   );
 };
