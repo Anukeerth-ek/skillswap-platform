@@ -3,7 +3,9 @@ import { getUserProfile, updateSessionStatus, createUserProfile} from "../contro
 const router = express.Router();
 
 router.get("/:id", getUserProfile);
-router.put("/:id", updateSessionStatus);
-router.post("/", createUserProfile);
+
+router.put("/:id", updateSessionStatus as unknown as express.RequestHandler);
+
+router.post("/", createUserProfile as unknown as express.RequestHandler);
 
 export default router;
