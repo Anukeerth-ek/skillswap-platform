@@ -127,6 +127,7 @@ const ProfileCreatePage = () => {
                });
 
                if (response.ok) {
+                    router.push("/profile");
                     console.log("Profile created successfully!");
                } else {
                     console.error("Failed to create profile");
