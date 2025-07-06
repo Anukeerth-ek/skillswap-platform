@@ -61,70 +61,78 @@ export const updateSessionStatus = async (req: AuthenticatedRequest, res: Respon
 };
 
 export const createUserProfile = async (req: AuthenticatedRequest, res: Response) => {
-     console.log("we are here in backend boyy");
-     console.log("Decoded user ID:", req.userId);
+  console.log("we are here in backend boyy");
+  console.log("Decoded user ID:", req.userId);
 
-     const userId = req.user?.id;
+  const userId = req.userId;
 
-     if (!userId) {
-          res.status(401).json({ message: "Unauthorized" });
-          return;
-     }
+  if (!userId) {
+    res.status(401).json({ message: "Unauthorized" });
+    return;
+  }
 
-     const parsed = profileSchema.safeParse(req.body);
-     if (!parsed.success) {
-          res.status(400).json({
-               message: "Invalid profile data",
-               errors: parsed.error.format(),
-          });
-          return;
-     }
+  const parsed = profileSchema.safeParse(req.body);
+  if (!parsed.success) {
+    res.status(400).json({
+      message: "Invalid profile data",
+      errors: parsed.error.format(),
+    });
+    return;
+  }
 
-     const { name, bio, avatarUrl, timeZone, skillsOffered, skillsNeeded } = parsed.data;
+  const { name, bio, avatarUrl, timeZone, skillsOffered, skillsNeeded } = parsed.data;
 
-     try {
-          const existingUser = await prisma.user.findUnique({ where: { id: userId } });
+  try {
+    const existingUser = await prisma.user.findUnique({ where: { id: userId } });
 
-          if (!existingUser) {
-               res.status(404).json({ message: "User not found" });
-               return 
-          }
+    if (!existingUser) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
 
-          // Disconnect existing skills to avoid duplication
-          await prisma.user.update({
-               where: { id: userId },
-               data: {
-                    skillsOffered: { set: [] },
-               },
-          });
+    // Disconnect existing skills to avoid duplication
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        skillsOffered: { set: [] },
+        skillsWanted: { set: [] }, // optional: clear skillsNeeded if applicable
+      },
+    });
 
-          // Update with new data
-          const user = await prisma.user.update({
-               where: { id: userId },
-               data: {
-                    name,
-                    bio,
-                    avatarUrl,
-                    timeZone,
-                    skillsOffered: {
-                         connect: skillsOffered?.map((id) => ({ id })) || [],
-                    },
-                    // skillsNeeded property removed or adjust according to your schema
-               },
-               include: {
-                    skillsOffered: true,
-               },
-          });
+    const user = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name,
+        bio,
+        avatarUrl,
+        timeZone,
+        skillsOffered: {
+          connectOrCreate: skillsOffered?.map((name) => ({
+            where: { name },
+            create: { name },
+          })) || [],
+        },
+        skillsWanted: {
+          connectOrCreate: skillsNeeded?.map((name) => ({
+            where: { name },
+            create: { name },
+          })) || [],
+        },
+      },
+      include: {
+        skillsOffered: true,
+        skillsWanted: true,
+      },
+    });
 
-          console.log("we got it ", user)
-
-          res.status(200).json({ user });
-          return;
-     } catch (error) {
-          console.error("Error creating/updating profile:", error);
-          res.status(500).json({ message: "Server error" });
-          return;
-     }
+    console.log("we got it ", user);
+    res.status(200).json({ user });
+    return;
+  } catch (error) {
+    console.error("Error creating/updating profile:", error);
+    res.status(500).json({ message: "Server error" });
+    return;
+  }
 };
 
 interface AuthenticatedRequest extends Request {

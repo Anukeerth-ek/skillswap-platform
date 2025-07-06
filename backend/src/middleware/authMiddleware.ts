@@ -24,7 +24,7 @@ export const authenticateUser = (
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
-    req.userId = decoded.userId; // ✅ fixed key name
+    req.userId = decoded.userId;
     next();
   } catch (err) {
     console.error("JWT Error:", err);
