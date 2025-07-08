@@ -28,6 +28,17 @@ const ProfileCreatePage = () => {
      const [newSkillOffered, setNewSkillOffered] = useState("");
      const [newSkillNeeded, setNewSkillNeeded] = useState("");
      const [isSubmitting, setIsSubmitting] = useState(false);
+     const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
+
+     useEffect(() => {
+          const avatarInput = document.getElementById("avatarFile") as HTMLInputElement;
+          avatarInput?.addEventListener("change", () => {
+               if (avatarInput.files?.[0]) {
+                    const file = avatarInput.files[0];
+                    setAvatarPreview(URL.createObjectURL(file));
+               }
+          });
+     }, []);
 
      // Common timezones for selection
      const commonTimezones = [
@@ -101,43 +112,59 @@ const ProfileCreatePage = () => {
           ok: boolean;
           // Add more fields if your API returns them
      }
+    const handleSubmit = async (e: HandleSubmitEvent): Promise<void> => {
+  e.preventDefault();
+  setIsSubmitting(true);
 
-     const handleSubmit = async (e: HandleSubmitEvent): Promise<void> => {
-          e.preventDefault();
-          setIsSubmitting(true);
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      console.error("No auth token found");
+      return;
+    }
 
-          try {
-               const token = localStorage.getItem("token");
-               console.log("Sending token:", token);
+    const avatarFileInput = document.getElementById("avatarFile") as HTMLInputElement;
+    const avatarFile = avatarFileInput?.files?.[0];
 
-               if (!token) {
-                    console.error("No auth token found");
-                    return;
-               }
+    const formDataToSend = new FormData();
+    formDataToSend.append("name", formData.name);
+    formDataToSend.append("bio", formData.bio || "");
+    formDataToSend.append("timeZone", formData.timeZone || "");
 
-               const response = await fetch("http://localhost:4000/api/profile", {
-                    method: "POST",
-                    headers: {
-                         "Content-Type": "application/json",
-                         Authorization: `Bearer ${token}`, // ✅ Must be exactly like this
-                    },
-                    body: JSON.stringify({
-                         ...formData,
-                    }),
-               });
+    if (avatarFile) {
+      formDataToSend.append("avatar", avatarFile); // 👈 this is the actual file
+    }
 
-               if (response.ok) {
-                    router.push("/profile");
-                    console.log("Profile created successfully!");
-               } else {
-                    console.error("Failed to create profile");
-               }
-          } catch (error) {
-               console.error("Error creating profile:", error);
-          } finally {
-               setIsSubmitting(false);
-          }
-     };
+    formData.skillsOffered.forEach((skill) => {
+      formDataToSend.append("skillsOffered[]", skill);
+    });
+
+    formData.skillsNeeded.forEach((skill) => {
+      formDataToSend.append("skillsNeeded[]", skill);
+    });
+
+    const response = await fetch("http://localhost:4000/api/profile", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`, // ✅ DO NOT set Content-Type manually
+      },
+      body: formDataToSend,
+    });
+
+    if (response.ok) {
+      router.push("/");
+      console.log("Profile created successfully!");
+    } else {
+      const errData = await response.json();
+      console.error("Failed to create profile", errData);
+    }
+  } catch (error) {
+    console.error("Error creating profile:", error);
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
      useEffect(() => {
           const token = localStorage.getItem("token");
@@ -192,20 +219,26 @@ const ProfileCreatePage = () => {
                                    />
                               </div>
 
-                              {/* Avatar URL Field */}
+                              {/* Avatar Upload Field */}
                               <div>
-                                   <label htmlFor="avatarUrl" className="block text-sm font-medium text-gray-700 mb-2">
-                                        Avatar URL
+                                   <label htmlFor="avatarFile" className="block text-sm font-medium text-gray-700 mb-2">
+                                        Upload Avatar
                                    </label>
                                    <input
-                                        type="url"
-                                        id="avatarUrl"
-                                        name="avatarUrl"
-                                        value={formData.avatarUrl}
-                                        onChange={handleInputChange}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                                        placeholder="https://example.com/your-avatar.jpg"
+                                        type="file"
+                                        id="avatarFile"
+                                        name="avatar"
+                                        accept="image/*"
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                    />
+
+                                   {avatarPreview && (
+                                        <img
+                                             src={avatarPreview}
+                                             alt="Preview"
+                                             className="w-24 h-24 rounded-full mt-3 object-cover border border-gray-300"
+                                        />
+                                   )}
                               </div>
 
                               {/* Timezone Field */}

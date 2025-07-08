@@ -9,10 +9,11 @@ import Link from "next/link";
 
 export const Navbar = () => {
      const { user, loading } = useAuthUser();
+     console.log("user", user)
      console.log("user", user);
      const displayName = loading ? "Loading..." : user?.name || "Guest";
      const avatarLetter = user?.name?.charAt(0)?.toUpperCase() || "G";
-     const avatarUrl = user?.avatarUrl || "/default-avatar.png";
+     const avatarUrl = user?.avatarUrl || "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png";
      return (
           <nav className="bg-gray-900 text-white px-6 py-4 flex items-center justify-between">
                <div className="flex items-center space-x-8">

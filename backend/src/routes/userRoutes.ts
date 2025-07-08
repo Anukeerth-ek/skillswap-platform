@@ -8,9 +8,10 @@ const router = express.Router();
 router.get("/me", authenticateUser, getUserProfile);
 
 // ✅ FIXED: apply `authenticateUser` here too
-router.post("/", authenticateUser, createUserProfile);
+router.post("/", authenticateUser, upload.single("avatar"), createUserProfile);
 
-router.post("/", authenticateUser, upload.single("avatar"), updateUserProfile);
+
+// router.post("/", authenticateUser, upload.single("avatar"), updateUserProfile);
 
 router.put("/:id", authenticateUser, updateSessionStatus as unknown as express.RequestHandler);
 

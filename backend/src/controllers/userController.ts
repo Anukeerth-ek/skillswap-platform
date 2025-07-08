@@ -7,13 +7,16 @@ const statusSchema = z.object({
 });
 
 const profileSchema = z.object({
-     name: z.string().min(2),
-     bio: z.string().optional(),
-     avatarUrl: z.string().url().optional(),
-     timeZone: z.string().optional(),
-     skillsOffered: z.array(z.string()).optional(), // Skill IDs
-     skillsNeeded: z.array(z.string()).optional(), // Skill IDs
+  name: z.string().min(2),
+  bio: z.string().optional(),
+  avatarUrl: z.string().url().optional(),
+  timeZone: z.string().optional(),
+  skillsOffered: z.array(z.string()).optional(),
+  skillsNeeded: z.array(z.string()).optional(),
 });
+
+
+
 
 interface AuthenticatedRequest extends Request {
      user?: { id: string };
@@ -99,31 +102,32 @@ export const createUserProfile = async (req: AuthenticatedRequest, res: Response
       },
     });
 
-    const user = await prisma.user.update({
-      where: { id: userId },
-      data: {
-        name,
-        bio,
-        avatarUrl,
-        timeZone,
-        skillsOffered: {
-          connectOrCreate: skillsOffered?.map((name) => ({
-            where: { name },
-            create: { name },
-          })) || [],
-        },
-        skillsWanted: {
-          connectOrCreate: skillsNeeded?.map((name) => ({
-            where: { name },
-            create: { name },
-          })) || [],
-        },
-      },
-      include: {
-        skillsOffered: true,
-        skillsWanted: true,
-      },
-    });
+ const user = await prisma.user.update({
+  where: { id: userId },
+  data: {
+    name,
+    bio,
+    avatarUrl,
+    timeZone,
+    skillsOffered: {
+      connectOrCreate: (Array.isArray(skillsOffered) ? skillsOffered : [skillsOffered || ""]).filter(Boolean).map((name) => ({
+        where: { name },
+        create: { name },
+      })),
+    },
+    skillsWanted: {
+      connectOrCreate: (Array.isArray(skillsNeeded) ? skillsNeeded : [skillsNeeded || ""]).filter(Boolean).map((name) => ({
+        where: { name },
+        create: { name },
+      })),
+    },
+  },
+  include: {
+    skillsOffered: true,
+    skillsWanted: true,
+  },
+});
+
 
     console.log("we got it ", user);
     res.status(200).json({ user });

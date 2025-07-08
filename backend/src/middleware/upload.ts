@@ -1,12 +1,22 @@
-// middleware/upload.ts
 import multer from "multer";
+import fs from "fs";
 import path from "path";
 
+// ✅ This makes sure the path resolves correctly inside `src/uploads`
+const uploadDir = path.join(__dirname, "../../uploads");
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir);
+}
+
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, Date.now() + ext);
+  destination: function (req, file, cb) {
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now();
+    const extension = file.originalname.split(".").pop();
+    cb(null, `${uniqueSuffix}.${extension}`);
   },
 });
 
