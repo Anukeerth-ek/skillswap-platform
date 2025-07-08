@@ -8,6 +8,7 @@ import bookSessionRoutes from "./routes/bookSessionRoutes";
 import authRoutes from "./routes/authRoutes";
 import learnerRoutes from "./routes/learnerRoutes";
 import mentorRoutes from "./routes/mentorRoutes";
+import profileRoutes from "./routes/profile.routes"
 
 dotenv.config();
 
@@ -20,6 +21,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/skills", skillRoutes);
 app.use("/api/bookSession", bookSessionRoutes);
 app.use("/api/profile", userRoutes);
+app.use("/api/profiles", profileRoutes);
 app.use("/api/learnersBooking", learnerRoutes);
 app.use("/api/mentorBooking", mentorRoutes);
 
