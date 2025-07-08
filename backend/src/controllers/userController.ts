@@ -139,12 +139,10 @@ interface AuthenticatedRequest extends Request {
   userId?: string;
 }
 
-export const getUserProfile = async (req: AuthenticatedRequest, res: Response) => {
-  const userId = req.userId;
-
+export const getUserProfile = async (req: Request & { userId?: string }, res: Response) => {
   try {
     const user = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: req.userId },
       include: {
         skillsOffered: true,
         skillsWanted: true,
@@ -152,13 +150,13 @@ export const getUserProfile = async (req: AuthenticatedRequest, res: Response) =
     });
 
     if (!user) {
-         res.status(404).json({ message: "User not found" });
-      return 
+      res.status(404).json({ message: "User not found" });
+      return;
     }
 
     res.status(200).json({ user });
   } catch (error) {
-    console.error("Error fetching user profile:", error);
-    res.status(500).json({ message: "Server error" });
+    console.error("Error fetching profile:", error);
+    res.status(500).json({ message: "Error fetching profile" });
   }
 };
