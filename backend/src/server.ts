@@ -24,6 +24,7 @@ app.use("/api/profile", userRoutes);
 app.use("/api/profiles", profileRoutes);
 app.use("/api/learnersBooking", learnerRoutes);
 app.use("/api/mentorBooking", mentorRoutes);
+// app.use("/api/profile", profileRoutes);
 
 const PORT = process.env.PORT || 4500;
 
