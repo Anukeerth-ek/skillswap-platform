@@ -44,6 +44,8 @@ const ProfileCreatePage = () => {
      const [isSubmitting, setIsSubmitting] = useState(false);
      const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
      const [profile, setProfile] = useState<Profile | null>(null);
+     const [isEdit, setIsEdit] = useState(false);
+
      useEffect(() => {
           const avatarInput = document.getElementById("avatarFile") as HTMLInputElement;
           avatarInput?.addEventListener("change", () => {
@@ -156,11 +158,14 @@ const ProfileCreatePage = () => {
                formData.skillsWanted.forEach((skill) => {
                     formDataToSend.append("skillsWanted[]", skill);
                });
+               const url = isEdit
+                    ? "http://localhost:4000/api/profile/update" // PUT for update
+                    : "http://localhost:4000/api/profile"; // POST for create
 
-               const response = await fetch("http://localhost:4000/api/profile", {
-                    method: "POST",
+               const response = await fetch(url, {
+                    method: isEdit ? "PUT" : "POST",
                     headers: {
-                         Authorization: `Bearer ${token}`, // ✅ DO NOT set Content-Type manually
+                         Authorization: `Bearer ${token}`,
                     },
                     body: formDataToSend,
                });
@@ -188,7 +193,6 @@ const ProfileCreatePage = () => {
      useEffect(() => {
           const fetchProfile = async () => {
                const token = localStorage.getItem("token");
-
                const res = await fetch("http://localhost:4000/api/profile/me", {
                     method: "GET",
                     headers: {
@@ -197,15 +201,26 @@ const ProfileCreatePage = () => {
                });
 
                const data = await res.json();
-               if (res.ok) {
-                    setProfile(data.user); // or whatever your state is
-               } else {
-                    console.error("Error fetching profile:", data.message);
+               if (res.ok && data.user) {
+                    setProfile(data.user);
+                    setIsEdit(true); // ✅ important
+                    setFormData({
+                         name: data.user.name || "",
+                         bio: data.user.bio || "",
+                         avatarUrl: data.user.avatarUrl || "",
+                         timeZone: data.user.timeZone || "",
+                         skillsOffered: data.user.skillsOffered?.map((s: any) => s.name) || [],
+                         skillsWanted: data.user.skillsWanted?.map((s: any) => s.name) || [],
+                    });
+                    if (data.user.avatarUrl) {
+                         setAvatarPreview(data.user.avatarUrl);
+                    }
                }
           };
 
           fetchProfile();
      }, []);
+
      console.log("helo anu", profile);
 
      console.log("backy", profile?.skillsWanted);
