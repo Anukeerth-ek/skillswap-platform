@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import prisma from "../prismaClient";
-
+import jwt from "jsonwebtoken";
 export const updateUserProfile = async (req: Request & { userId?: string }, res: Response) => {
      const { bio, avatarUrl, timeZone, skillsOffered, skillsWanted } = req.body;
 
@@ -55,30 +55,34 @@ async function getOrCreateSkill(name: string) {
 }
 
 
-export const getAllProfiles = async (req: Request, res: Response): Promise<void> => {
+export const getAllProfiles = async (req: Request, res: Response) => {
   try {
+    const authHeader = req.headers.authorization;
+    const token = authHeader?.split(" ")[1];
+
+    if (!token) {
+         res.status(401).json({ message: "Unauthorized" });
+         return 
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: string };
+
     const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        name: true,
-        avatarUrl: true,
-        bio: true,
-        timeZone: true,
-        skillsOffered: {
-          select: { name: true },
-        },
-        skillsWanted: {
-          select: { name: true },
+      where: {
+        id: {
+          not: decoded.userId, // Exclude current user
         },
       },
-      orderBy: {
-        createdAt: "desc",
+      include: {
+        skillsOffered: true,
       },
     });
 
-    res.status(200).json(users);
+    res.json({ users });
+    return 
   } catch (error) {
-    console.error("Error fetching profiles:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.error("Error fetching users:", error);
+    res.status(500).json({ message: "Server error" });
+    return 
   }
 };
