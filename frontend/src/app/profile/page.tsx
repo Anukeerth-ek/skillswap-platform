@@ -7,29 +7,43 @@ import { useRouter } from "next/navigation";
 const ProfileCreatePage = () => {
      const router = useRouter();
 
-     type ProfileFormData = {
+     type ProfileData = {
           name: string;
           bio: string;
           avatarUrl: string;
           timeZone: string;
           skillsOffered: string[];
-          skillsNeeded: string[];
+          skillsWanted: string[];
+     };
+     type Skill = {
+          id: string;
+          name: string;
+          category: string | null;
      };
 
-     const [formData, setFormData] = useState<ProfileFormData>({
+     type Profile = {
+          name: string;
+          bio: string;
+          avatarUrl: string;
+          timeZone: string;
+          skillsOffered: Skill[];
+          skillsWanted: Skill[];
+     };
+
+     const [formData, setFormData] = useState<ProfileData>({
           name: "",
           bio: "",
           avatarUrl: "",
           timeZone: "",
           skillsOffered: [],
-          skillsNeeded: [],
+          skillsWanted: [],
      });
 
      const [newSkillOffered, setNewSkillOffered] = useState("");
      const [newSkillNeeded, setNewSkillNeeded] = useState("");
      const [isSubmitting, setIsSubmitting] = useState(false);
      const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-
+     const [profile, setProfile] = useState<Profile | null>(null);
      useEffect(() => {
           const avatarInput = document.getElementById("avatarFile") as HTMLInputElement;
           avatarInput?.addEventListener("change", () => {
@@ -86,10 +100,10 @@ const ProfileCreatePage = () => {
      };
 
      const addSkillNeeded = () => {
-          if (newSkillNeeded.trim() && !formData.skillsNeeded.includes(newSkillNeeded.trim())) {
+          if (newSkillNeeded.trim() && !formData.skillsWanted.includes(newSkillNeeded.trim())) {
                setFormData((prev) => ({
                     ...prev,
-                    skillsNeeded: [...prev.skillsNeeded, newSkillNeeded.trim()],
+                    skillsWanted: [...prev.skillsWanted, newSkillNeeded.trim()],
                }));
                setNewSkillNeeded("");
           }
@@ -102,7 +116,7 @@ const ProfileCreatePage = () => {
      const removeSkillNeeded: RemoveSkillNeededFn = (skillToRemove) => {
           setFormData((prev) => ({
                ...prev,
-               skillsNeeded: prev.skillsNeeded.filter((skill) => skill !== skillToRemove),
+               skillsWanted: prev.skillsWanted.filter((skill) => skill !== skillToRemove),
           }));
      };
 
@@ -139,8 +153,8 @@ const ProfileCreatePage = () => {
                     formDataToSend.append("skillsOffered[]", skill);
                });
 
-               formData.skillsNeeded.forEach((skill) => {
-                    formDataToSend.append("skillsNeeded[]", skill);
+               formData.skillsWanted.forEach((skill) => {
+                    formDataToSend.append("skillsWanted[]", skill);
                });
 
                const response = await fetch("http://localhost:4000/api/profile", {
@@ -171,7 +185,30 @@ const ProfileCreatePage = () => {
                router.push("/"); // or redirect to /login
           }
      }, []);
+     useEffect(() => {
+          const fetchProfile = async () => {
+               const token = localStorage.getItem("token");
 
+               const res = await fetch("http://localhost:4000/api/profile/me", {
+                    method: "GET",
+                    headers: {
+                         Authorization: `Bearer ${token}`,
+                    },
+               });
+
+               const data = await res.json();
+               if (res.ok) {
+                    setProfile(data.user); // or whatever your state is
+               } else {
+                    console.error("Error fetching profile:", data.message);
+               }
+          };
+
+          fetchProfile();
+     }, []);
+     console.log("helo anu", profile);
+
+     console.log("backy", profile?.skillsWanted);
      return (
           <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
                <div className="max-w-2xl mx-auto">
@@ -194,7 +231,7 @@ const ProfileCreatePage = () => {
                                         type="text"
                                         id="name"
                                         name="name"
-                                        value={formData.name}
+                                        value={profile?.name || formData.name}
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
@@ -210,7 +247,7 @@ const ProfileCreatePage = () => {
                                    <textarea
                                         id="bio"
                                         name="bio"
-                                        value={formData.bio}
+                                        value={profile?.bio || formData.bio}
                                         onChange={handleInputChange}
                                         rows={4}
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
@@ -249,7 +286,7 @@ const ProfileCreatePage = () => {
                                    <select
                                         id="timeZone"
                                         name="timeZone"
-                                        value={formData.timeZone}
+                                        value={profile?.timeZone || formData.timeZone}
                                         onChange={handleInputChange}
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                    >
@@ -271,7 +308,7 @@ const ProfileCreatePage = () => {
                                    <div className="flex gap-2 mb-3">
                                         <input
                                              type="text"
-                                             value={newSkillOffered}
+                                             value={profile?.skillsOffered?.map((skill) => skill.name) || newSkillOffered}
                                              onChange={(e) => setNewSkillOffered(e.target.value)}
                                              onKeyPress={(e) =>
                                                   e.key === "Enter" && (e.preventDefault(), addSkillOffered())
@@ -289,21 +326,40 @@ const ProfileCreatePage = () => {
                                         </button>
                                    </div>
                                    <div className="flex flex-wrap gap-2">
-                                        {formData.skillsOffered.map((skill, index) => (
-                                             <span
-                                                  key={index}
-                                                  className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                                             >
-                                                  {skill}
-                                                  <button
-                                                       type="button"
-                                                       onClick={() => removeSkillOffered(skill)}
-                                                       className="text-blue-600 hover:text-blue-800"
-                                                  >
-                                                       <X className="w-3 h-3" />
-                                                  </button>
-                                             </span>
-                                        ))}
+                                        {profile?.skillsOffered
+                                             ? profile.skillsOffered.map((skill: any, index) => {
+                                                    console.log("check", skill.name);
+                                                    return (
+                                                         <span
+                                                              key={index}
+                                                              className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                                                         >
+                                                              {skill?.name}
+                                                              <button
+                                                                   type="button"
+                                                                   onClick={() => removeSkillOffered(skill)}
+                                                                   className="text-blue-600 hover:text-blue-800"
+                                                              >
+                                                                   <X className="w-3 h-3" />
+                                                              </button>
+                                                         </span>
+                                                    );
+                                               })
+                                             : formData.skillsOffered.map((skill, index) => (
+                                                    <span
+                                                         key={index}
+                                                         className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                                                    >
+                                                         {skill}
+                                                         <button
+                                                              type="button"
+                                                              onClick={() => removeSkillOffered(skill)}
+                                                              className="text-blue-600 hover:text-blue-800"
+                                                         >
+                                                              <X className="w-3 h-3" />
+                                                         </button>
+                                                    </span>
+                                               ))}
                                    </div>
                               </div>
 
@@ -316,7 +372,7 @@ const ProfileCreatePage = () => {
                                    <div className="flex gap-2 mb-3">
                                         <input
                                              type="text"
-                                             value={newSkillNeeded}
+                                             value={profile?.skillsWanted?.map((skill) => skill.name) || newSkillNeeded}
                                              onChange={(e) => setNewSkillNeeded(e.target.value)}
                                              onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addSkillNeeded())}
                                              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
@@ -332,21 +388,37 @@ const ProfileCreatePage = () => {
                                         </button>
                                    </div>
                                    <div className="flex flex-wrap gap-2">
-                                        {formData.skillsNeeded.map((skill, index) => (
-                                             <span
-                                                  key={index}
-                                                  className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
-                                             >
-                                                  {skill}
-                                                  <button
-                                                       type="button"
-                                                       onClick={() => removeSkillNeeded(skill)}
-                                                       className="text-green-600 hover:text-green-800"
-                                                  >
-                                                       <X className="w-3 h-3" />
-                                                  </button>
-                                             </span>
-                                        ))}
+                                        {profile?.skillsWanted
+                                             ? profile.skillsWanted.map((neededSkill: any, index) => (
+                                                    <span
+                                                         key={index}
+                                                         className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
+                                                    >
+                                                         {neededSkill.name}
+                                                         <button
+                                                              type="button"
+                                                              onClick={() => removeSkillNeeded(neededSkill.name)}
+                                                              className="text-green-600 hover:text-green-800"
+                                                         >
+                                                              <X className="w-3 h-3" />
+                                                         </button>
+                                                    </span>
+                                               ))
+                                             : formData.skillsWanted.map((skill, index) => (
+                                                    <span
+                                                         key={index}
+                                                         className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
+                                                    >
+                                                         {skill}
+                                                         <button
+                                                              type="button"
+                                                              onClick={() => removeSkillNeeded(skill)}
+                                                              className="text-green-600 hover:text-green-800"
+                                                         >
+                                                              <X className="w-3 h-3" />
+                                                         </button>
+                                                    </span>
+                                               ))}
                                    </div>
                               </div>
 

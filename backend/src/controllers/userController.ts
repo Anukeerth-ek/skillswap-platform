@@ -12,7 +12,7 @@ const profileSchema = z.object({
   avatarUrl: z.string().url().optional(),
   timeZone: z.string().optional(),
   skillsOffered: z.array(z.string()).optional(),
-  skillsNeeded: z.array(z.string()).optional(),
+  skillsWanted: z.array(z.string()).optional(),
 });
 
 
@@ -68,76 +68,74 @@ export const createUserProfile = async (req: AuthenticatedRequest, res: Response
   console.log("Decoded user ID:", req.userId);
 
   const userId = req.userId;
-
   if (!userId) {
     res.status(401).json({ message: "Unauthorized" });
     return;
   }
 
-  const parsed = profileSchema.safeParse(req.body);
-  if (!parsed.success) {
-    res.status(400).json({
-      message: "Invalid profile data",
-      errors: parsed.error.format(),
-    });
-    return;
-  }
-
-  const { name, bio, avatarUrl, timeZone, skillsOffered, skillsNeeded } = parsed.data;
-
   try {
-    const existingUser = await prisma.user.findUnique({ where: { id: userId } });
+    const {
+      name,
+      bio,
+      timeZone,
+    } = req.body;
 
-    if (!existingUser) {
-      res.status(404).json({ message: "User not found" });
-      return;
-    }
+    const avatarUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
 
-    // Disconnect existing skills to avoid duplication
+    const skillsOffered = req.body["skillsOffered[]"]
+      ? Array.isArray(req.body["skillsOffered[]"])
+        ? req.body["skillsOffered[]"]
+        : [req.body["skillsOffered[]"]]
+      : [];
+
+    const skillsWanted = req.body["skillsWanted[]"]
+      ? Array.isArray(req.body["skillsWanted[]"])
+        ? req.body["skillsWanted[]"]
+        : [req.body["skillsWanted[]"]]
+      : [];
+
+    // Disconnect existing skills
     await prisma.user.update({
       where: { id: userId },
       data: {
         skillsOffered: { set: [] },
-        skillsWanted: { set: [] }, // optional: clear skillsNeeded if applicable
+        skillsWanted: { set: [] },
       },
     });
 
- const user = await prisma.user.update({
-  where: { id: userId },
-  data: {
-    name,
-    bio,
-    avatarUrl,
-    timeZone,
-    skillsOffered: {
-      connectOrCreate: (Array.isArray(skillsOffered) ? skillsOffered : [skillsOffered || ""]).filter(Boolean).map((name) => ({
-        where: { name },
-        create: { name },
-      })),
-    },
-    skillsWanted: {
-      connectOrCreate: (Array.isArray(skillsNeeded) ? skillsNeeded : [skillsNeeded || ""]).filter(Boolean).map((name) => ({
-        where: { name },
-        create: { name },
-      })),
-    },
-  },
-  include: {
-    skillsOffered: true,
-    skillsWanted: true,
-  },
-});
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        name,
+        bio,
+        avatarUrl,
+        timeZone,
+        skillsOffered: {
+          connectOrCreate: skillsOffered.map((name: string) => ({
+            where: { name },
+            create: { name },
+          })),
+        },
+        skillsWanted: {
+          connectOrCreate: skillsWanted.map((name: string) => ({
+            where: { name },
+            create: { name },
+          })),
+        },
+      },
+      include: {
+        skillsOffered: true,
+        skillsWanted: true,
+      },
+    });
 
-
-    console.log("we got it ", user);
-    res.status(200).json({ user });
-    return;
+    res.status(200).json({ user: updatedUser });
   } catch (error) {
-    console.error("Error creating/updating profile:", error);
+    console.error("Error creating profile:", error);
     res.status(500).json({ message: "Server error" });
-    return;
   }
 };
+
 
 interface AuthenticatedRequest extends Request {
   userId?: string;

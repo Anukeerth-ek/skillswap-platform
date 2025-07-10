@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import prisma from "../prismaClient";
 
 export const updateUserProfile = async (req: Request & { userId?: string }, res: Response) => {
-     const { bio, avatarUrl, timeZone, skillsOffered, skillsNeeded } = req.body;
+     const { bio, avatarUrl, timeZone, skillsOffered, skillsWanted } = req.body;
 
      if (!req.userId) {
           res.status(401).json({ message: "Unauthorized" });
@@ -14,7 +14,7 @@ export const updateUserProfile = async (req: Request & { userId?: string }, res:
           const offeredSkillRecords = await Promise.all(skillsOffered.map((name: string) => getOrCreateSkill(name)));
 
           // 2. Upsert needed skills
-          const wantedSkillRecords = await Promise.all(skillsNeeded.map((name: string) => getOrCreateSkill(name)));
+          const wantedSkillRecords = await Promise.all(skillsWanted.map((name: string) => getOrCreateSkill(name)));
 
           // 3. Update User profile and connect skills
           const updatedUser = await prisma.user.update({

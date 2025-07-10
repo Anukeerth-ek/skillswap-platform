@@ -103,7 +103,9 @@ export default function page() {
                     });
 
                     const data = await res.json();
-
+                    if(res.ok) {
+                         console.log("logged in succesfully")
+                    }
                     if (!res.ok) {
                          setErrors({ general: data.message || "Login failed" });
                          setIsLoading(false);
@@ -113,7 +115,8 @@ export default function page() {
                     localStorage.setItem("token", data.token);
 
                     // 🔍 Check if user has a profile
-                    const profileRes = await fetch("http://localhost:4000/api/profile", {
+                    const profileRes = await fetch("http://localhost:4000/api/profiles/me", {
+
                          method: "GET",
                          headers: {
                               Authorization: `Bearer ${data.token}`,
@@ -177,7 +180,7 @@ export default function page() {
                <Card className="w-full max-w-md">
                     <CardHeader className="space-y-1">
                          <CardTitle className="text-2xl font-bold text-center">
-                              {isLogin ? "Sign in to your account" : "Create your account"}
+                              {isLogin ? "Log in to your account" : "Create your account"}
                          </CardTitle>
                          <CardDescription className="text-center">
                               {isLogin
