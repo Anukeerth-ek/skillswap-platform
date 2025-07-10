@@ -15,6 +15,6 @@ router.put("/update", authenticateUser, upload.single("avatar"), updateUserProfi
 
 router.put("/:id", authenticateUser, updateSessionStatus as unknown as express.RequestHandler);
 
-// router.get("/all",getAllProfiles);
+router.get("/all",getAllProfiles);
 
 export default router;
