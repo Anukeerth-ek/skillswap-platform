@@ -112,59 +112,58 @@ const ProfileCreatePage = () => {
           ok: boolean;
           // Add more fields if your API returns them
      }
-    const handleSubmit = async (e: HandleSubmitEvent): Promise<void> => {
-  e.preventDefault();
-  setIsSubmitting(true);
+     const handleSubmit = async (e: HandleSubmitEvent): Promise<void> => {
+          e.preventDefault();
+          setIsSubmitting(true);
 
-  try {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      console.error("No auth token found");
-      return;
-    }
+          try {
+               const token = localStorage.getItem("token");
+               if (!token) {
+                    console.error("No auth token found");
+                    return;
+               }
 
-    const avatarFileInput = document.getElementById("avatarFile") as HTMLInputElement;
-    const avatarFile = avatarFileInput?.files?.[0];
+               const avatarFileInput = document.getElementById("avatarFile") as HTMLInputElement;
+               const avatarFile = avatarFileInput?.files?.[0];
 
-    const formDataToSend = new FormData();
-    formDataToSend.append("name", formData.name);
-    formDataToSend.append("bio", formData.bio || "");
-    formDataToSend.append("timeZone", formData.timeZone || "");
+               const formDataToSend = new FormData();
+               formDataToSend.append("name", formData.name);
+               formDataToSend.append("bio", formData.bio || "");
+               formDataToSend.append("timeZone", formData.timeZone || "");
 
-    if (avatarFile) {
-      formDataToSend.append("avatar", avatarFile); // 👈 this is the actual file
-    }
+               if (avatarFile) {
+                    formDataToSend.append("avatar", avatarFile); // 👈 this is the actual file
+               }
 
-    formData.skillsOffered.forEach((skill) => {
-      formDataToSend.append("skillsOffered[]", skill);
-    });
+               formData.skillsOffered.forEach((skill) => {
+                    formDataToSend.append("skillsOffered[]", skill);
+               });
 
-    formData.skillsNeeded.forEach((skill) => {
-      formDataToSend.append("skillsNeeded[]", skill);
-    });
+               formData.skillsNeeded.forEach((skill) => {
+                    formDataToSend.append("skillsNeeded[]", skill);
+               });
 
-    const response = await fetch("http://localhost:4000/api/profile", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`, // ✅ DO NOT set Content-Type manually
-      },
-      body: formDataToSend,
-    });
+               const response = await fetch("http://localhost:4000/api/profile", {
+                    method: "POST",
+                    headers: {
+                         Authorization: `Bearer ${token}`, // ✅ DO NOT set Content-Type manually
+                    },
+                    body: formDataToSend,
+               });
 
-    if (response.ok) {
-      router.push("/");
-      console.log("Profile created successfully!");
-    } else {
-      const errData = await response.json();
-      console.error("Failed to create profile", errData);
-    }
-  } catch (error) {
-    console.error("Error creating profile:", error);
-  } finally {
-    setIsSubmitting(false);
-  }
-};
-
+               if (response.ok) {
+                    router.push("/");
+                    console.log("Profile created successfully!");
+               } else {
+                    const errData = await response.json();
+                    console.error("Failed to create profile", errData);
+               }
+          } catch (error) {
+               console.error("Error creating profile:", error);
+          } finally {
+               setIsSubmitting(false);
+          }
+     };
 
      useEffect(() => {
           const token = localStorage.getItem("token");

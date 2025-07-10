@@ -82,70 +82,84 @@ export default function page() {
           }
      };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+     const handleSubmit = async (e: React.FormEvent) => {
+          e.preventDefault();
 
-  if (!validateForm()) return;
+          if (!validateForm()) return;
 
-  setIsLoading(true);
-  setErrors({});
+          setIsLoading(true);
+          setErrors({});
 
-  try {
-    if (isLogin) {
-      // LOGIN LOGIC
-      const res = await fetch("http://localhost:4000/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-        }),
-      });
+          try {
+               if (isLogin) {
+                    // LOGIN LOGIC
+                    const res = await fetch("http://localhost:4000/api/auth/login", {
+                         method: "POST",
+                         headers: { "Content-Type": "application/json" },
+                         body: JSON.stringify({
+                              email: formData.email,
+                              password: formData.password,
+                         }),
+                    });
 
-      const data = await res.json();
+                    const data = await res.json();
 
-      if (!res.ok) {
-        setErrors({ general: data.message || "Login failed" });
-        setIsLoading(false);
-        return;
-      }
+                    if (!res.ok) {
+                         setErrors({ general: data.message || "Login failed" });
+                         setIsLoading(false);
+                         return;
+                    }
 
-      localStorage.setItem("token", data.token);
+                    localStorage.setItem("token", data.token);
 
-      // OPTIONAL: You can move profile creation here if needed
-      router.push("/profile");
+                    // 🔍 Check if user has a profile
+                    const profileRes = await fetch("http://localhost:4000/api/profile", {
+                         method: "GET",
+                         headers: {
+                              Authorization: `Bearer ${data.token}`,
+                         },
+                    });
 
-    } else {
-      // ✅ SIGNUP LOGIC
-      const res = await fetch("http://localhost:4000/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          name: formData.name,
-        }),
-      });
+                    if (profileRes.ok) {
+                         // 🎉 Profile exists
+                         router.push("/");
+                    } else if (profileRes.status === 404) {
+                         // 🆕 No profile found
+                         router.push("/profile");
+                    } else {
+                         console.error("Error checking profile");
+                         setErrors({ general: "Something went wrong. Please try again." });
+                    }
+               } else {
+                    // ✅ SIGNUP LOGIC
+                    const res = await fetch("http://localhost:4000/api/auth/signup", {
+                         method: "POST",
+                         headers: { "Content-Type": "application/json" },
+                         body: JSON.stringify({
+                              email: formData.email,
+                              password: formData.password,
+                              name: formData.name,
+                         }),
+                    });
 
-      const data = await res.json();
+                    const data = await res.json();
 
-      if (!res.ok) {
-        setErrors({ general: data.message || "Signup failed" });
-        setIsLoading(false);
-        return;
-      }
+                    if (!res.ok) {
+                         setErrors({ general: data.message || "Signup failed" });
+                         setIsLoading(false);
+                         return;
+                    }
 
-      alert("Signup successful! Please log in.");
-      setIsLogin(true); // Switch to login mode
-    }
-
-  } catch (error) {
-    setErrors({ general: "An error occurred. Please try again." });
-  } finally {
-    setIsLoading(false);
-  }
-};
-
+                    alert("Signup successful! Please log in.");
+                    setIsLogin(true); // Switch to login mode
+               }
+          } catch (error) {
+               console.error("Login/signup error:", error);
+               setErrors({ general: "An error occurred. Please try again." });
+          } finally {
+               setIsLoading(false);
+          }
+     };
 
      const toggleMode = () => {
           setIsLogin(!isLogin);
