@@ -232,7 +232,7 @@ const ProfileCreatePage = () => {
                               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
                                    <User className="w-8 h-8 text-white" />
                               </div>
-                              <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Your Profile</h1>
+                              <h1 className="text-3xl font-bold text-gray-900 mb-2"> {isEdit ? "Edit Your Profile" : "Create Your Profile"}</h1>
                               <p className="text-gray-600">Share your skills and discover new ones in our community</p>
                          </div>
 
@@ -246,7 +246,7 @@ const ProfileCreatePage = () => {
                                         type="text"
                                         id="name"
                                         name="name"
-                                        value={profile?.name || formData.name}
+                                        value={formData.name}
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
@@ -262,7 +262,7 @@ const ProfileCreatePage = () => {
                                    <textarea
                                         id="bio"
                                         name="bio"
-                                        value={profile?.bio || formData.bio}
+                                        value={formData.bio}
                                         onChange={handleInputChange}
                                         rows={4}
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"
@@ -301,7 +301,7 @@ const ProfileCreatePage = () => {
                                    <select
                                         id="timeZone"
                                         name="timeZone"
-                                        value={profile?.timeZone || formData.timeZone}
+                                        value={formData.timeZone}
                                         onChange={handleInputChange}
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                    >
@@ -320,14 +320,13 @@ const ProfileCreatePage = () => {
                                         <Lightbulb className="inline w-4 h-4 mr-1" />
                                         Skills You Can Offer
                                    </label>
+
                                    <div className="flex gap-2 mb-3">
                                         <input
                                              type="text"
-                                             value={profile?.skillsOffered?.map((skill) => skill.name) || newSkillOffered}
+                                             value={newSkillOffered}
                                              onChange={(e) => setNewSkillOffered(e.target.value)}
-                                             onKeyPress={(e) =>
-                                                  e.key === "Enter" && (e.preventDefault(), addSkillOffered())
-                                             }
+                                             onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkillOffered())}
                                              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                              placeholder="e.g., JavaScript, Cooking, Photography"
                                         />
@@ -340,41 +339,23 @@ const ProfileCreatePage = () => {
                                              Add
                                         </button>
                                    </div>
+
                                    <div className="flex flex-wrap gap-2">
-                                        {profile?.skillsOffered
-                                             ? profile.skillsOffered.map((skill: any, index) => {
-                                                    console.log("check", skill.name);
-                                                    return (
-                                                         <span
-                                                              key={index}
-                                                              className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                                                         >
-                                                              {skill?.name}
-                                                              <button
-                                                                   type="button"
-                                                                   onClick={() => removeSkillOffered(skill)}
-                                                                   className="text-blue-600 hover:text-blue-800"
-                                                              >
-                                                                   <X className="w-3 h-3" />
-                                                              </button>
-                                                         </span>
-                                                    );
-                                               })
-                                             : formData.skillsOffered.map((skill, index) => (
-                                                    <span
-                                                         key={index}
-                                                         className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
-                                                    >
-                                                         {skill}
-                                                         <button
-                                                              type="button"
-                                                              onClick={() => removeSkillOffered(skill)}
-                                                              className="text-blue-600 hover:text-blue-800"
-                                                         >
-                                                              <X className="w-3 h-3" />
-                                                         </button>
-                                                    </span>
-                                               ))}
+                                        {formData.skillsOffered.map((skill, index) => (
+                                             <span
+                                                  key={index}
+                                                  className="inline-flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm"
+                                             >
+                                                  {skill}
+                                                  <button
+                                                       type="button"
+                                                       onClick={() => removeSkillOffered(skill)}
+                                                       className="text-blue-600 hover:text-blue-800"
+                                                  >
+                                                       <X className="w-3 h-3" />
+                                                  </button>
+                                             </span>
+                                        ))}
                                    </div>
                               </div>
 
@@ -384,12 +365,13 @@ const ProfileCreatePage = () => {
                                         <Book className="inline w-4 h-4 mr-1" />
                                         Skills You Want to Learn
                                    </label>
+
                                    <div className="flex gap-2 mb-3">
                                         <input
                                              type="text"
-                                             value={profile?.skillsWanted?.map((skill) => skill.name) || newSkillNeeded}
+                                             value={newSkillNeeded}
                                              onChange={(e) => setNewSkillNeeded(e.target.value)}
-                                             onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addSkillNeeded())}
+                                             onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkillNeeded())}
                                              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                              placeholder="e.g., Python, Guitar, Public Speaking"
                                         />
@@ -402,38 +384,23 @@ const ProfileCreatePage = () => {
                                              Add
                                         </button>
                                    </div>
+
                                    <div className="flex flex-wrap gap-2">
-                                        {profile?.skillsWanted
-                                             ? profile.skillsWanted.map((neededSkill: any, index) => (
-                                                    <span
-                                                         key={index}
-                                                         className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
-                                                    >
-                                                         {neededSkill.name}
-                                                         <button
-                                                              type="button"
-                                                              onClick={() => removeSkillNeeded(neededSkill.name)}
-                                                              className="text-green-600 hover:text-green-800"
-                                                         >
-                                                              <X className="w-3 h-3" />
-                                                         </button>
-                                                    </span>
-                                               ))
-                                             : formData.skillsWanted.map((skill, index) => (
-                                                    <span
-                                                         key={index}
-                                                         className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
-                                                    >
-                                                         {skill}
-                                                         <button
-                                                              type="button"
-                                                              onClick={() => removeSkillNeeded(skill)}
-                                                              className="text-green-600 hover:text-green-800"
-                                                         >
-                                                              <X className="w-3 h-3" />
-                                                         </button>
-                                                    </span>
-                                               ))}
+                                        {formData.skillsWanted.map((skill, index) => (
+                                             <span
+                                                  key={index}
+                                                  className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm"
+                                             >
+                                                  {skill}
+                                                  <button
+                                                       type="button"
+                                                       onClick={() => removeSkillNeeded(skill)}
+                                                       className="text-green-600 hover:text-green-800"
+                                                  >
+                                                       <X className="w-3 h-3" />
+                                                  </button>
+                                             </span>
+                                        ))}
                                    </div>
                               </div>
 
@@ -446,7 +413,7 @@ const ProfileCreatePage = () => {
                                    {isSubmitting ? (
                                         <div className="flex items-center justify-center gap-2">
                                              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                             Creating Profile...
+                                            {isEdit ? "Updating Profile..." : "Creating Profile..."}
                                         </div>
                                    ) : (
                                         "Create Profile"
