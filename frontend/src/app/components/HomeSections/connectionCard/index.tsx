@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Heart, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -23,8 +23,13 @@ export const ConnectionCard: React.FC<TeacherCardProps> = ({
      skills,
      isBookmarked = false,
 }) => {
+     const [isBookmark, setIsBookmark] = useState(isBookmarked);
+
+     const toggleBookmark = () => {
+          setIsBookmark(!isBookmarked);
+     };
      return (
-          <div className="bg-[#1f172a] rounded-xl p-5 border border-[#2d203f] hover:border-purple-500 transition-colors">
+          <div className="bg-slate-800 rounded-xl p-5 border border-[#2d203f] hover:border-purple-500 transition-colors">
                <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-4">
                          <Avatar className="w-12 h-12">
@@ -37,7 +42,7 @@ export const ConnectionCard: React.FC<TeacherCardProps> = ({
                          </div>
                     </div>
                     <Button variant="ghost" size="icon" className="text-gray-400 hover:text-purple-400">
-                         <Heart className={`w-4 h-4 ${isBookmarked ? "fill-purple-500 text-purple-500" : ""}`} />
+                         <Heart className={`w-4 h-4 ${isBookmark ? "fill-purple-500 text-purple-500" : ""}`} />
                     </Button>
                </div>
 
@@ -47,10 +52,9 @@ export const ConnectionCard: React.FC<TeacherCardProps> = ({
                               key={index}
                               variant="secondary"
                               className={`rounded-full px-3 py-1 text-sm font-medium ${
-                                   skill === "Python"
-                                        ? "bg-purple-600 text-white hover:bg-purple-700"
-                                        : "bg-[#2d203f] text-gray-300 hover:bg-[#3a2b4e]"
+                                   skill === "Python" ? "bg-purple-600 text-white" : "text-gray-300"
                               }`}
+                              style={skill !== "Python" ? { backgroundColor: "#2d2338" } : {}}
                          >
                               {skill}
                          </Badge>

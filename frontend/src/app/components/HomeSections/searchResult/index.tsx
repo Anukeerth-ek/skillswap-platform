@@ -56,7 +56,7 @@ export const SearchResults = () => {
             role={user.role}
             avatar={user.avatarUrl || "/default-avatar.png"}
             hourRate={Math.floor(Math.random() * 20) + 15} // Random for now
-            experience={user.bio || "No experience mentioned"}
+            experience={ "5Years of Experience"}
             skills={user.skillsOffered.map((s) => s.name)}
           />
         )) : <p className="text-white text-center">No users found </p>}
