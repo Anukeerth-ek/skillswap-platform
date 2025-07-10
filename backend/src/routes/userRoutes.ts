@@ -10,7 +10,7 @@ router.get("/me", authenticateUser, getUserProfile);
 // ✅ FIXED: apply `authenticateUser` here too
 router.post("/", authenticateUser, upload.single("avatar"), createUserProfile);
 
-
+router.put("/update", authenticateUser, upload.single("avatar"), updateUserProfile);
 // router.post("/", authenticateUser, upload.single("avatar"), updateUserProfile);
 
 router.put("/:id", authenticateUser, updateSessionStatus as unknown as express.RequestHandler);
