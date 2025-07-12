@@ -17,7 +17,7 @@ export default function Home() {
           </div>
           <div className="flex flex-1">
             <SearchResults />
-            <ConnectionDetailSideBar />
+            {/* <ConnectionDetailSideBar /> */}
           </div>
         </div>
       </div>

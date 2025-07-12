@@ -12,6 +12,7 @@ interface TeacherCardProps {
      experience: string;
      skills: string[];
      isBookmarked?: boolean;
+     handleShowConnectionDetail?: () => void;
 }
 
 export const ConnectionCard: React.FC<TeacherCardProps> = ({
@@ -22,14 +23,15 @@ export const ConnectionCard: React.FC<TeacherCardProps> = ({
      experience,
      skills,
      isBookmarked = false,
+     handleShowConnectionDetail,
 }) => {
      const [isBookmark, setIsBookmark] = useState(isBookmarked);
 
      const toggleBookmark = () => {
-          setIsBookmark(!isBookmarked);
+          setIsBookmark(!isBookmark);
      };
      return (
-          <div className="bg-slate-800 rounded-xl p-5 border border-[#2d203f] hover:border-purple-500 transition-colors">
+          <div onClick={ handleShowConnectionDetail} className="bg-slate-800 cursor-pointer rounded-xl p-5 border border-[#2d203f] hover:border-purple-500 transition-colors">
                <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center space-x-4">
                          <Avatar className="w-12 h-12">
@@ -41,7 +43,12 @@ export const ConnectionCard: React.FC<TeacherCardProps> = ({
                               <p className="text-sm text-gray-400">{role}</p>
                          </div>
                     </div>
-                    <Button variant="ghost" size="icon" className="text-gray-400 hover:text-purple-400">
+                    <Button
+                         variant="ghost"
+                         size="icon"
+                         className="text-gray-400 cursor-pointer hover:text-purple-400"
+                         onClick={() => toggleBookmark()}
+                    >
                          <Heart className={`w-4 h-4 ${isBookmark ? "fill-purple-500 text-purple-500" : ""}`} />
                     </Button>
                </div>

@@ -3,8 +3,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Share2, Bookmark } from 'lucide-react';
+interface Props {
+  user: {
+    name: string;
+    role: string;
+    avatarUrl?: string;
+    bio?: string;
+    skillsOffered: { name: string }[];
+  };
+}
 
-export const ConnectionDetailSideBar = () => {
+export const ConnectionDetailSideBar = ({user}: Props) => {
   return (
     <div className="w-80 bg-gray-900 text-white p-6">
       <div className="flex items-center justify-between mb-6">
@@ -23,12 +32,22 @@ export const ConnectionDetailSideBar = () => {
           <AvatarImage src="/api/placeholder/80/80" />
           <AvatarFallback>JP</AvatarFallback>
         </Avatar>
-        <h2 className="text-xl font-semibold mb-1">John Peterson</h2>
+        <h2 className="text-xl font-semibold mb-1">{user?.name}</h2>
         <p className="text-gray-400 mb-4">Teacher</p>
         
-        <div className="flex flex-wrap gap-2 justify-center mb-4">
-          <Badge className="bg-purple-600 hover:bg-purple-700">Python</Badge>
-          <Badge variant="secondary" className="bg-gray-700 hover:bg-gray-600">C++</Badge>
+         <div className="flex flex-wrap gap-2 justify-center mb-4">
+          {user.skillsOffered.map((skill, idx) => (
+            <Badge
+              key={idx}
+              className={`${
+                skill.name === "Python"
+                  ? "bg-purple-600 hover:bg-purple-700"
+                  : "bg-gray-700 hover:bg-gray-600"
+              }`}
+            >
+              {skill.name}
+            </Badge>
+          ))}
         </div>
       </div>
       

@@ -2,6 +2,8 @@
 
 import React, { useEffect, useState } from "react";
 import { ConnectionCard } from "../connectionCard/index";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { ConnectionDetailSideBar } from "../connectionDetailPage";
 
 type User = {
   id: string;
@@ -15,18 +17,19 @@ type User = {
 export const SearchResults = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const token = localStorage.getItem("token"); // if auth protected
+        const token = localStorage.getItem("token");
         const res = await fetch("http://localhost:4000/api/profile/all", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         const data = await res.json();
-        console.log("anu",data)
         setUsers(data.users);
       } catch (error) {
         console.error("Failed to fetch users", error);
@@ -37,30 +40,50 @@ export const SearchResults = () => {
 
     fetchUsers();
   }, []);
-  // console.log("user", users)
+
+  const handleCardClick = (user: User) => {
+    setSelectedUser(user);
+    setIsSidebarOpen(true);
+  };
 
   return (
-    <div className="flex-1 p-6">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-semibold text-white">Search Results</h2>
-        <span className="text-gray-400">
-          {loading ? "Loading..." : `${users?.length} results found`}
-        </span>
+    <>
+      <div className="flex-1 p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-xl font-semibold text-white">Search Results</h2>
+          <span className="text-gray-400">
+            {loading ? "Loading..." : `${users.length} results found`}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {users.map((user) => (
+            <ConnectionCard
+              key={user.id}
+              name={user.name}
+              role={user.role}
+              avatar={user.avatarUrl || "/default-avatar.png"}
+              hourRate={Math.floor(Math.random() * 20) + 15}
+              experience={"5Years of Experience"}
+              skills={user.skillsOffered.map((s) => s.name)}
+              handleShowConnectionDetail={() => handleCardClick(user)}
+            />
+          ))}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {users && users.length > 1 ? users?.map((user) => (
-          <ConnectionCard
-            key={user.id}
-            name={user.name}
-            role={user.role}
-            avatar={user.avatarUrl || "/default-avatar.png"}
-            hourRate={Math.floor(Math.random() * 20) + 15} // Random for now
-            experience={ "5Years of Experience"}
-            skills={user.skillsOffered.map((s) => s.name)}
-          />
-        )) : <p className="text-white text-center">No users found </p>}
-      </div>
-    </div>
+      <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
+        <SheetContent side="right" className="w-[25rem] sm:w-[400px] bg-gray-900 text-white overflow-auto">
+          <SheetHeader>
+            <SheetTitle>User Details</SheetTitle>
+          </SheetHeader>
+          {selectedUser && (
+            <div className="mt-4">
+              <ConnectionDetailSideBar user={selectedUser} />
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
+    </>
   );
 };
