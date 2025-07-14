@@ -8,10 +8,24 @@ import { ConnectionDetailSideBar } from "../connectionDetailPage";
 type User = {
      id: string;
      name: string;
-     avatarUrl?: string;
-     role: string;
+     email: string;
      bio?: string;
-     skillsOffered: { name: string }[];
+     avatarUrl?: string;
+     role: "LEARNER" | "MENTOR" | string;
+     timeZone?: string;
+     createdAt: string;
+
+     skillsOffered: { id: string; name: string }[];
+     skillsWanted: { id: string; name: string }[];
+
+     sessionsAsMentor: { id: string }[];
+     sessionsAsLearner: { id: string }[];
+
+     sentConnections: { id: string }[];
+     receivedConnections: { id: string }[];
+
+     followers: { id: string; followerId: string }[];
+     following: { id: string; followingId: string }[];
 };
 
 export const SearchResults = () => {
@@ -55,23 +69,27 @@ export const SearchResults = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                         {users && users?.map((user) => (
-                              <ConnectionCard
-                                   key={user.id}
-                                   name={user.name}
-                                   role={user.role}
-                                   avatar={user.avatarUrl || "/default-avatar.png"}
-                                   hourRate={Math.floor(Math.random() * 20) + 15}
-                                   experience={"5Years of Experience"}
-                                   skills={user.skillsOffered.map((s) => s.name)}
-                                   handleShowConnectionDetail={() => handleCardClick(user)}
-                              />
-                         ))}
+                         {users &&
+                              users?.map((user) => (
+                                   <ConnectionCard
+                                        key={user.id}
+                                        name={user.name}
+                                        role={user.role}
+                                        avatar={user.avatarUrl || "/default-avatar.png"}
+                                        hourRate={Math.floor(Math.random() * 20) + 15}
+                                        experience={"5Years of Experience"}
+                                        skills={user.skillsOffered.map((s) => s.name)}
+                                        handleShowConnectionDetail={() => handleCardClick(user)}
+                                   />
+                              ))}
                     </div>
                </div>
 
                <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>
-                    <SheetContent side="right" className="w-[25rem] sm:w-[400px] bg-gray-900 text-white overflow-auto">
+                    <SheetContent
+                         side="right"
+                         className="border-l-0 w-[25rem] sm:w-[400px] bg-gray-900 text-white overflow-auto"
+                    >
                          <SheetHeader className="cursor-pointer">
                               <SheetTitle className="text-white">Connection Details</SheetTitle>
                          </SheetHeader>

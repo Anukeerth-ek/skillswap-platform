@@ -5,15 +5,31 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Share2, Bookmark } from "lucide-react";
 interface Props {
      user: {
-          name: string;
-          role: string;
-          avatarUrl?: string;
-          bio?: string;
-          skillsOffered: { name: string }[];
+ id: string;
+     name: string;
+     email: string;
+     bio?: string;
+     avatarUrl?: string;
+     role: "LEARNER" | "MENTOR" | string;
+     timeZone?: string;
+     createdAt: string;
+
+     skillsOffered: { id: string; name: string }[];
+     skillsWanted: { id: string; name: string }[];
+
+     sessionsAsMentor: { id: string }[];
+     sessionsAsLearner: { id: string }[];
+
+     sentConnections: { id: string }[];
+     receivedConnections: { id: string }[];
+
+     followers: { id: string; followerId: string }[];
+     following: { id: string; followingId: string }[];
      };
 }
 
 export const ConnectionDetailSideBar = ({ user }: Props) => {
+     console.log("user", user)
 
   const [isFollowing, setIsFollowing] = useState(false)
      return (
@@ -71,26 +87,21 @@ export const ConnectionDetailSideBar = ({ user }: Props) => {
                     </div>
                     <div className="flex justify-between">
                          <span className="text-gray-400">On this platform</span>
-                         <span className="text-white">14 October, 2023</span>
+                         <span className="text-white">{user?.createdAt ? new Date(user?.createdAt).toLocaleDateString():'Today'}</span>
                     </div>
                </div>
 
                <div className="mb-6">
                     <h3 className="font-medium mb-3">Teacher description</h3>
                     <p className="text-gray-400 text-sm leading-relaxed">
-                         With a rich tapestry of 15 years in education, I am a seasoned teacher deeply immersed in the world
-                         of programming, with Python as my language of choice.
-                    </p>
-                    <p className="text-gray-400 text-sm leading-relaxed mt-2">
-                         My journey is woven with a passion for imparting knowledge, fostering curiosity, and molding the
-                         next generation of tech enthusiasts.
+                     {user?.bio}
                     </p>
                </div>
 
-               <div className="mb-6">
+               {/* <div className="mb-6">
                     <h3 className="font-medium mb-2">Hour rate</h3>
                     <p className="text-gray-400">$24/h</p>
-               </div>
+               </div> */}
 
                <Button className="w-full bg-purple-600 cursor-pointer hover:bg-purple-700 text-white">
                     Add Connection
