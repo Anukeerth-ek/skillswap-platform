@@ -54,35 +54,34 @@ async function getOrCreateSkill(name: string) {
      });
 }
 
-
 export const getAllProfiles = async (req: Request, res: Response) => {
-  try {
-    const authHeader = req.headers.authorization;
-    const token = authHeader?.split(" ")[1];
+     try {
+          const authHeader = req.headers.authorization;
+          //     const token = authHeader?.split(" ")[1];
 
-    if (!token) {
-         res.status(401).json({ message: "Unauthorized" });
-         return 
-    }
+          //     if (!token) {
+          //          res.status(401).json({ message: "Unauthorized" });
+          //          return
+          //     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: string };
+          //     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: string };
 
-    const users = await prisma.user.findMany({
-      where: {
-        id: {
-          not: decoded.userId, // Exclude current user
-        },
-      },
-      include: {
-        skillsOffered: true,
-      },
-    });
+          const users = await prisma.user.findMany({
+               //  where: {
+               //    id: {
+               //      not: decoded.userId, // Exclude current user
+               //    },
+               //  },
+               include: {
+                    skillsOffered: true,
+               },
+          });
 
-    res.json({ users });
-    return 
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).json({ message: "Server error" });
-    return 
-  }
+          res.json({ users });
+          return;
+     } catch (error) {
+          console.error("Error fetching users:", error);
+          res.status(500).json({ message: "Server error" });
+          return;
+     }
 };

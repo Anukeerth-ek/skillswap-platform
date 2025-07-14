@@ -28,7 +28,7 @@ export const useAuthUser = () => {
           },
         });
 console.log("helo", res)
-        if (!res.ok) throw new Error("Unauthorized");
+        if (!res.ok) console.log("not authorized")
 
         const data = await res.json();
         setUser(data.user);
