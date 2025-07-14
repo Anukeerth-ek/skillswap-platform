@@ -45,7 +45,6 @@ export const updateUserProfile = async (req: Request & { userId?: string }, res:
      }
 };
 
-// helper
 async function getOrCreateSkill(name: string) {
      return await prisma.skill.upsert({
           where: { name },
@@ -56,32 +55,30 @@ async function getOrCreateSkill(name: string) {
 
 export const getAllProfiles = async (req: Request, res: Response) => {
      try {
+          let currentUserId: string | null = null;
+
           const authHeader = req.headers.authorization;
-          //     const token = authHeader?.split(" ")[1];
+          const token = authHeader?.split(" ")[1];
 
-          //     if (!token) {
-          //          res.status(401).json({ message: "Unauthorized" });
-          //          return
-          //     }
-
-          //     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: string };
+          if (token) {
+               try {
+                    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: string };
+                    currentUserId = decoded.userId;
+               } catch {
+                    console.log("We got error");
+               }
+          }
 
           const users = await prisma.user.findMany({
-               //  where: {
-               //    id: {
-               //      not: decoded.userId, // Exclude current user
-               //    },
-               //  },
+               where: currentUserId ? { id: { not: currentUserId } } : {},
                include: {
                     skillsOffered: true,
                },
           });
 
           res.json({ users });
-          return;
      } catch (error) {
           console.error("Error fetching users:", error);
           res.status(500).json({ message: "Server error" });
-          return;
      }
 };

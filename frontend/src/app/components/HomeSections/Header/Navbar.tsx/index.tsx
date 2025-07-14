@@ -32,32 +32,32 @@ export const Navbar = () => {
                     </div>
                </div>
                <div className="flex items-center space-x-6">
-                    <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white">
+                    <Button variant="ghost" size="sm" className="text-gray-300 hover:text-black cursor-pointer">
                          <Home className="w-4 h-4 mr-2" />
                          Home
                     </Button>
                     <Button
                          variant="ghost"
                          size="sm"
-                         className="text-purple-400 hover:text-white border-b-2 border-purple-400"
+                         className="text-purple-400 hover:text-purple-900 cursor-pointer border-b-2 border-purple-400"
                     >
                          <UserPlus className="w-4 h-4 mr-2" />
                          Find SkillMate
                     </Button>
-                    <Link href="/frontend/connecitons">
-                         <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white">
+                    <Link href="/frontend/connections">
+                         <Button variant="ghost" size="sm" className="text-gray-300 hover:text-black cursor-pointer =">
                               <Users className="w-4 h-4 mr-2" />
                               My Connections
                          </Button>
                     </Link>
                     <Link href="/frontend/sessions">
-                         <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white">
+                         <Button variant="ghost" size="sm" className="text-gray-300 hover:text-black cursor-pointer">
                               <BookOpen className="w-4 h-4 mr-2" />
                               Sessions
                          </Button>
                     </Link>
                     <Link href="/frontend/chat">
-                         <Button variant="ghost" size="sm" className="text-gray-300 hover:text-white">
+                         <Button variant="ghost" size="sm" className="text-gray-300 hover:text-black cursor-pointer">
                               <MessageCircle className="w-4 h-4 mr-2" />
                               Messages
                          </Button>
