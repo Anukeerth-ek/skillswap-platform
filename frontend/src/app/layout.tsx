@@ -3,8 +3,11 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "./components/HomeSections/Header/Navbar.tsx";
 import { Toaster } from "sonner";
-import useSocket from "../app/hooks/useSocket";
-import { useSession } from "next-auth/react";
+import { ClientProviders } from "./components/ClientProvider";
+import { SessionProvider } from "next-auth/react";
+import { SessionWrapper } from "./components/SessionWrapper";
+// import useSocket from "../app/hooks/useSocket";
+// import { useSession } from "next-auth/react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,17 +29,19 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-    const { data: session } = useSession();
-  const userId = session?.user?.id;
-    useSocket(userId);
+  //   const { data: session } = useSession();
+  // const userId = session?.user?.id;
+  //   useSocket(userId);
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar/>
-        {children}
-        <Toaster /> 
+           <SessionWrapper>
+          <Navbar />
+          {children}
+          <ClientProviders />
+        </SessionWrapper>
       </body>
     </html>
   );
