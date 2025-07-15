@@ -1,6 +1,8 @@
 import express = require("express");
 import dotenv = require("dotenv");
 import cors = require("cors"); 
+import http from "http";
+import { Server } from "socket.io";
 
 import skillRoutes from "./routes/skillRoutes";
 import userRoutes from "./routes/userRoutes";
@@ -26,8 +28,35 @@ app.use("/api/learnersBooking", learnerRoutes);
 app.use("/api/mentorBooking", mentorRoutes);
 app.use("/api/profile", profileRoutes);
 
+
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:3000", // adjust to your frontend URL
+    credentials: true,
+  },
+});
+
+const onlineUsers = new Map<string, string>();
+
+io.on("connection", (socket) => {
+  const userId = socket.handshake.query.userId as string;
+
+  if (userId) {
+    onlineUsers.set(userId, socket.id);
+    console.log(`🟢 ${userId} connected: ${socket.id}`);
+  }
+
+  socket.on("disconnect", () => {
+    if (userId) onlineUsers.delete(userId);
+    console.log(`🔴 ${userId} disconnected`);
+  });
+});
+
+// ✅ Export Socket.IO and user map so you can use them in controllers
+export { io, onlineUsers };
 const PORT = process.env.PORT || 4500;
 
-app.listen(PORT, () => {
-  console.log(`Server listening on port ${PORT}`);
+server.listen(PORT, () => {
+  console.log(`🚀 Server listening on port ${PORT}`);
 });
