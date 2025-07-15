@@ -2,8 +2,9 @@
 
 import { Request, Response } from "express";
 import prisma from "../lib/prisma";
-import { io, onlineUsers } from "../server";
-
+import { getIO, getOnlineUsers } from "../socket";
+const io = getIO();
+const onlineUsers = getOnlineUsers();
 export const sendConnectionRequest = async (req: Request, res: Response) => {
      const { senderId, receiverId } = req.body;
 

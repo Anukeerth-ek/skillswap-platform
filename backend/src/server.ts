@@ -3,7 +3,7 @@ import dotenv = require("dotenv");
 import cors = require("cors"); 
 import http from "http";
 import { Server } from "socket.io";
-
+import { initSocket } from "./socket";
 import skillRoutes from "./routes/skillRoutes";
 import userRoutes from "./routes/userRoutes";
 import bookSessionRoutes from "./routes/bookSessionRoutes";
@@ -12,7 +12,7 @@ import learnerRoutes from "./routes/learnerRoutes";
 import mentorRoutes from "./routes/mentorRoutes";
 import profileRoutes from "./routes/profile.routes"
 import connectionRoutes from "./routes/connectionRoutes"
-import followRoutes from "./routes/connectionRoutes"
+import followRoutes from "./routes/followRoutes"
 dotenv.config();
 
 const app = express();
@@ -35,6 +35,7 @@ app.use("/api/follow", followRoutes);
 
 
 const server = http.createServer(app);
+initSocket(server);
 const io = new Server(server, {
   cors: {
     origin: "http://localhost:3000", // adjust to your frontend URL
