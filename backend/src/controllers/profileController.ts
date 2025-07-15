@@ -73,6 +73,18 @@ export const getAllProfiles = async (req: Request, res: Response) => {
                where: currentUserId ? { id: { not: currentUserId } } : {},
                include: {
                     skillsOffered: true,
+                    receivedConnections: {
+                         select: {
+                              id: true,
+                              senderId: true,
+                         },
+                    },
+                    sentConnections: {
+                         select: {
+                              id: true,
+                              receiverId: true,
+                         },
+                    },
                },
           });
 
