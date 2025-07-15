@@ -8,7 +8,7 @@ import { ConnectionDetailSideBar } from '../app/components/HomeSections/connecti
 export default function Home() {
   return (
     <div className="min-h-screen bg-gray-900">
-      <Navbar />
+      {/* <Navbar /> */}
       <div className="flex">
         <LeftSidebar />
         <div className="flex-1 flex flex-col">
