@@ -6,27 +6,28 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { ConnectionDetailSideBar } from "../connectionDetailPage";
 
 type User = {
-     id: string;
-     name: string;
-     email: string;
-     bio?: string;
-     avatarUrl?: string;
-     role: "LEARNER" | "MENTOR" | string;
-     timeZone?: string;
-     createdAt: string;
+  id: string;
+  name: string;
+  email: string;
+  bio?: string;
+  avatarUrl?: string;
+  role: "LEARNER" | "MENTOR" | string;
+  timeZone?: string;
+  createdAt: string;
 
-     skillsOffered: { id: string; name: string }[];
-     skillsWanted: { id: string; name: string }[];
+  skillsOffered: { id: string; name: string }[];
+  skillsWanted: { id: string; name: string }[];
 
-     sessionsAsMentor: { id: string }[];
-     sessionsAsLearner: { id: string }[];
+  sessionsAsMentor: { id: string }[];
+  sessionsAsLearner: { id: string }[];
 
-     sentConnections: { id: string }[];
-     receivedConnections: { id: string }[];
+  sentConnections: { id: string; receiverId: string }[];
+  receivedConnections: { id: string; senderId: string }[];
 
-     followers: { id: string; followerId: string }[];
-     following: { id: string; followingId: string }[];
+  followers: { id: string; followerId: string }[];
+  following: { id: string; followingId: string }[];
 };
+
 
 export const SearchResults = () => {
      const [users, setUsers] = useState<User[]>([]);

@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Share2, Bookmark } from "lucide-react";
-interface Props {
-     user: {
- id: string;
+import { useSession } from "next-auth/react";
+import { toast } from "sonner";
+import { useAuthUser } from "@/app/hooks/useAuth";
+type User = {
+     id: string;
      name: string;
      email: string;
      bio?: string;
@@ -20,18 +24,73 @@ interface Props {
      sessionsAsMentor: { id: string }[];
      sessionsAsLearner: { id: string }[];
 
-     sentConnections: { id: string }[];
-     receivedConnections: { id: string }[];
+     sentConnections: { id: string; receiverId: string }[];
+     receivedConnections: { id: string; senderId: string }[];
 
      followers: { id: string; followerId: string }[];
      following: { id: string; followingId: string }[];
+};
+
+export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
+     console.log("user", user);
+     const [connectionSent, setConnectionSent] = useState(false);
+     const { user: currentUser } = useAuthUser();
+
+     useEffect(() => {
+          if (!currentUser?.id || !user?.id) return;
+
+          console.log("anu", user)
+          const sent = user.receivedConnections?.some((connection) => connection.senderId === currentUser.id);
+          const received = user.sentConnections?.some((connection) => connection.receiverId === currentUser.id);
+
+          if (sent || received) {
+               setConnectionSent(true);
+          }
+     }, [currentUser?.id, user]);
+
+     console.log("session", currentUser);
+     const [isFollowing, setIsFollowing] = useState(false);
+
+     const handleSendConnection = async () => {
+          if (!currentUser?.id) {
+               toast.error("You must be logged in to connect");
+               return;
+          }
+
+          try {
+               const response = await fetch("http://localhost:4000/api/connections/request", {
+                    method: "POST",
+                    headers: {
+                         "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                         senderId: currentUser.id,
+                         receiverId: user.id,
+                    }),
+               });
+
+               const data = await response.json();
+
+               if (!response.ok) {
+                    // Check if error is "Connection already exists"
+                    if (data.message === "Connection already exists") {
+                         toast.info("Connection already exists");
+                         setConnectionSent(true); // ⬅️ Still set this to update UI
+                    } else {
+                         toast.error(data.message || "Failed to send request");
+                    }
+                    return;
+               }
+
+               setConnectionSent(true);
+               toast.success("Connection request sent! ✅");
+          } catch (err) {
+               console.error("Send connection error", err);
+               toast.error("Something went wrong");
+          }
      };
-}
 
-export const ConnectionDetailSideBar = ({ user }: Props) => {
-     console.log("user", user)
-
-  const [isFollowing, setIsFollowing] = useState(false)
+     console.log("heolo", connectionSent);
      return (
           <div className=" bg-gray-900 text-white p-6">
                <div className="flex items-center justify-between mb-6">
@@ -44,7 +103,12 @@ export const ConnectionDetailSideBar = ({ user }: Props) => {
                                    <Bookmark className="w-4 h-4" />
                               </Button>
                          </div>
-                         <Button onClick={()=> setIsFollowing(!isFollowing)} className="border cursor-pointer hover:text-gray-100">{isFollowing ? 'Following' : 'Follow'}</Button>
+                         <Button
+                              onClick={() => setIsFollowing(!isFollowing)}
+                              className="border cursor-pointer hover:text-gray-100"
+                         >
+                              {isFollowing ? "Following" : "Follow"}
+                         </Button>
                     </div>
                </div>
 
@@ -87,15 +151,15 @@ export const ConnectionDetailSideBar = ({ user }: Props) => {
                     </div>
                     <div className="flex justify-between">
                          <span className="text-gray-400">On this platform</span>
-                         <span className="text-white">{user?.createdAt ? new Date(user?.createdAt).toLocaleDateString():'Today'}</span>
+                         <span className="text-white">
+                              {user?.createdAt ? new Date(user?.createdAt).toLocaleDateString() : "Today"}
+                         </span>
                     </div>
                </div>
 
                <div className="mb-6">
                     <h3 className="font-medium mb-3">Teacher description</h3>
-                    <p className="text-gray-400 text-sm leading-relaxed">
-                     {user?.bio}
-                    </p>
+                    <p className="text-gray-400 text-sm leading-relaxed">{user?.bio}</p>
                </div>
 
                {/* <div className="mb-6">
@@ -103,8 +167,12 @@ export const ConnectionDetailSideBar = ({ user }: Props) => {
                     <p className="text-gray-400">$24/h</p>
                </div> */}
 
-               <Button className="w-full bg-purple-600 cursor-pointer hover:bg-purple-700 text-white">
-                    Add Connection
+               <Button
+                    onClick={handleSendConnection}
+                    disabled={connectionSent}
+                    className="w-full bg-purple-600 cursor-pointer hover:bg-purple-700 text-white"
+               >
+                    {connectionSent ? "Request Sent ✅" : "Add Connection"}
                </Button>
           </div>
      );

@@ -3,11 +3,15 @@
 
 import { useEffect, useState } from "react";
 
-type User = {
+export type User = {
+  id: string; // ✅ Add this field
   name: string;
   avatarUrl?: string;
   email?: string;
+  role?: "LEARNER" | "MENTOR" | string;
+  createdAt?: string;
 };
+
 
 export const useAuthUser = () => {
   const [user, setUser] = useState<User | null>(null);

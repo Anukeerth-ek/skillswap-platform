@@ -1,8 +1,62 @@
-// app/api/auth/[...nextauth]/route.ts
 import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials"; // Or GitHub, Google, etc.
-import { authOptions } from "../../../../lib/auth"; // You can also define inline if preferred
+import CredentialsProvider from "next-auth/providers/credentials";
 
-const handler = NextAuth(authOptions);
+const handler = NextAuth({
+  providers: [
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        const res = await fetch("http://localhost:4000/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: credentials?.email,
+            password: credentials?.password,
+          }),
+        });
+
+        const data = await res.json();
+
+        if (!res.ok || !data?.user) return null;
+
+        // 🧠 Attach the token payload to session
+        return {
+          id: data.user._id,
+          name: data.user.name,
+          email: data.user.email,
+          avatarUrl: data.user.avatarUrl,
+        };
+      },
+    }),
+  ],
+  session: {
+    strategy: "jwt",
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+        token.avatarUrl = user.avatarUrl;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user.id = token.id;
+        session.user.name = token.name;
+        session.user.email = token.email;
+        session.user.avatarUrl = token.avatarUrl;
+      }
+      return session;
+    },
+  },
+});
 
 export { handler as GET, handler as POST };

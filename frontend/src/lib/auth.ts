@@ -1,43 +1,32 @@
-// lib/auth.ts
-import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
+import type { NextAuthOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: {},
-        password: {},
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        // Validate user here from DB
-        const user = {
-          id: "user-id",
-          name: "Test",
-          email: credentials?.email,
-        };
+        const res = await fetch("http://localhost:4000/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: credentials?.email,
+            password: credentials?.password,
+          }),
+        });
 
-        if (user) return user;
+        const user = await res.json();
+        if (res.ok && user) return user;
         return null;
       },
     }),
   ],
-  callbacks: {
-    async session({ session, token }) {
-      if (session.user) {
-        (session.user as { id?: string }).id = token.sub;
-      }
-      return session;
-    },
-    async jwt({ token, user }) {
-      if (user) {
-        token.sub = user.id;
-      }
-      return token;
-    },
+  session: {
+    strategy: "jwt",
   },
-  pages: {
-    signIn: "/login",
-  },
+  secret: process.env.NEXTAUTH_SECRET,
 };
