@@ -11,7 +11,8 @@ import authRoutes from "./routes/authRoutes";
 import learnerRoutes from "./routes/learnerRoutes";
 import mentorRoutes from "./routes/mentorRoutes";
 import profileRoutes from "./routes/profile.routes"
-
+import connectionRoutes from "./routes/connectionRoutes"
+import followRoutes from "./routes/connectionRoutes"
 dotenv.config();
 
 const app = express();
@@ -27,6 +28,10 @@ app.use("/api/profiles", profileRoutes);
 app.use("/api/learnersBooking", learnerRoutes);
 app.use("/api/mentorBooking", mentorRoutes);
 app.use("/api/profile", profileRoutes);
+
+app.use("/api/connections", connectionRoutes);
+app.use("/api/follow", followRoutes);
+
 
 
 const server = http.createServer(app);
