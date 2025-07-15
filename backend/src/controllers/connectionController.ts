@@ -83,3 +83,70 @@ export const declineConnectionRequest = async (req: Request, res: Response) => {
           res.status(500).json({ message: "Internal server error" });
      }
 };
+
+
+export const getIncomingRequests = async (req: Request, res: Response) => {
+  const userId = req.params.userId; // or get from token
+
+  try {
+    const requests = await prisma.connection.findMany({
+      where: {
+        receiverId: userId,
+        status: "PENDING",
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            avatarUrl: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json(requests);
+  } catch (error) {
+    console.error("Get incoming requests error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+export const getAcceptedConnections = async (req: Request, res: Response) => {
+  const userId = req.params.userId;
+
+  try {
+    const connections = await prisma.connection.findMany({
+      where: {
+        status: "ACCEPTED",
+        OR: [
+          { senderId: userId },
+          { receiverId: userId },
+        ],
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            avatarUrl: true,
+          },
+        },
+        receiver: {
+          select: {
+            id: true,
+            name: true,
+            avatarUrl: true,
+          },
+        },
+      },
+    });
+
+    res.status(200).json(connections);
+  } catch (error) {
+    console.error("Get accepted connections error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
