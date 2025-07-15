@@ -150,3 +150,55 @@ export const getAcceptedConnections = async (req: Request, res: Response) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+// Get all accepted connections for a user (only the other user's details)
+export const getUserConnections = async (req: Request, res: Response) => {
+  const userId = req.params.userId;
+
+  try {
+    const connections = await prisma.connection.findMany({
+      where: {
+        status: "ACCEPTED",
+        OR: [
+          { senderId: userId },
+          { receiverId: userId },
+        ],
+      },
+      include: {
+        sender: {
+          select: {
+            id: true,
+            name: true,
+            avatarUrl: true,
+            skillsOffered: true,
+            skillsWanted: true,
+          },
+        },
+        receiver: {
+          select: {
+            id: true,
+            name: true,
+            avatarUrl: true,
+          },
+        },
+      },
+    });
+
+    // Map to return only the "other user" in each connection
+    const formatted = connections.map((conn) => {
+      const isSender = conn.senderId === userId;
+      const otherUser = isSender ? conn.receiver : conn.sender;
+
+      return {
+        id: conn.id,
+        user: otherUser,
+        connectedAt: conn.createdAt, // optional: when accepted
+      };
+    });
+
+    res.status(200).json({ connections: formatted });
+  } catch (error) {
+    console.error("Get user connections error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

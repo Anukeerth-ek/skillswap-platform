@@ -32,7 +32,7 @@ app.use("/api/profile", profileRoutes);
 app.use("/api/connections", connectionRoutes);
 app.use("/api/follow", followRoutes);
 
-
+app.use("/api", connectionRoutes);
 
 const server = http.createServer(app);
 initSocket(server);

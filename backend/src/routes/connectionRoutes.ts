@@ -5,6 +5,7 @@ import {
   declineConnectionRequest,
   getIncomingRequests,
   getAcceptedConnections,
+  getUserConnections,
 } from "../controllers/connectionController";
 
 const router = express.Router();
@@ -16,5 +17,5 @@ router.post("/decline", declineConnectionRequest);
 router.get("/requests/incoming/:userId", getIncomingRequests);
 router.get("/accepted/:userId", getAcceptedConnections);
 
-
+router.get("/connections/:userId", getUserConnections);
 export default router;

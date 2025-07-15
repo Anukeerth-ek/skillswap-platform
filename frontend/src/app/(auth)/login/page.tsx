@@ -128,7 +128,7 @@ export default function page() {
                          router.push("/");
                     } else if (profileRes.status === 404) {
                          // 🆕 No profile found
-                         router.push("/profile");
+                         router.push("/");
                     } else {
                          console.error("Error checking profile");
                          setErrors({ general: "Something went wrong. Please try again." });

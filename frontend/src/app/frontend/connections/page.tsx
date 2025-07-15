@@ -135,11 +135,22 @@ export default function ConnectionListPage() {
      const [selectedDepartment, setSelectedDepartment] = useState("All Departments");
      const [selectedRows, setSelectedRows] = useState<string[]>([]);
      const [rowsPerPage, setRowsPerPage] = useState(10);
-
+     const [usersConnection, setUsersConnection] = useState<any[]>([]);
      const { user: currentUser } = useAuthUser();
 
+     useEffect(() => {
+          if (!currentUser?.id) return;
+          const fetchUsersConnection = async () => {
+               const res = await fetch(`http://localhost:4000/api/connections/${currentUser?.id}`);
+               const data = await res.json();
+               console.table("dfjdklf", data);
+               setUsersConnection(data.connections);
+          };
+          fetchUsersConnection();
+     }, [currentUser?.id]);
+
      const filteredConnections = useMemo(() => {
-          return mockconnections.filter((connection) => {
+          return usersConnection?.filter((connection) => {
                const matchesSearch =
                     connection.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                     connection.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -175,11 +186,10 @@ export default function ConnectionListPage() {
      const [loadingRequests, setLoadingRequests] = useState(false);
 
      useEffect(() => {
-      if(!currentUser?.id) {
-        return
-      }
+          if (!currentUser?.id) {
+               return;
+          }
           const fetchIncoming = async () => {
-               alert("mount");
                try {
                     const res = await fetch(`http://localhost:4000/api/connections/requests/incoming/${currentUser?.id}`);
                     const data = await res.json();
@@ -195,7 +205,7 @@ export default function ConnectionListPage() {
                }
           };
           //  if (!currentUser?.id) {
-            console.log("loading anu")
+          console.log("loading anu");
           //  }
           // if (currentUser?.id) {
           fetchIncoming();
@@ -203,13 +213,12 @@ export default function ConnectionListPage() {
      }, [currentUser?.id]);
 
      const fetchIncomingRequests = async () => {
-    
           if (!currentUser?.id) return;
           setLoadingRequests(true);
           try {
                const res = await fetch(`http://localhost:4000/api/connections/requests/incoming/${currentUser.id}`);
                const data = await res.json();
-               console.log("from function", data)
+               console.log("from function", data);
                setIncomingRequests(data || []);
           } catch (err) {
                toast.error("Failed to load connection requests");
@@ -229,6 +238,11 @@ export default function ConnectionListPage() {
                if (res.ok) {
                     toast.success("Connection accepted");
                     setIncomingRequests((prev) => prev.filter((c) => c.id !== connectionId));
+
+                    // ✅ Re-fetch the accepted connections to update the table
+                    const updated = await fetch(`http://localhost:4000/api/connections/${currentUser?.id}`);
+                    const data = await updated.json();
+                    setUsersConnection(data);
                } else {
                     const error = await res.json();
                     toast.error(error.message || "Failed to accept");
@@ -378,55 +392,81 @@ export default function ConnectionListPage() {
                               </tr>
                          </thead>
                          <tbody className="bg-white divide-y divide-gray-200">
-                              {filteredConnections.slice(0, rowsPerPage).map((connection) => (
-                                   <tr key={connection.id} className="hover:bg-gray-50">
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                             <Checkbox
-                                                  checked={selectedRows.includes(connection.id)}
-                                                  onCheckedChange={() => handleRowSelect(connection.id)}
-                                             />
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                             <div className="flex items-center">
-                                                  <Avatar className="h-8 w-8 mr-3">
-                                                       <AvatarImage src={connection.avatar} alt={connection.name} />
-                                                       <AvatarFallback className="text-xs">
-                                                            {getInitials(connection.name)}
-                                                       </AvatarFallback>
-                                                  </Avatar>
-                                                  <div className="text-sm font-medium text-gray-900">{connection.name}</div>
-                                             </div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                             <div className="text-sm text-gray-900">{connection.jobTitle}</div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                             <Badge className={getDepartmentColor(connection.department)}>
-                                                  {connection.department}
-                                             </Badge>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                             <div className="text-sm text-gray-900">{connection.phoneNumber}</div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap">
-                                             <div className="text-sm text-gray-900">{connection.email}</div>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                             <DropdownMenu>
-                                                  <DropdownMenuTrigger asChild>
-                                                       <Button variant="ghost" className="h-8 w-8 p-0">
-                                                            <MoreHorizontal className="h-4 w-4" />
-                                                       </Button>
-                                                  </DropdownMenuTrigger>
-                                                  <DropdownMenuContent align="end">
-                                                       <DropdownMenuItem>Edit</DropdownMenuItem>
-                                                       <DropdownMenuItem>View Details</DropdownMenuItem>
-                                                       <DropdownMenuItem className="text-red-600">Delete</DropdownMenuItem>
-                                                  </DropdownMenuContent>
-                                             </DropdownMenu>
+                              {usersConnection.length > 0 ? (
+                                   usersConnection?.map((connection: any) => {
+                                        console.log("ipl", connection?.user);
+                                        return (
+                                             <tr key={connection.id} className="hover:bg-gray-50">
+                                                  <td className="px-6 py-4 whitespace-nowrap">
+                                                       <Checkbox
+                                                            checked={selectedRows.includes(connection.id)}
+                                                            onCheckedChange={() => handleRowSelect(connection.id)}
+                                                       />
+                                                  </td>
+                                                  <td className="px-6 py-4 whitespace-nowrap">
+                                                       <div className="flex items-center">
+                                                            <Avatar className="h-8 w-8 mr-3">
+                                                                 <AvatarImage
+                                                                      src={connection.avatar}
+                                                                      alt={connection.name}
+                                                                 />
+                                                                 {/* <AvatarFallback className="text-xs">
+                                                                 {getInitials(connection?.name)}
+                                                            </AvatarFallback> */}
+                                                            </Avatar>
+                                                            <div className="text-sm font-medium text-gray-900">
+                                                                 {connection.user.name}
+                                                            </div>
+                                                       </div>
+                                                  </td>
+                                                  <td className="px-6 py-4 whitespace-nowrap">
+                                                       <div className="text-sm text-gray-900">software engineer</div>
+                                                  </td>
+                                                  <td className="px-6 py-4 whitespace-nowrap">
+                                                       <Badge className={getDepartmentColor(connection.department)}>
+                                                            {connection.department}
+                                                       </Badge>
+                                                  </td>
+                                                  <td className="px-6 py-4 whitespace-nowrap">
+                                                       {connection?.user?.skillsOffered?.map((item: any, index: number) => (
+                                                            <div key={index} className="text-sm text-gray-900">
+                                                                 {item.name}
+                                                            </div>
+                                                       ))}
+                                                  </td>
+                                                  <td className="px-6 py-4 whitespace-nowrap">
+                                                       {connection?.user?.skillsWanted?.map((item: any, index: number) => (
+                                                            <div key={index} className="text-sm text-gray-900">
+                                                                 {item.name}
+                                                            </div>
+                                                       ))}
+                                                  </td>
+                                                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                                                       <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                 <Button variant="ghost" className="h-8 w-8 p-0">
+                                                                      <MoreHorizontal className="h-4 w-4" />
+                                                                 </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end">
+                                                                 <DropdownMenuItem>Edit</DropdownMenuItem>
+                                                                 <DropdownMenuItem>View Details</DropdownMenuItem>
+                                                                 <DropdownMenuItem className="text-red-600">
+                                                                      Delete
+                                                                 </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                       </DropdownMenu>
+                                                  </td>
+                                             </tr>
+                                        );
+                                   })
+                              ) : (
+                                   <tr>
+                                        <td colSpan={7} className="text-center py-4 text-gray-500">
+                                             You have no connections.
                                         </td>
                                    </tr>
-                              ))}
+                              )}
                          </tbody>
                     </table>
                </div>
