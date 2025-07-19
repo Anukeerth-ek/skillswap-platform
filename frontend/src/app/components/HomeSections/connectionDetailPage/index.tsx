@@ -7,7 +7,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Share2, Bookmark } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
-import { useAuthUser } from "@/app/hooks/useAuth";
+import { useAuthUser } from "@/app/hooks/useAuth"; 
+
 type User = {
      id: string;
      name: string;
