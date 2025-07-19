@@ -19,6 +19,11 @@ model User {
   email             String     @unique
   password          String
   bio               String?
+  professionDetails     UserProfessionDetails?
+  currentOrganization   UserCurrentOrganization?
+  experienceSummary     UserExperienceSummary?
+  currentStatus         UserCurrentStatus?
+  socialLinks           UserSocialLinks?
   avatarUrl         String?
   role              Role       @default(LEARNER)
   timeZone          String?
@@ -96,3 +101,42 @@ enum SessionStatus {
   CANCELLED
 }
  
+ model UserProfessionDetails {
+  id        String @id @default(uuid())
+  title     String
+  userId    String @unique
+  user      User   @relation(fields: [userId], references: [id])
+}
+
+model UserCurrentOrganization {
+  id             String @id @default(uuid())
+  organization   String
+  userId         String @unique
+  user           User   @relation(fields: [userId], references: [id])
+}
+
+model UserExperienceSummary {
+  id           String @id @default(uuid())
+  years        Int
+  description  String?
+  userId       String @unique
+  user         User   @relation(fields: [userId], references: [id])
+}
+
+model UserCurrentStatus {
+  id       String @id @default(uuid())
+  status   String
+  userId   String @unique
+  user     User   @relation(fields: [userId], references: [id])
+}
+
+model UserSocialLinks {
+  id        String @id @default(uuid())
+  linkedin  String?
+  github    String?
+  twitter   String?
+  leetcode  String?
+  website   String?
+  userId    String  @unique
+  user      User    @relation(fields: [userId], references: [id])
+}
