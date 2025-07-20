@@ -232,7 +232,10 @@ const ProfileCreatePage = () => {
                               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
                                    <User className="w-8 h-8 text-white" />
                               </div>
-                              <h1 className="text-3xl font-bold text-gray-900 mb-2"> {isEdit ? "Edit Your Profile" : "Create Your Profile"}</h1>
+                              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                                   {" "}
+                                   {isEdit ? "Edit Your Profile" : "Create Your Profile"}
+                              </h1>
                               <p className="text-gray-600">Share your skills and discover new ones in our community</p>
                          </div>
 
@@ -251,6 +254,22 @@ const ProfileCreatePage = () => {
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                         placeholder="Enter your full name"
+                                   />
+                              </div>
+                              {/* Profession Field */}
+                              <div>
+                                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                                        Please Add your profession*
+                                   </label>
+                                   <input
+                                        type="text"
+                                        id="name"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleInputChange}
+                                        required
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                                        placeholder="Enter your current profession"
                                    />
                               </div>
 
@@ -413,7 +432,7 @@ const ProfileCreatePage = () => {
                                    {isSubmitting ? (
                                         <div className="flex items-center justify-center gap-2">
                                              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                            {isEdit ? "Updating Profile..." : "Creating Profile..."}
+                                             {isEdit ? "Updating Profile..." : "Creating Profile..."}
                                         </div>
                                    ) : (
                                         "Create Profile"
