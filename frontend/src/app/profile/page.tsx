@@ -273,6 +273,40 @@ const ProfileCreatePage = () => {
                                    />
                               </div>
 
+                              {/* Professional Experience in years*/}
+                              <div>
+                                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                                        Enter your professional experience (In years)*
+                                   </label>
+                                   <input
+                                        type="text"
+                                        id="name"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleInputChange}
+                                        required
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                                        placeholder="Eg: If its is 5 year, enter 5"
+                                   />
+                              </div>
+
+                              {/* Current organisation*/}
+                              <div>
+                                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                                        Enter your professional experience (In years)*
+                                   </label>
+                                   <input
+                                        type="text"
+                                        id="name"
+                                        name="name"
+                                        value={formData.name}
+                                        onChange={handleInputChange}
+                                        required
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
+                                        placeholder="Eg: If its is 5 year, enter 5"
+                                   />
+                              </div>
+
                               {/* Bio Field */}
                               <div>
                                    <label htmlFor="bio" className="block text-sm font-medium text-gray-700 mb-2">
