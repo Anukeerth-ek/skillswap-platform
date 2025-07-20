@@ -60,7 +60,7 @@ export const SearchResults = () => {
           setSelectedUser(user);
           setIsSidebarOpen(true);
      };
-
+console.log('user', users)
      return (
           <>
                <div className="flex-1 p-6">
