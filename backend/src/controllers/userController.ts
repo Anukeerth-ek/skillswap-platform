@@ -78,6 +78,15 @@ export const createUserProfile = async (req: AuthenticatedRequest, res: Response
       name,
       bio,
       timeZone,
+      professionTitle,
+      organization,
+      experienceYears,
+      experienceDescription,
+      currentStatus,
+      linkedin,
+      github,
+      twitter,
+      website,
     } = req.body;
 
     const avatarUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
@@ -122,10 +131,61 @@ export const createUserProfile = async (req: AuthenticatedRequest, res: Response
             create: { name },
           })),
         },
+        professionDetails: {
+          upsert: {
+            update: { title: professionTitle },
+            create: { title: professionTitle },
+          },
+        },
+        currentOrganization: {
+          upsert: {
+            update: { organization },
+            create: { organization },
+          },
+        },
+        experienceSummary: {
+          upsert: {
+            update: {
+              years: Number(experienceYears),
+              description: experienceDescription,
+            },
+            create: {
+              years: Number(experienceYears),
+              description: experienceDescription,
+            },
+          },
+        },
+        currentStatus: {
+          upsert: {
+            update: { status: currentStatus },
+            create: { status: currentStatus },
+          },
+        },
+        socialLinks: {
+          upsert: {
+            update: {
+              linkedin,
+              github,
+              twitter,
+              website,
+            },
+            create: {
+              linkedin,
+              github,
+              twitter,
+              website,
+            },
+          },
+        },
       },
       include: {
         skillsOffered: true,
         skillsWanted: true,
+        professionDetails: true,
+        currentOrganization: true,
+        experienceSummary: true,
+        currentStatus: true,
+        socialLinks: true,
       },
     });
 
@@ -148,6 +208,11 @@ export const getUserProfile = async (req: Request & { userId?: string }, res: Re
       include: {
         skillsOffered: true,
         skillsWanted: true,
+        professionDetails: true,
+        currentOrganization: true,
+        experienceSummary: true,
+        currentStatus: true,
+        socialLinks: true,
       },
     });
 

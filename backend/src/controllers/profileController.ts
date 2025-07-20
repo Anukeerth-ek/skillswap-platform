@@ -1,8 +1,24 @@
 import { Request, Response } from "express";
 import prisma from "../prismaClient";
 import jwt from "jsonwebtoken";
+
 export const updateUserProfile = async (req: Request & { userId?: string }, res: Response) => {
-     const { bio, avatarUrl, timeZone, skillsOffered, skillsWanted } = req.body;
+     const {
+          bio,
+          avatarUrl,
+          timeZone,
+          skillsOffered,
+          skillsWanted,
+          professionTitle,
+          organization,
+          experienceYears,
+          experienceDescription,
+          currentStatus,
+          linkedin,
+          github,
+          twitter,
+          website,
+     } = req.body;
 
      if (!req.userId) {
           res.status(401).json({ message: "Unauthorized" });
@@ -10,13 +26,12 @@ export const updateUserProfile = async (req: Request & { userId?: string }, res:
      }
 
      try {
-          // 1. Upsert offered skills
+          // 1. Upsert skills
           const offeredSkillRecords = await Promise.all(skillsOffered.map((name: string) => getOrCreateSkill(name)));
 
-          // 2. Upsert needed skills
           const wantedSkillRecords = await Promise.all(skillsWanted.map((name: string) => getOrCreateSkill(name)));
 
-          // 3. Update User profile and connect skills
+          // 2. Update user with nested profile info
           const updatedUser = await prisma.user.update({
                where: { id: req.userId },
                data: {
@@ -24,17 +39,68 @@ export const updateUserProfile = async (req: Request & { userId?: string }, res:
                     avatarUrl,
                     timeZone,
                     skillsOffered: {
-                         set: [], // Clear old connections
+                         set: [],
                          connect: offeredSkillRecords.map((skill) => ({ id: skill.id })),
                     },
                     skillsWanted: {
-                         set: [], // Clear old connections
+                         set: [],
                          connect: wantedSkillRecords.map((skill) => ({ id: skill.id })),
+                    },
+                    professionDetails: {
+                         upsert: {
+                              update: { title: professionTitle },
+                              create: { title: professionTitle },
+                         },
+                    },
+                    currentOrganization: {
+                         upsert: {
+                              update: { organization },
+                              create: { organization },
+                         },
+                    },
+                    experienceSummary: {
+                         upsert: {
+                              update: {
+                                   years: Number(experienceYears),
+                                   description: experienceDescription,
+                              },
+                              create: {
+                                   years: Number(experienceYears),
+                                   description: experienceDescription,
+                              },
+                         },
+                    },
+                    currentStatus: {
+                         upsert: {
+                              update: { status: currentStatus },
+                              create: { status: currentStatus },
+                         },
+                    },
+                    socialLinks: {
+                         upsert: {
+                              update: {
+                                   linkedin,
+                                   github,
+                                   twitter,
+                                   website,
+                              },
+                              create: {
+                                   linkedin,
+                                   github,
+                                   twitter,
+                                   website,
+                              },
+                         },
                     },
                },
                include: {
                     skillsOffered: true,
                     skillsWanted: true,
+                    professionDetails: true,
+                    currentOrganization: true,
+                    experienceSummary: true,
+                    currentStatus: true,
+                    socialLinks: true,
                },
           });
 
@@ -65,7 +131,7 @@ export const getAllProfiles = async (req: Request, res: Response) => {
                     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as { userId: string };
                     currentUserId = decoded.userId;
                } catch {
-                    console.log("We got error");
+                    console.log("Invalid token");
                }
           }
 
@@ -73,6 +139,11 @@ export const getAllProfiles = async (req: Request, res: Response) => {
                where: currentUserId ? { id: { not: currentUserId } } : {},
                include: {
                     skillsOffered: true,
+                    professionDetails: true,
+                    currentOrganization: true,
+                    experienceSummary: true,
+                    currentStatus: true,
+                    socialLinks: true,
                     receivedConnections: {
                          select: {
                               id: true,
