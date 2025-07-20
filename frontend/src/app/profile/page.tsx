@@ -293,7 +293,7 @@ const ProfileCreatePage = () => {
                               {/* Current organisation*/}
                               <div>
                                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
-                                        Enter your professional experience (In years)*
+                                        Enter your current organisation name
                                    </label>
                                    <input
                                         type="text"
@@ -303,7 +303,7 @@ const ProfileCreatePage = () => {
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                                        placeholder="Eg: If its is 5 year, enter 5"
+                                        placeholder="Your current organisation name"
                                    />
                               </div>
 
