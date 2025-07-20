@@ -271,14 +271,14 @@ const ProfileCreatePage = () => {
                               </div>
                               {/* Profession Field */}
                               <div>
-                                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                                   <label htmlFor="professionalDetail" className="block text-sm font-medium text-gray-700 mb-2">
                                         Please Add your profession*
                                    </label>
                                    <input
                                         type="text"
-                                        id="name"
-                                        name="name"
-                                        value={formData.name}
+                                        id="professionalDetail"
+                                        name="professionalDetail"
+                                        value={formData.professionalDetail}
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
@@ -288,14 +288,14 @@ const ProfileCreatePage = () => {
 
                               {/* Professional Experience in years*/}
                               <div>
-                                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                                   <label htmlFor="yearsOfExperience" className="block text-sm font-medium text-gray-700 mb-2">
                                         Enter your professional experience (In years)*
                                    </label>
                                    <input
                                         type="text"
-                                        id="name"
-                                        name="name"
-                                        value={formData.name}
+                                        id="yearsOfExperience"
+                                        name="yearsOfExperience"
+                                        value={formData.yearsOfExperience}
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
@@ -305,14 +305,14 @@ const ProfileCreatePage = () => {
 
                               {/* Current organisation*/}
                               <div>
-                                   <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                                   <label htmlFor="currentOrganisation" className="block text-sm font-medium text-gray-700 mb-2">
                                         Enter your current organisation name
                                    </label>
                                    <input
                                         type="text"
-                                        id="name"
-                                        name="name"
-                                        value={formData.name}
+                                        id="currentOrganisation"
+                                        name="currentOrganisation"
+                                        value={formData.currentOrganisation}
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
