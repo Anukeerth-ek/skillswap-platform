@@ -11,6 +11,9 @@ const ProfileCreatePage = () => {
           name: string;
           bio: string;
           avatarUrl: string;
+          professionalDetail: string;
+          currentOrganisatio: string;
+          yearsOfExperience: string;
           timeZone: string;
           skillsOffered: string[];
           skillsWanted: string[];
@@ -37,6 +40,9 @@ const ProfileCreatePage = () => {
           timeZone: "",
           skillsOffered: [],
           skillsWanted: [],
+          professionalDetail: "",
+          currentOrganisatio: "",
+          yearsOfExperience: ""
      });
 
      const [newSkillOffered, setNewSkillOffered] = useState("");
@@ -209,6 +215,9 @@ const ProfileCreatePage = () => {
                          bio: data.user.bio || "",
                          avatarUrl: data.user.avatarUrl || "",
                          timeZone: data.user.timeZone || "",
+                         professionalDetail: data?.user.professionalDetail || "",
+                         currentOrganisatio: data?.user.currentOrganisatio || "",
+                         yearsOfExperience: data?.user.yearsOfExperience || "",
                          skillsOffered: data.user.skillsOffered?.map((s: any) => s.name) || [],
                          skillsWanted: data.user.skillsWanted?.map((s: any) => s.name) || [],
                     });
