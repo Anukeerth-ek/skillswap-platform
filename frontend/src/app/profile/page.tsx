@@ -12,7 +12,7 @@ const ProfileCreatePage = () => {
           bio: string;
           avatarUrl: string;
           professionalDetail: string;
-          currentOrganisatio: string;
+          currentOrganisation: string;
           yearsOfExperience: string;
           timeZone: string;
           skillsOffered: string[];
@@ -41,8 +41,8 @@ const ProfileCreatePage = () => {
           skillsOffered: [],
           skillsWanted: [],
           professionalDetail: "",
-          currentOrganisatio: "",
-          yearsOfExperience: ""
+          currentOrganisation: "",
+          yearsOfExperience: "",
      });
 
      const [newSkillOffered, setNewSkillOffered] = useState("");
@@ -153,6 +153,10 @@ const ProfileCreatePage = () => {
                formDataToSend.append("bio", formData.bio || "");
                formDataToSend.append("timeZone", formData.timeZone || "");
 
+               formDataToSend.append("professionalDetail", formData.professionalDetail);
+               formDataToSend.append("currentOrganisation", formData.currentOrganisation);
+               formDataToSend.append("yearsOfExperience", formData.yearsOfExperience);
+
                if (avatarFile) {
                     formDataToSend.append("avatar", avatarFile); // 👈 this is the actual file
                }
@@ -216,7 +220,7 @@ const ProfileCreatePage = () => {
                          avatarUrl: data.user.avatarUrl || "",
                          timeZone: data.user.timeZone || "",
                          professionalDetail: data?.user.professionalDetail || "",
-                         currentOrganisatio: data?.user.currentOrganisatio || "",
+                         currentOrganisation: data?.user.currentOrganisation || "",
                          yearsOfExperience: data?.user.yearsOfExperience || "",
                          skillsOffered: data.user.skillsOffered?.map((s: any) => s.name) || [],
                          skillsWanted: data.user.skillsWanted?.map((s: any) => s.name) || [],
