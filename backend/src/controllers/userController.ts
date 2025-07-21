@@ -23,7 +23,7 @@ interface AuthenticatedRequest extends Request {
 }
 
 export const updateSessionStatus = async (req: AuthenticatedRequest, res: Response) => {
-     const mentorId = req.user?.id;
+     const mentorId = req.userId;
      const { id } = req.params;
 
      const parsed = statusSchema.safeParse(req.body);
@@ -64,13 +64,9 @@ export const updateSessionStatus = async (req: AuthenticatedRequest, res: Respon
 };
 
 export const createUserProfile = async (req: AuthenticatedRequest, res: Response) => {
-  console.log("we are here in backend boyy");
-  console.log("Decoded user ID:", req.userId);
-
   const userId = req.userId;
   if (!userId) {
-    res.status(401).json({ message: "Unauthorized" });
-    return;
+    return res.status(401).json({ message: "Unauthorized" });
   }
 
   try {
@@ -91,16 +87,15 @@ export const createUserProfile = async (req: AuthenticatedRequest, res: Response
 
     const avatarUrl = req.file ? `/uploads/${req.file.filename}` : undefined;
 
-    const skillsOffered = req.body["skillsOffered[]"]
-      ? Array.isArray(req.body["skillsOffered[]"])
-        ? req.body["skillsOffered[]"]
-        : [req.body["skillsOffered[]"]]
+    const rawSkillsOffered = req.body.skillsOffered || req.body["skillsOffered[]"] || [];
+    const rawSkillsWanted = req.body.skillsWanted || req.body["skillsWanted[]"] || [];
+
+    const skillsOffered = Array.isArray(rawSkillsOffered)
+      ? rawSkillsOffered.map((s) => s.trim().toLowerCase())
       : [];
 
-    const skillsWanted = req.body["skillsWanted[]"]
-      ? Array.isArray(req.body["skillsWanted[]"])
-        ? req.body["skillsWanted[]"]
-        : [req.body["skillsWanted[]"]]
+    const skillsWanted = Array.isArray(rawSkillsWanted)
+      ? rawSkillsWanted.map((s) => s.trim().toLowerCase())
       : [];
 
     // Disconnect existing skills
@@ -112,72 +107,79 @@ export const createUserProfile = async (req: AuthenticatedRequest, res: Response
       },
     });
 
+    const updateData: any = {
+      name,
+      bio,
+      avatarUrl,
+      timeZone,
+      skillsOffered: {
+        connectOrCreate: skillsOffered.map((name: string) => ({
+          where: { name },
+          create: { name },
+        })),
+      },
+      skillsWanted: {
+        connectOrCreate: skillsWanted.map((name: string) => ({
+          where: { name },
+          create: { name },
+        })),
+      },
+    };
+
+    if (professionTitle) {
+      updateData.professionDetails = {
+        upsert: {
+          update: { title: professionTitle },
+          create: { title: professionTitle },
+        },
+      };
+    }
+
+    if (organization) {
+      updateData.currentOrganization = {
+        upsert: {
+          update: { organization },
+          create: { organization },
+        },
+      };
+    }
+
+    if (experienceYears) {
+      updateData.experienceSummary = {
+        upsert: {
+          update: {
+            years: Number(experienceYears),
+            description: experienceDescription || "",
+          },
+          create: {
+            years: Number(experienceYears),
+            description: experienceDescription || "",
+          },
+        },
+      };
+    }
+
+    if (currentStatus) {
+      updateData.currentStatus = {
+        upsert: {
+          update: { status: currentStatus },
+          create: { status: currentStatus },
+        },
+      };
+    }
+
+    if (linkedin || github || twitter || website) {
+      updateData.socialLinks = {
+        upsert: {
+          update: { linkedin, github, twitter, website },
+          create: { linkedin, github, twitter, website },
+        },
+      };
+    }
+
     const updatedUser = await prisma.user.update({
       where: { id: userId },
-      data: {
-        name,
-        bio,
-        avatarUrl,
-        timeZone,
-        skillsOffered: {
-          connectOrCreate: skillsOffered.map((name: string) => ({
-            where: { name },
-            create: { name },
-          })),
-        },
-        skillsWanted: {
-          connectOrCreate: skillsWanted.map((name: string) => ({
-            where: { name },
-            create: { name },
-          })),
-        },
-        professionDetails: {
-          upsert: {
-            update: { title: professionTitle },
-            create: { title: professionTitle },
-          },
-        },
-        currentOrganization: {
-          upsert: {
-            update: { organization },
-            create: { organization },
-          },
-        },
-        experienceSummary: {
-          upsert: {
-            update: {
-              years: Number(experienceYears),
-              description: experienceDescription,
-            },
-            create: {
-              years: Number(experienceYears),
-              description: experienceDescription,
-            },
-          },
-        },
-        currentStatus: {
-          upsert: {
-            update: { status: currentStatus },
-            create: { status: currentStatus },
-          },
-        },
-        socialLinks: {
-          upsert: {
-            update: {
-              linkedin,
-              github,
-              twitter,
-              website,
-            },
-            create: {
-              linkedin,
-              github,
-              twitter,
-              website,
-            },
-          },
-        },
-      },
+      data: updateData,
       include: {
         skillsOffered: true,
         skillsWanted: true,
@@ -195,6 +197,7 @@ export const createUserProfile = async (req: AuthenticatedRequest, res: Response
     res.status(500).json({ message: "Server error" });
   }
 };
+
 
 
 interface AuthenticatedRequest extends Request {
