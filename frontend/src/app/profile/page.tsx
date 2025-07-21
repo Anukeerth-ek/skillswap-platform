@@ -12,7 +12,7 @@ const ProfileCreatePage = () => {
           bio: string;
           avatarUrl: string;
           professionalDetail: string;
-          currentOrganisation: string;
+          currentOrganization: string;
           yearsOfExperience: string;
           timeZone: string;
           skillsOffered: string[];
@@ -41,7 +41,7 @@ const ProfileCreatePage = () => {
           skillsOffered: [],
           skillsWanted: [],
           professionalDetail: "",
-          currentOrganisation: "",
+          currentOrganization: "",
           yearsOfExperience: "",
      });
 
@@ -49,7 +49,7 @@ const ProfileCreatePage = () => {
      const [newSkillNeeded, setNewSkillNeeded] = useState("");
      const [isSubmitting, setIsSubmitting] = useState(false);
      const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-     const [profile, setProfile] = useState<Profile | null>(null);
+     const [profile, setProfile] = useState<ProfileData | null>(null);
      const [isEdit, setIsEdit] = useState(false);
 
      useEffect(() => {
@@ -154,7 +154,7 @@ const ProfileCreatePage = () => {
                formDataToSend.append("timeZone", formData.timeZone || "");
 
                formDataToSend.append("professionalDetail", formData.professionalDetail);
-               formDataToSend.append("currentOrganisation", formData.currentOrganisation);
+               formDataToSend.append("currentOrganization", formData.currentOrganization);
                formDataToSend.append("yearsOfExperience", formData.yearsOfExperience);
 
                if (avatarFile) {
@@ -220,7 +220,7 @@ const ProfileCreatePage = () => {
                          avatarUrl: data.user.avatarUrl || "",
                          timeZone: data.user.timeZone || "",
                          professionalDetail: data?.user.professionalDetail || "",
-                         currentOrganisation: data?.user.currentOrganisation || "",
+                         currentOrganization: data?.user.currentOrganization || "",
                          yearsOfExperience: data?.user.yearsOfExperience || "",
                          skillsOffered: data.user.skillsOffered?.map((s: any) => s.name) || [],
                          skillsWanted: data.user.skillsWanted?.map((s: any) => s.name) || [],
@@ -305,14 +305,14 @@ const ProfileCreatePage = () => {
 
                               {/* Current organisation*/}
                               <div>
-                                   <label htmlFor="currentOrganisation" className="block text-sm font-medium text-gray-700 mb-2">
+                                   <label htmlFor="currentOrganization" className="block text-sm font-medium text-gray-700 mb-2">
                                         Enter your current organisation name
                                    </label>
                                    <input
                                         type="text"
-                                        id="currentOrganisation"
-                                        name="currentOrganisation"
-                                        value={formData.currentOrganisation}
+                                        id="currentOrganization"
+                                        name="currentOrganization"
+                                        value={formData.currentOrganization}
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"

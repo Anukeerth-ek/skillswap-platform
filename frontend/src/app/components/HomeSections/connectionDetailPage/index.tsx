@@ -36,7 +36,7 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
      console.log("user", user);
      const [connectionSent, setConnectionSent] = useState(false);
      const { user: currentUser } = useAuthUser();
-
+     
      useEffect(() => {
           if (!currentUser?.id || !user?.id) return;
 
