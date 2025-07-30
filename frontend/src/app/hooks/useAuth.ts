@@ -31,7 +31,7 @@ export const useAuthUser = () => {
             Authorization: `Bearer ${token}`,
           },
         });
-console.log("helo", res)
+
         if (!res.ok) console.log("not authorized")
 
         const data = await res.json();

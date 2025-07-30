@@ -1,22 +1,23 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Plus, X, User, Clock, Globe, Book, Lightbulb } from "lucide-react";
+import { Plus, X, Clock, Globe, Book, Lightbulb } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { User } from "../../types";
 
 const ProfileCreatePage = () => {
      const router = useRouter();
 
      type ProfileData = {
-          name: string;
-          bio: string;
-          avatarUrl: string;
-          professionalDetail: string;
-          currentOrganization: string;
-          yearsOfExperience: string;
-          timeZone: string;
-          skillsOffered: string[];
-          skillsWanted: string[];
+  name: string;
+  bio: string;
+  avatarUrl: string;
+  timeZone: string;
+  professionDetails: string;
+  currentOrganization: string;
+  experienceSummary: string;
+  skillsOffered: string[];
+  skillsWanted: string[];
      };
      type Skill = {
           id: string;
@@ -34,15 +35,15 @@ const ProfileCreatePage = () => {
      };
 
      const [formData, setFormData] = useState<ProfileData>({
-          name: "",
-          bio: "",
-          avatarUrl: "",
-          timeZone: "",
-          skillsOffered: [],
-          skillsWanted: [],
-          professionalDetail: "",
-          currentOrganization: "",
-          yearsOfExperience: "",
+   name: "",
+    bio: "",
+    avatarUrl: "",
+    timeZone: "",
+    professionDetails: "",
+    currentOrganization: "",
+    experienceSummary: "",
+    skillsOffered: [],
+    skillsWanted: [],
      });
 
      const [newSkillOffered, setNewSkillOffered] = useState("");
@@ -153,9 +154,9 @@ const ProfileCreatePage = () => {
                formDataToSend.append("bio", formData.bio || "");
                formDataToSend.append("timeZone", formData.timeZone || "");
 
-               formDataToSend.append("professionalDetail", formData.professionalDetail);
+               formDataToSend.append("professionalDetail", formData.professionDetails );
                formDataToSend.append("currentOrganization", formData.currentOrganization);
-               formDataToSend.append("yearsOfExperience", formData.yearsOfExperience);
+               formDataToSend.append("yearsOfExperience", formData.experienceSummary);
 
                if (avatarFile) {
                     formDataToSend.append("avatar", avatarFile); // 👈 this is the actual file
@@ -211,6 +212,7 @@ const ProfileCreatePage = () => {
                });
 
                const data = await res.json();
+               console.log("data", data);
                if (res.ok && data.user) {
                     setProfile(data.user);
                     setIsEdit(true); // ✅ important
@@ -219,12 +221,14 @@ const ProfileCreatePage = () => {
                          bio: data.user.bio || "",
                          avatarUrl: data.user.avatarUrl || "",
                          timeZone: data.user.timeZone || "",
-                         professionalDetail: data?.user.professionalDetail || "",
-                         currentOrganization: data?.user.currentOrganization || "",
-                         yearsOfExperience: data?.user.yearsOfExperience || "",
+                         professionDetails: data.user.professionDetails?.title || "",
+                         currentOrganization: data.user.currentOrganization?.organization || "",
+                         experienceSummary: data.user.experienceSummary?.years?.toString() || "",
+                         //   currentStatus: data.user.currentStatus?.status || "",
                          skillsOffered: data.user.skillsOffered?.map((s: any) => s.name) || [],
                          skillsWanted: data.user.skillsWanted?.map((s: any) => s.name) || [],
                     });
+
                     if (data.user.avatarUrl) {
                          setAvatarPreview(data.user.avatarUrl);
                     }
@@ -234,16 +238,17 @@ const ProfileCreatePage = () => {
           fetchProfile();
      }, []);
 
-     console.log("helo anu", profile);
+     console.log("profile here", profile);
 
-     console.log("backy", profile?.skillsWanted);
+     console.log("formdata", formData);
+
      return (
           <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
                <div className="max-w-2xl mx-auto">
                     <div className="bg-white rounded-2xl shadow-xl p-8">
                          <div className="text-center mb-8">
                               <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                                   <User className="w-8 h-8 text-white" />
+                                   {/* <User className="w-8 h-8 text-white" /> */}
                               </div>
                               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                                    {" "}
@@ -271,14 +276,17 @@ const ProfileCreatePage = () => {
                               </div>
                               {/* Profession Field */}
                               <div>
-                                   <label htmlFor="professionalDetail" className="block text-sm font-medium text-gray-700 mb-2">
+                                   <label
+                                        htmlFor="professionalDetail"
+                                        className="block text-sm font-medium text-gray-700 mb-2"
+                                   >
                                         Please Add your profession*
                                    </label>
                                    <input
                                         type="text"
                                         id="professionalDetail"
                                         name="professionalDetail"
-                                        value={formData.professionalDetail}
+                                        value={formData.professionDetails}
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
@@ -288,14 +296,17 @@ const ProfileCreatePage = () => {
 
                               {/* Professional Experience in years*/}
                               <div>
-                                   <label htmlFor="yearsOfExperience" className="block text-sm font-medium text-gray-700 mb-2">
+                                   <label
+                                        htmlFor="yearsOfExperience"
+                                        className="block text-sm font-medium text-gray-700 mb-2"
+                                   >
                                         Enter your professional experience (In years)*
                                    </label>
                                    <input
                                         type="text"
                                         id="yearsOfExperience"
                                         name="yearsOfExperience"
-                                        value={formData.yearsOfExperience}
+                                        value={formData.experienceSummary}
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
@@ -305,7 +316,10 @@ const ProfileCreatePage = () => {
 
                               {/* Current organisation*/}
                               <div>
-                                   <label htmlFor="currentOrganization" className="block text-sm font-medium text-gray-700 mb-2">
+                                   <label
+                                        htmlFor="currentOrganization"
+                                        className="block text-sm font-medium text-gray-700 mb-2"
+                                   >
                                         Enter your current organisation name
                                    </label>
                                    <input
@@ -481,6 +495,8 @@ const ProfileCreatePage = () => {
                                              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                              {isEdit ? "Updating Profile..." : "Creating Profile..."}
                                         </div>
+                                   ) : isEdit ? (
+                                        "Edit Profile"
                                    ) : (
                                         "Create Profile"
                                    )}

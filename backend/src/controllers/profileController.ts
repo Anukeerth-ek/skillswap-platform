@@ -7,8 +7,8 @@ export const updateUserProfile = async (req: Request & { userId?: string }, res:
           bio,
           avatarUrl,
           timeZone,
-          skillsOffered,
-          skillsWanted,
+          skillsOffered = [],
+          skillsWanted = [],
           professionTitle,
           organization,
           experienceYears,
@@ -22,77 +22,98 @@ export const updateUserProfile = async (req: Request & { userId?: string }, res:
 
      if (!req.userId) {
           res.status(401).json({ message: "Unauthorized" });
-          return;
+          return 
      }
 
      try {
-          // 1. Upsert skills
-          const offeredSkillRecords = await Promise.all(skillsOffered.map((name: string) => getOrCreateSkill(name)));
+          // 1. Upsert skills (gracefully handle empty arrays)
+          const offeredSkillRecords = await Promise.all(
+               (skillsOffered || []).map((name: string) => getOrCreateSkill(name))
+          );
+          const wantedSkillRecords = await Promise.all(
+               (skillsWanted || []).map((name: string) => getOrCreateSkill(name))
+          );
 
-          const wantedSkillRecords = await Promise.all(skillsWanted.map((name: string) => getOrCreateSkill(name)));
+          // 2. Prepare nested updates conditionally
+          const data: any = {
+               bio,
+               avatarUrl,
+               timeZone,
+               skillsOffered: {
+                    set: [],
+                    connect: offeredSkillRecords.map((skill) => ({ id: skill.id })),
+               },
+               skillsWanted: {
+                    set: [],
+                    connect: wantedSkillRecords.map((skill) => ({ id: skill.id })),
+               },
+          };
 
-          // 2. Update user with nested profile info
+          if (professionTitle) {
+               data.professionDetails = {
+                    upsert: {
+                         update: { title: professionTitle },
+                         create: { title: professionTitle },
+                    },
+               };
+          }
+
+          if (organization) {
+               data.currentOrganization = {
+                    upsert: {
+                         update: { organization },
+                         create: { organization },
+                    },
+               };
+          }
+
+          if (experienceYears || experienceDescription) {
+               data.experienceSummary = {
+                    upsert: {
+                         update: {
+                              years: Number(experienceYears) || 0,
+                              description: experienceDescription || '',
+                         },
+                         create: {
+                              years: Number(experienceYears) || 0,
+                              description: experienceDescription || '',
+                         },
+                    },
+               };
+          }
+
+          if (currentStatus) {
+               data.currentStatus = {
+                    upsert: {
+                         update: { status: currentStatus },
+                         create: { status: currentStatus },
+                    },
+               };
+          }
+
+          if (linkedin || github || twitter || website) {
+               data.socialLinks = {
+                    upsert: {
+                         update: {
+                              linkedin: linkedin || '',
+                              github: github || '',
+                              twitter: twitter || '',
+                              website: website || '',
+                         },
+                         create: {
+                              linkedin: linkedin || '',
+                              github: github || '',
+                              twitter: twitter || '',
+                              website: website || '',
+                         },
+                    },
+               };
+          }
+
+          // 3. Update the user
           const updatedUser = await prisma.user.update({
                where: { id: req.userId },
-               data: {
-                    bio,
-                    avatarUrl,
-                    timeZone,
-                    skillsOffered: {
-                         set: [],
-                         connect: offeredSkillRecords.map((skill) => ({ id: skill.id })),
-                    },
-                    skillsWanted: {
-                         set: [],
-                         connect: wantedSkillRecords.map((skill) => ({ id: skill.id })),
-                    },
-                    professionDetails: {
-                         upsert: {
-                              update: { title: professionTitle },
-                              create: { title: professionTitle },
-                         },
-                    },
-                    currentOrganization: {
-                         upsert: {
-                              update: { organization },
-                              create: { organization },
-                         },
-                    },
-                    experienceSummary: {
-                         upsert: {
-                              update: {
-                                   years: Number(experienceYears),
-                                   description: experienceDescription,
-                              },
-                              create: {
-                                   years: Number(experienceYears),
-                                   description: experienceDescription,
-                              },
-                         },
-                    },
-                    currentStatus: {
-                         upsert: {
-                              update: { status: currentStatus },
-                              create: { status: currentStatus },
-                         },
-                    },
-                    socialLinks: {
-                         upsert: {
-                              update: {
-                                   linkedin,
-                                   github,
-                                   twitter,
-                                   website,
-                              },
-                              create: {
-                                   linkedin,
-                                   github,
-                                   twitter,
-                                   website,
-                              },
-                         },
-                    },
-               },
+               data,
                include: {
                     skillsOffered: true,
                     skillsWanted: true,
@@ -110,6 +131,7 @@ export const updateUserProfile = async (req: Request & { userId?: string }, res:
           res.status(500).json({ message: "Error updating profile" });
      }
 };
+
 
 async function getOrCreateSkill(name: string) {
      return await prisma.skill.upsert({

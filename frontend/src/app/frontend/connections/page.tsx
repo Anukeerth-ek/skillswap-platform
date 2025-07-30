@@ -193,7 +193,7 @@ export default function ConnectionListPage() {
                try {
                     const res = await fetch(`http://localhost:4000/api/connections/requests/incoming/${currentUser?.id}`);
                     const data = await res.json();
-                    console.log("from useeffect", data);
+   
                     if (res.ok) {
                          setIncomingRequests(data || []);
                     } else {
@@ -205,7 +205,7 @@ export default function ConnectionListPage() {
                }
           };
           //  if (!currentUser?.id) {
-          console.log("loading anu");
+
           //  }
           // if (currentUser?.id) {
           fetchIncoming();
@@ -218,7 +218,7 @@ export default function ConnectionListPage() {
           try {
                const res = await fetch(`http://localhost:4000/api/connections/requests/incoming/${currentUser.id}`);
                const data = await res.json();
-               console.log("from function", data);
+        
                setIncomingRequests(data || []);
           } catch (err) {
                toast.error("Failed to load connection requests");

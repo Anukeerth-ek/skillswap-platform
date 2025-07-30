@@ -33,14 +33,14 @@ type User = {
 };
 
 export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
-     console.log("user", user);
+
      const [connectionSent, setConnectionSent] = useState(false);
      const { user: currentUser } = useAuthUser();
      
      useEffect(() => {
           if (!currentUser?.id || !user?.id) return;
 
-          console.log("anu", user)
+
           const sent = user.receivedConnections?.some((connection) => connection.senderId === currentUser.id);
           const received = user.sentConnections?.some((connection) => connection.receiverId === currentUser.id);
 
@@ -49,7 +49,6 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
           }
      }, [currentUser?.id, user]);
 
-     console.log("session", currentUser);
      const [isFollowing, setIsFollowing] = useState(false);
 
      const handleSendConnection = async () => {
@@ -91,7 +90,7 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
           }
      };
 
-     console.log("heolo", connectionSent);
+
      return (
           <div className=" bg-gray-900 text-white p-6">
                <div className="flex items-center justify-between mb-6">

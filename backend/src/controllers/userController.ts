@@ -66,7 +66,8 @@ export const updateSessionStatus = async (req: AuthenticatedRequest, res: Respon
 export const createUserProfile = async (req: AuthenticatedRequest, res: Response) => {
   const userId = req.userId;
   if (!userId) {
-    return res.status(401).json({ message: "Unauthorized" });
+    res.status(401).json({ message: "Unauthorized" });
+    return 
   }
 
   try {
@@ -205,6 +206,11 @@ interface AuthenticatedRequest extends Request {
 }
 
 export const getUserProfile = async (req: Request & { userId?: string }, res: Response) => {
+   if (!req.userId) {
+     res.status(401).json({ message: "Unauthorized" });
+     return 
+  }
+
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.userId },
@@ -221,12 +227,12 @@ export const getUserProfile = async (req: Request & { userId?: string }, res: Re
 
     if (!user) {
       res.status(404).json({ message: "User not found" });
-      return;
+      return 
     }
 
     res.status(200).json({ user });
   } catch (error) {
     console.error("Error fetching profile:", error);
-    res.status(500).json({ message: "Error fetching profile" });
+    res.status(500).json({ message: "Server error" });
   }
 };
