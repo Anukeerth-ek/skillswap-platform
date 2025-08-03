@@ -13,6 +13,8 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { useEffect } from "react";
 import { useAuthUser } from "@/app/hooks/useAuth";
 import { toast } from "sonner";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface connection {
      id: string;
@@ -138,6 +140,8 @@ export default function ConnectionListPage() {
      const [usersConnection, setUsersConnection] = useState<any[]>([]);
      const { user: currentUser } = useAuthUser();
 
+     const router = useRouter()
+
      useEffect(() => {
           if (!currentUser?.id) return;
           const fetchUsersConnection = async () => {
@@ -193,7 +197,7 @@ export default function ConnectionListPage() {
                try {
                     const res = await fetch(`http://localhost:4000/api/connections/requests/incoming/${currentUser?.id}`);
                     const data = await res.json();
-   
+
                     if (res.ok) {
                          setIncomingRequests(data || []);
                     } else {
@@ -218,7 +222,7 @@ export default function ConnectionListPage() {
           try {
                const res = await fetch(`http://localhost:4000/api/connections/requests/incoming/${currentUser.id}`);
                const data = await res.json();
-        
+
                setIncomingRequests(data || []);
           } catch (err) {
                toast.error("Failed to load connection requests");
@@ -396,7 +400,7 @@ export default function ConnectionListPage() {
                                    usersConnection?.map((connection: any) => {
                                         console.log("ipl", connection?.user);
                                         return (
-                                             <tr key={connection.id} className="hover:bg-gray-50">
+                                             <tr className="hover:bg-gray-50 cursor-pointer"  key={connection.id} onClick={()=> router.push(`/frontend/connections/${connection.id}`)}>
                                                   <td className="px-6 py-4 whitespace-nowrap">
                                                        <Checkbox
                                                             checked={selectedRows.includes(connection.id)}
