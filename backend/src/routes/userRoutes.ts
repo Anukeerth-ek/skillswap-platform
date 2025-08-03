@@ -7,7 +7,7 @@ const router = express.Router();
 
 router.get("/me", authenticateUser, getUserProfile);
 
-router.get("/users/:id", getUserById);
+router.get("/user/:id", getUserById);
 
 // ✅ FIXED: apply `authenticateUser` here too
 router.post("/", authenticateUser, upload.single("avatar"), createUserProfile);

@@ -240,7 +240,7 @@ export const getUserProfile = async (req: Request & { userId?: string }, res: Re
 // controllers/userController.ts
 export const getUserById = async (req: Request, res: Response) => {
   const { id } = req.params;
-
+console.log("from backend", id)
   try {
     const user = await prisma.user.findUnique({
       where: { id },
@@ -254,6 +254,7 @@ export const getUserById = async (req: Request, res: Response) => {
         socialLinks: true,
       },
     });
+    console.log("user from back", user)
 
     if (!user) {
       res.status(404).json({ message: "User not found" });
