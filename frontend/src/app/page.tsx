@@ -1,9 +1,9 @@
 import React from 'react';
-import { Navbar } from '../app/components/HomeSections/Header/Navbar.tsx';
+// import { Navbar } from '../app/components/HomeSections/Header/Navbar.tsx';
 import { SearchBar } from '../app/components/Searchbar';
 import { LeftSidebar } from '../app/components/HomeSections/Filters';
 import { SearchResults } from '../app/components/HomeSections/searchResult';
-import { ConnectionDetailSideBar } from '../app/components/HomeSections/connectionDetailPage';
+// import { ConnectionDetailSideBar } from '../app/components/HomeSections/connectionDetailPage';
 
 export default function Home() {
   return (

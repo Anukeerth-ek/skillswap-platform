@@ -1,123 +1,38 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, Filter, Plus, MoreHorizontal } from "lucide-react";
+import { Search, Filter, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useEffect } from "react";
 import { useAuthUser } from "@/app/hooks/useAuth";
 import { toast } from "sonner";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-interface connection {
-     id: string;
-     name: string;
-     jobTitle: string;
-     department: string;
-     phoneNumber: string;
-     email: string;
-     avatar?: string;
-}
+// interface connection {
+//      id: string;
+//      name: string;
+//      jobTitle: string;
+//      department: string;
+//      phoneNumber: string;
+//      email: string;
+//      avatar?: string;
+// }
 
-const mockconnections: connection[] = [
-     {
-          id: "1",
-          name: "Darlene Robertson",
-          jobTitle: "Project Manager",
-          department: "Management",
-          phoneNumber: "(201) 555-0124",
-          email: "darlener@epic.com",
-          avatar: "/api/placeholder/32/32",
-     },
-     {
-          id: "2",
-          name: "Kristin Watson",
-          jobTitle: "Office Manager",
-          department: "Office",
-          phoneNumber: "(629) 555-0129",
-          email: "kristinw@epic.com",
-          avatar: "/api/placeholder/32/32",
-     },
-     {
-          id: "3",
-          name: "Bessie Cooper",
-          jobTitle: "Developer",
-          department: "Development",
-          phoneNumber: "(225) 555-0118",
-          email: "bessie@epic.com",
-          avatar: "/api/placeholder/32/32",
-     },
-     {
-          id: "4",
-          name: "Brooklyn Simmons",
-          jobTitle: "Developer",
-          department: "Development",
-          phoneNumber: "(308) 555-0121",
-          email: "brooklyns@epic.com",
-          avatar: "/api/placeholder/32/32",
-     },
-     {
-          id: "5",
-          name: "Eleanor Pena",
-          jobTitle: "Developer",
-          department: "Development",
-          phoneNumber: "(303) 555-0105",
-          email: "eleanorp@epic.com",
-          avatar: "/api/placeholder/32/32",
-     },
-     {
-          id: "6",
-          name: "Savannah Nguyen",
-          jobTitle: "Designer",
-          department: "Marketing",
-          phoneNumber: "(207) 555-0119",
-          email: "savannahh@epic.com",
-          avatar: "/api/placeholder/32/32",
-     },
-     {
-          id: "7",
-          name: "Dianne Russell",
-          jobTitle: "Designer",
-          department: "Marketing",
-          phoneNumber: "(252) 555-0126",
-          email: "dianner@epic.com",
-          avatar: "/api/placeholder/32/32",
-     },
-     {
-          id: "8",
-          name: "Courtney Henry",
-          jobTitle: "Content Writer",
-          department: "Marketing",
-          phoneNumber: "(302) 555-0107",
-          email: "courtneyh@epic.com",
-          avatar: "/api/placeholder/32/32",
-     },
-     {
-          id: "9",
-          name: "Jacob Jones",
-          jobTitle: "Brand Manager",
-          department: "Marketing",
-          phoneNumber: "(208) 555-0112",
-          email: "jacobsj@epic.com",
-          avatar: "/api/placeholder/32/32",
-     },
-     {
-          id: "10",
-          name: "Jenny Wilson",
-          jobTitle: "Sales Manager",
-          department: "Sales & Business",
-          phoneNumber: "(406) 555-0120",
-          email: "jennyw@epic.com",
-          avatar: "/api/placeholder/32/32",
-     },
-];
+
+     interface IncomingRequest {
+          id: string;
+          sender: {
+               id: string;
+               name: string;
+          };
+     }
 
 const departments = ["All Departments", "Management", "Office", "Development", "Marketing", "Sales & Business"];
 
@@ -137,7 +52,22 @@ export default function ConnectionListPage() {
      const [selectedDepartment, setSelectedDepartment] = useState("All Departments");
      const [selectedRows, setSelectedRows] = useState<string[]>([]);
      const [rowsPerPage, setRowsPerPage] = useState(10);
-     const [usersConnection, setUsersConnection] = useState<any[]>([]);
+     interface UserConnection {
+          id: string;
+          name?: string;
+          jobTitle?: string;
+          department: string;
+          email?: string;
+          avatar?: string;
+          user: {
+               id: string;
+               name: string;
+               skillsOffered?: { name: string }[];
+               skillsWanted?: { name: string }[];
+          };
+     }
+
+     const [usersConnection, setUsersConnection] = useState<UserConnection[]>([]);
      const { user: currentUser } = useAuthUser();
 
      const router = useRouter()
@@ -156,10 +86,10 @@ export default function ConnectionListPage() {
      const filteredConnections = useMemo(() => {
           return usersConnection?.filter((connection) => {
                const matchesSearch =
-                    connection.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    connection.jobTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    connection.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    connection.email.toLowerCase().includes(searchTerm.toLowerCase());
+                    connection.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    connection.jobTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    connection.department?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    connection.email?.toLowerCase().includes(searchTerm.toLowerCase());
 
                const matchesDepartment =
                     selectedDepartment === "All Departments" || connection.department === selectedDepartment;
@@ -176,17 +106,17 @@ export default function ConnectionListPage() {
           setSelectedRows(selectedRows.length === filteredConnections.length ? [] : filteredConnections.map((c) => c.id));
      };
 
-     const getInitials = (name: string) => {
-          return name
-               .split(" ")
-               .map((n) => n[0])
-               .join("")
-               .toUpperCase();
-     };
+     // const getInitials = (name: string) => {
+     //      return name
+     //           .split(" ")
+     //           .map((n) => n[0])
+     //           .join("")
+     //           .toUpperCase();
+     // };
 
      //  const { user: currentUser } = useAuthUser();
      const [showPopover, setShowPopover] = useState(false);
-     const [incomingRequests, setIncomingRequests] = useState<any[]>([]);
+     const [incomingRequests, setIncomingRequests] = useState<IncomingRequest[]>([]);
      const [loadingRequests, setLoadingRequests] = useState(false);
 
      useEffect(() => {
@@ -226,6 +156,7 @@ export default function ConnectionListPage() {
                setIncomingRequests(data || []);
           } catch (err) {
                toast.error("Failed to load connection requests");
+               console.log(err)
           } finally {
                setLoadingRequests(false);
           }

@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
-import { redirect, useRouter } from "next/navigation";
+import {  useRouter } from "next/navigation";
 
 interface FormData {
      email: string;
@@ -24,7 +24,7 @@ interface FormErrors {
      general?: string;
 }
 
-export default function page() {
+export default function Page() {
      const router = useRouter();
      const [isLogin, setIsLogin] = useState(true);
      const [showPassword, setShowPassword] = useState(false);

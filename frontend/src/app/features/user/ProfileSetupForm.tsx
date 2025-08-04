@@ -65,7 +65,7 @@ export default function ProfileSetupForm() {
 
       <div>
         <Label>Your Role</Label>
-        <Select value={role} onValueChange={(value) => setRole(value as any)}>
+        <Select value={role} onValueChange={(value) => setRole(value as "MENTOR" | "LEARNER" | "BOTH")}>
           <SelectItem value="MENTOR">Mentor</SelectItem>
           <SelectItem value="LEARNER">Learner</SelectItem>
           <SelectItem value="BOTH">Both</SelectItem>

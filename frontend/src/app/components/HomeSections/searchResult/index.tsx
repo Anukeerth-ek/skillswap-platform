@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import { ConnectionCard } from "../connectionCard/index";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ConnectionDetailSideBar } from "../connectionDetailPage";
 
 type User = {

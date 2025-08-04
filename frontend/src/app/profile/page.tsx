@@ -1,49 +1,61 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Plus, X, Clock, Globe, Book, Lightbulb } from "lucide-react";
+import { Plus, X, Clock, Book, Lightbulb } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { User } from "../../types";
+// import { User } from "../../types";
 
 const ProfileCreatePage = () => {
      const router = useRouter();
 
      type ProfileData = {
-  name: string;
-  bio: string;
-  avatarUrl: string;
-  timeZone: string;
-  professionDetails: string;
-  currentOrganization: string;
-  experienceSummary: string;
-  skillsOffered: string[];
-  skillsWanted: string[];
-     };
-     type Skill = {
-          id: string;
-          name: string;
-          category: string | null;
-     };
-
-     type Profile = {
           name: string;
           bio: string;
           avatarUrl: string;
           timeZone: string;
-          skillsOffered: Skill[];
-          skillsWanted: Skill[];
+          professionDetails: string;
+          currentOrganization: string;
+          experienceSummary: string;
+          skillsOffered: string[];
+          skillsWanted: string[];
      };
+     // type Skill = {
+     //      id: string;
+     //      name: string;
+     //      category: string | null;
+     // };
+       interface UserProfileApiResponse {
+                         name?: string;
+                         bio?: string;
+                         avatarUrl?: string;
+                         timeZone?: string;
+                         professionDetails?: { title?: string };
+                         currentOrganization?: { organization?: string };
+                         experienceSummary?: { years?: number };
+                         // currentStatus?: { status?: string };
+                         skillsOffered?: { name: string }[];
+                         skillsWanted?: { name: string }[];
+                    }
+     interface HandleSubmitEvent extends React.FormEvent<HTMLFormElement> {}
+     // type Profile = {
+     //      name: string;
+     //      bio: string;
+     //      avatarUrl: string;
+     //      timeZone: string;
+     //      skillsOffered: Skill[];
+     //      skillsWanted: Skill[];
+     // };
 
      const [formData, setFormData] = useState<ProfileData>({
-   name: "",
-    bio: "",
-    avatarUrl: "",
-    timeZone: "",
-    professionDetails: "",
-    currentOrganization: "",
-    experienceSummary: "",
-    skillsOffered: [],
-    skillsWanted: [],
+          name: "",
+          bio: "",
+          avatarUrl: "",
+          timeZone: "",
+          professionDetails: "",
+          currentOrganization: "",
+          experienceSummary: "",
+          skillsOffered: [],
+          skillsWanted: [],
      });
 
      const [newSkillOffered, setNewSkillOffered] = useState("");
@@ -79,7 +91,9 @@ const ProfileCreatePage = () => {
           "Asia/Kolkata",
      ];
 
-     const handleInputChange = (e: any) => {
+     interface InputChangeEvent extends React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> {}
+
+     const handleInputChange = (e: InputChangeEvent): void => {
           const { name, value } = e.target;
           setFormData((prev) => ({
                ...prev,
@@ -129,12 +143,10 @@ const ProfileCreatePage = () => {
           }));
      };
 
-     interface HandleSubmitEvent extends React.FormEvent<HTMLFormElement> {}
-
-     interface ApiResponse {
-          ok: boolean;
-          // Add more fields if your API returns them
-     }
+     // interface ApiResponse {
+     //      ok: boolean;
+     //      // Add more fields if your API returns them
+     // }
      const handleSubmit = async (e: HandleSubmitEvent): Promise<void> => {
           e.preventDefault();
           setIsSubmitting(true);
@@ -154,7 +166,7 @@ const ProfileCreatePage = () => {
                formDataToSend.append("bio", formData.bio || "");
                formDataToSend.append("timeZone", formData.timeZone || "");
 
-               formDataToSend.append("professionalDetail", formData.professionDetails );
+               formDataToSend.append("professionalDetail", formData.professionDetails);
                formDataToSend.append("currentOrganization", formData.currentOrganization);
                formDataToSend.append("yearsOfExperience", formData.experienceSummary);
 
@@ -216,17 +228,18 @@ const ProfileCreatePage = () => {
                if (res.ok && data.user) {
                     setProfile(data.user);
                     setIsEdit(true); // ✅ important
+
                     setFormData({
-                         name: data.user.name || "",
-                         bio: data.user.bio || "",
-                         avatarUrl: data.user.avatarUrl || "",
-                         timeZone: data.user.timeZone || "",
-                         professionDetails: data.user.professionDetails?.title || "",
-                         currentOrganization: data.user.currentOrganization?.organization || "",
-                         experienceSummary: data.user.experienceSummary?.years?.toString() || "",
-                         //   currentStatus: data.user.currentStatus?.status || "",
-                         skillsOffered: data.user.skillsOffered?.map((s: any) => s.name) || [],
-                         skillsWanted: data.user.skillsWanted?.map((s: any) => s.name) || [],
+                         name: (data.user as UserProfileApiResponse).name || "",
+                         bio: (data.user as UserProfileApiResponse).bio || "",
+                         avatarUrl: (data.user as UserProfileApiResponse).avatarUrl || "",
+                         timeZone: (data.user as UserProfileApiResponse).timeZone || "",
+                         professionDetails: (data.user as UserProfileApiResponse).professionDetails?.title || "",
+                         currentOrganization: (data.user as UserProfileApiResponse).currentOrganization?.organization || "",
+                         experienceSummary: (data.user as UserProfileApiResponse).experienceSummary?.years?.toString() || "",
+                         //   currentStatus: (data.user as UserProfileApiResponse).currentStatus?.status || "",
+                         skillsOffered: (data.user as UserProfileApiResponse).skillsOffered?.map((s: { name: string }) => s.name) || [],
+                         skillsWanted: (data.user as UserProfileApiResponse).skillsWanted?.map((s: { name: string }) => s.name) || [],
                     });
 
                     if (data.user.avatarUrl) {
