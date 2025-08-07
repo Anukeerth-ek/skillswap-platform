@@ -17,12 +17,12 @@ export const initSocket = (server: any) => {
 
     if (userId) {
       onlineUsers.set(userId, socket.id);
-      console.log(`🟢 ${userId} connected`);
+
     }
 
     socket.on("disconnect", () => {
       if (userId) onlineUsers.delete(userId);
-      console.log(`🔴 ${userId} disconnected`);
+      console.log(`disconnected`);
     });
   });
 

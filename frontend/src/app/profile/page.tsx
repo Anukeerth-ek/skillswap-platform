@@ -195,7 +195,7 @@ const ProfileCreatePage = () => {
 
                if (response.ok) {
                     router.push("/");
-                    console.log("Profile created successfully!");
+                
                } else {
                     const errData = await response.json();
                     console.error("Failed to create profile", errData);
@@ -224,7 +224,7 @@ const ProfileCreatePage = () => {
                });
 
                const data = await res.json();
-               console.log("data", data);
+             
                if (res.ok && data.user) {
                     setProfile(data.user);
                     setIsEdit(true); // ✅ important
@@ -251,9 +251,6 @@ const ProfileCreatePage = () => {
           fetchProfile();
      }, []);
 
-     console.log("profile here", profile);
-
-     console.log("formdata", formData);
 
      return (
           <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">

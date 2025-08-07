@@ -23,12 +23,12 @@ io.on("connection", (socket) => {
 
   if (userId) {
     onlineUsers.set(userId, socket.id);
-    console.log(`${userId} connected: ${socket.id}`);
+    
   }
 
   socket.on("disconnect", () => {
     if (userId) onlineUsers.delete(userId);
-    console.log(`${userId} disconnected`);
+    console.log(` disconnected`);
   });
 });
 

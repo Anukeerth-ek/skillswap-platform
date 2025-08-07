@@ -29,6 +29,31 @@ export default function ConnectionDetailPage() {
      const [user, setUser] = useState<User | null>(null);
      const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
+     const handleSubmitRequest = async () => {
+          if (!selectedDate || !user?.id) return;
+
+          const token = localStorage.getItem("token");
+
+          const res = await fetch("http://localhost:4000/api/sessions/request", {
+               method: "POST",
+               headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${token}`,
+               },
+               body: JSON.stringify({
+                    mentorId: user.id,
+                    startTime: selectedDate.toISOString(),
+               }),
+          });
+
+          const data = await res.json();
+          if (res.ok) {
+               alert("Session request sent!");
+          } else {
+               alert(data.message || "Failed to request session");
+          }
+     };
+
      useEffect(() => {
           if (!id) return;
 
@@ -132,7 +157,12 @@ export default function ConnectionDetailPage() {
                          )}
                     </div>
 
-                    <button className="bg-purple-500 py-2 px-4 rounded-3xl text-white align-middle">Submit</button>
+                    <button
+                         className="bg-purple-500 py-2 px-4 rounded-3xl text-white align-middle"
+                         onClick={handleSubmitRequest}
+                    >
+                         Submit
+                    </button>
                </div>
           </>
      );

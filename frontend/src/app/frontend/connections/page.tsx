@@ -329,7 +329,7 @@ export default function ConnectionListPage() {
                          <tbody className="bg-white divide-y divide-gray-200">
                               {usersConnection.length > 0 ? (
                                    usersConnection?.map((connection: any) => {
-                                        // console.log("ipl", connection?.user);
+                            
                                         return (
                                              <tr className="hover:bg-gray-50 cursor-pointer"  key={connection.id} onClick={()=> router.push(`/frontend/connections/${connection.user.id}`)}>
                                                   <td className="px-6 py-4 whitespace-nowrap">

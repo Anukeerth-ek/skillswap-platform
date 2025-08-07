@@ -1,36 +1,69 @@
 import  prisma  from "../prismaClient";
 import { createMeetEvent } from "../lib/googleCalendar";
 
-export const acceptSession = async (req:any, res:any) => {
+export const acceptSession = async (req: any, res: any) => {
   const sessionId = req.params.id;
+  const { status } = req.body;
 
   try {
     const session = await prisma.session.findUnique({ where: { id: sessionId } });
-
     if (!session) return res.status(404).json({ message: "Session not found" });
 
-    const startTime = session.scheduledAt.toISOString();
-    const endTime = new Date(session.scheduledAt.getTime() + 60 * 60 * 1000).toISOString(); // 1 hour
+    let meetLink:any = session.meetLink;
 
-    const meetLink = await createMeetEvent({
-      summary: `SkillSwap: ${session.skillId}`,
-      description: "Mentorship Session",
-      startTime,
-      endTime,
-    });
+    if (status === "CONFIRMED" && !meetLink) {
+      const startTime = session.scheduledAt.toISOString();
+      const endTime = new Date(session.scheduledAt.getTime() + 60 * 60 * 1000).toISOString();
+
+      meetLink = await createMeetEvent({
+        summary: `SkillSwap: ${session.skillId}`,
+        description: "Mentorship Session",
+        startTime,
+        endTime,
+      });
+    }
 
     const updated = await prisma.session.update({
       where: { id: sessionId },
       data: {
-        status: "CONFIRMED",
+        status,
         meetLink,
       },
     });
 
-    res.json({ message: "Session confirmed", session: updated });
+    res.json({ message: `Session ${status.toLowerCase()}`, session: updated });
   } catch (error) {
-    console.error("Error accepting session", error);
+    console.error("Error updating session", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
 
+
+export const requestSession = async (req: any, res: any) => {
+  try {
+    const { mentorId, skillId, startTime } = req.body;
+
+    console.log("anukeerth", mentorId, skillId, startTime)
+
+    if (!mentorId || !skillId || !startTime) {
+      return res.status(400).json({ message: "mentorId, skillId and startTime are required" });
+    }
+
+    const learnerId = req.user.id; // Comes from verifyToken middleware
+
+    const session = await prisma.session.create({
+      data: {
+        mentor: { connect: { id: mentorId } },
+        learner: { connect: { id: learnerId } },
+        skill: { connect: { id: skillId } },
+        scheduledAt: new Date(startTime),
+        status: "PENDING",
+      },
+    });
+
+    res.status(201).json({ message: "Session request created", session });
+  } catch (error) {
+    console.error("Error creating session request", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

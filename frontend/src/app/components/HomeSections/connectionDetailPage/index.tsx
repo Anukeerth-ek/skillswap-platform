@@ -52,7 +52,7 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
      const [isFollowing, setIsFollowing] = useState(false);
 
      const handleSendConnection = async () => {
-               console.log("user", currentUser?.id)
+         
           if (!currentUser?.id) {
                toast.error("You must be logged in to connect");
                return;

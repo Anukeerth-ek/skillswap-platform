@@ -13,6 +13,8 @@ import mentorRoutes from "./routes/mentorRoutes";
 import profileRoutes from "./routes/profile.routes"
 import connectionRoutes from "./routes/connectionRoutes"
 import followRoutes from "./routes/followRoutes"
+import meetSessionRoutes from './routes/meetSessionRoutes'
+
 dotenv.config();
 
 const app = express();
@@ -34,6 +36,8 @@ app.use("/api/follow", followRoutes);
 
 app.use("/api", connectionRoutes);
 
+app.use("/api/sessions", meetSessionRoutes)
+
 const server = http.createServer(app);
 initSocket(server);
 const io = new Server(server, {
@@ -50,12 +54,12 @@ io.on("connection", (socket) => {
 
   if (userId) {
     onlineUsers.set(userId, socket.id);
-    console.log(`🟢 ${userId} connected: ${socket.id}`);
+
   }
 
   socket.on("disconnect", () => {
     if (userId) onlineUsers.delete(userId);
-    console.log(`🔴 ${userId} disconnected`);
+    console.log('userid')
   });
 });
 
