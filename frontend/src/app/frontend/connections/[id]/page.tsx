@@ -26,11 +26,21 @@ type User = {
 
 export default function ConnectionDetailPage() {
      const { id } = useParams();
-     const [user, setUser] = useState<User | null>(null);
+     const [mentor, setMentor] = useState<User | null>(null);
      const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
+     const [loggedInUserSkills, setLoggedInUserSkills] = useState<any[]>([]);
+     const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
+
      const handleSubmitRequest = async () => {
-          if (!selectedDate || !user?.id) return;
+          console.log("user id",mentor?.id)
+          console.log("selecteddate",selectedDate)
+          console.log("selectedskillid", selectedSkillId)
+          
+          if (!selectedDate || !mentor?.id || !selectedSkillId) {
+               alert("Something is missing")
+               return
+          };
 
           const token = localStorage.getItem("token");
 
@@ -41,8 +51,9 @@ export default function ConnectionDetailPage() {
                     Authorization: `Bearer ${token}`,
                },
                body: JSON.stringify({
-                    mentorId: user.id,
                     startTime: selectedDate.toISOString(),
+                    mentorId: mentor.id,
+                    selectedSkillId: selectedSkillId,
                }),
           });
 
@@ -61,7 +72,7 @@ export default function ConnectionDetailPage() {
                try {
                     const res = await fetch(`http://localhost:4000/api/profile/user/${id}`);
                     const data = await res.json();
-                    setUser(data.user);
+                    setMentor(data.user);
                } catch (err) {
                     console.error("Failed to fetch user", err);
                }
@@ -70,7 +81,23 @@ export default function ConnectionDetailPage() {
           fetchData();
      }, [id]);
 
-     if (!user) return <div className="p-6">Loading user details...</div>;
+     useEffect(() => {
+          const fetchLoggedInUser = async () => {
+               const token = localStorage.getItem("token");
+               if (!token) return;
+
+               const res = await fetch("http://localhost:4000/api/profile/me", {
+                    headers: { Authorization: `Bearer ${token}` },
+               });
+
+               const data = await res.json();
+               setLoggedInUserSkills(data.user?.skillsOffered || []);
+          };
+
+          fetchLoggedInUser();
+     }, []);
+
+     if (!mentor) return <div className="p-6">Loading user details...</div>;
 
      return (
           <>
@@ -78,14 +105,14 @@ export default function ConnectionDetailPage() {
                <div className="max-w-4xl mx-auto p-8 bg-white rounded-xl shadow-md mt-10">
                     <div className="flex items-center gap-6 border-b pb-6">
                          <Avatar className="w-24 h-24 ring-2 ring-gray-300 shadow-sm">
-                              <AvatarImage src={user.avatarUrl || ""} alt={user.name} />
-                              <AvatarFallback className="text-xl">{user.name?.charAt(0)}</AvatarFallback>
+                              <AvatarImage src={mentor.avatarUrl || ""} alt={mentor.name} />
+                              <AvatarFallback className="text-xl">{mentor.name?.charAt(0)}</AvatarFallback>
                          </Avatar>
                          <div>
-                              <h1 className="text-3xl font-semibold">{user.name}</h1>
-                              <p className="text-gray-500 mt-1">{user.bio}</p>
+                              <h1 className="text-3xl font-semibold">{mentor.name}</h1>
+                              <p className="text-gray-500 mt-1">{mentor.bio}</p>
                               <Badge variant="secondary" className="mt-2">
-                                   {user.role}
+                                   {mentor.role}
                               </Badge>
                          </div>
                     </div>
@@ -93,16 +120,16 @@ export default function ConnectionDetailPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 text-gray-800">
                          <div>
                               <p className="text-sm text-gray-500">Email</p>
-                              <p className="font-medium">{user.email}</p>
+                              <p className="font-medium">{mentor.email}</p>
                          </div>
                          <div>
                               <p className="text-sm text-gray-500">Timezone</p>
-                              <p className="font-medium">{user.timezone}</p>
+                              <p className="font-medium">{mentor.timezone}</p>
                          </div>
                          <div>
                               <p className="text-sm text-gray-500">Joined</p>
                               <p className="font-medium">
-                                   {new Date(user.createdAt).toLocaleDateString(undefined, {
+                                   {new Date(mentor.createdAt).toLocaleDateString(undefined, {
                                         year: "numeric",
                                         month: "long",
                                         day: "numeric",
@@ -111,11 +138,11 @@ export default function ConnectionDetailPage() {
                          </div>
                     </div>
 
-                    {user.skillsOffered?.length > 0 && (
+                    {mentor.skillsOffered?.length > 0 && (
                          <div className="mt-10">
                               <h2 className="text-lg font-semibold mb-2">Skills Offered</h2>
                               <div className="flex flex-wrap gap-2">
-                                   {user.skillsOffered.map((skill, index) => (
+                                   {mentor.skillsOffered.map((skill, index) => (
                                         <Badge key={skill.id || index} variant="outline">
                                              {skill.name}
                                         </Badge>
@@ -124,11 +151,11 @@ export default function ConnectionDetailPage() {
                          </div>
                     )}
 
-                    {user.skillsWanted?.length > 0 && (
+                    {mentor.skillsWanted?.length > 0 && (
                          <div className="mt-6">
                               <h2 className="text-lg font-semibold mb-2">Skills Wanted</h2>
                               <div className="flex flex-wrap gap-2">
-                                   {user.skillsWanted.map((skill, index) => (
+                                   {mentor.skillsWanted.map((skill, index) => (
                                         <Badge
                                              key={skill.id || index}
                                              variant="outline"
@@ -157,8 +184,31 @@ export default function ConnectionDetailPage() {
                          )}
                     </div>
 
+                    {loggedInUserSkills.length > 0 && (
+                         <div className="mt-6">
+                              <label htmlFor="skill" className="block mb-2 font-medium">
+                                   Choose the skill you want mentorship on:
+                              </label>
+                              <select
+                                   id="skill"
+                                   value={selectedSkillId || ""}
+                                   onChange={(e) => setSelectedSkillId(e.target.value)}
+                                   className="border px-3 py-2 rounded w-full"
+                              >
+                                   <option value="" disabled>
+                                        Select a skill
+                                   </option>
+                                   {loggedInUserSkills.map((skill) => (
+                                        <option key={skill.id} value={skill.id}>
+                                             {skill.name}
+                                        </option>
+                                   ))}
+                              </select>
+                         </div>
+                    )}
+
                     <button
-                         className="bg-purple-500 py-2 px-4 rounded-3xl text-white align-middle"
+                         className="bg-purple-500 py-2 px-4 rounded-3xl text-white align-middle cursor-pointer"
                          onClick={handleSubmitRequest}
                     >
                          Submit
