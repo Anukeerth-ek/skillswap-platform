@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,73 +8,114 @@ datasource db {
 }
 
 model User {
-  id                String     @id @default(uuid())
-  name              String     
-  email             String     @unique
-  password          String
-  bio               String?
-  professionDetails     UserProfessionDetails?
-  currentOrganization   UserCurrentOrganization?
-  experienceSummary     UserExperienceSummary?
-  currentStatus         UserCurrentStatus?
-  socialLinks           UserSocialLinks?
-  avatarUrl         String?
-  role              Role       @default(LEARNER)
-  timeZone          String?
-  createdAt         DateTime   @default(now())
-  skillsOffered     Skill[]    @relation("SkillsOffered")
-  skillsWanted      Skill[]    @relation("SkillsWanted")
-  sessionsAsMentor  Session[]  @relation("MentorSessions")
-  sessionsAsLearner Session[]  @relation("LearnerSessions")
-  sentConnections     Connection[] @relation("SentConnections")
-  receivedConnections Connection[] @relation("ReceivedConnections")
-  followers Follow[] @relation("Followers")
-  following Follow[] @relation("Following")
+  id                  String                   @id @default(uuid())
+  name                String
+  email               String                   @unique
+  password            String
+  bio                 String?
+  avatarUrl           String?
+  createdAt           DateTime                 @default(now())
+  role                Role                     @default(LEARNER)
+  timeZone            String?
+  receivedConnections Connection[]             @relation("ReceivedConnections")
+  sentConnections     Connection[]             @relation("SentConnections")
+  following           Follow[]                 @relation("Following")
+  followers           Follow[]                 @relation("Followers")
+  sessionsAsLearner   Session[]                @relation("LearnerSessions")
+  sessionsAsMentor    Session[]                @relation("MentorSessions")
+  currentOrganization UserCurrentOrganization?
+  currentStatus       UserCurrentStatus?
+  experienceSummary   UserExperienceSummary?
+  professionDetails   UserProfessionDetails?
+  socialLinks         UserSocialLinks?
+  skillsOffered       Skill[]                  @relation("SkillsOffered")
+  skillsWanted        Skill[]                  @relation("SkillsWanted")
 }
 
 model Skill {
   id        String    @id @default(uuid())
-  name      String    @unique 
+  name      String    @unique
   category  String?
+  sessions  Session[] @relation("SkillSessions")
   offeredBy User[]    @relation("SkillsOffered")
   wantedBy  User[]    @relation("SkillsWanted")
-  sessions  Session[] @relation("SkillSessions")
 }
 
 model Connection {
-  id         String            @id @default(uuid())
-  sender     User              @relation("SentConnections", fields: [senderId], references: [id])
+  id         String           @id @default(uuid())
   senderId   String
-  receiver   User              @relation("ReceivedConnections", fields: [receiverId], references: [id])
   receiverId String
-  status     ConnectionStatus  @default(PENDING)
-  createdAt  DateTime          @default(now())
+  status     ConnectionStatus @default(PENDING)
+  createdAt  DateTime         @default(now())
+  receiver   User             @relation("ReceivedConnections", fields: [receiverId], references: [id])
+  sender     User             @relation("SentConnections", fields: [senderId], references: [id])
 }
 
 model Follow {
-  id         String  @id @default(uuid())
-  follower   User    @relation("Following", fields: [followerId], references: [id])
-  followerId String
-  following  User    @relation("Followers", fields: [followingId], references: [id])
+  id          String   @id @default(uuid())
+  followerId  String
   followingId String
-  createdAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  follower    User     @relation("Following", fields: [followerId], references: [id])
+  following   User     @relation("Followers", fields: [followingId], references: [id])
 
-  @@unique([followerId, followingId]) // Prevent duplicate follows
+  @@unique([followerId, followingId])
 }
 
 model Session {
-  id            String        @id @default(uuid())
-  mentor        User          @relation("MentorSessions", fields: [mentorId], references: [id])
-  mentorId      String
-  learner       User          @relation("LearnerSessions", fields: [learnerId], references: [id])
-  learnerId     String
-  skill         Skill         @relation("SkillSessions", fields: [skillId], references: [id])
-  skillId       String
-  scheduledAt   DateTime
-  status        SessionStatus @default(PENDING)
-  feedback      String?
-  meetLink      String?       
-  createdAt     DateTime      @default(now())
+  id          String        @id @default(uuid())
+  mentorId    String
+  learnerId   String
+  scheduledAt DateTime
+  status      SessionStatus @default(PENDING)
+  feedback    String?
+  meetLink    String?       
+  createdAt   DateTime      @default(now())
+  skillId     String
+  learner     User          @relation("LearnerSessions", fields: [learnerId], references: [id])
+  mentor      User          @relation("MentorSessions", fields: [mentorId], references: [id])
+  skill       Skill         @relation("SkillSessions", fields: [skillId], references: [id])
+}
+
+
+model UserProfessionDetails {
+  id     String @id @default(uuid())
+  title  String
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model UserCurrentOrganization {
+  id           String @id @default(uuid())
+  organization String
+  userId       String @unique
+  user         User   @relation(fields: [userId], references: [id])
+}
+
+model UserExperienceSummary {
+  id          String  @id @default(uuid())
+  years       Int
+  description String?
+  userId      String  @unique
+  user        User    @relation(fields: [userId], references: [id])
+}
+
+model UserCurrentStatus {
+  id     String @id @default(uuid())
+  status String
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+}
+
+model UserSocialLinks {
+  id       String  @id @default(uuid())
+  linkedin String?
+  github   String?
+  twitter  String?
+  leetcode String?
+  website  String?
+  userId   String  @unique
+  user     User    @relation(fields: [userId], references: [id])
 }
 
 enum Role {
@@ -100,44 +135,4 @@ enum SessionStatus {
   CONFIRMED
   COMPLETED
   CANCELLED
-}
- 
- model UserProfessionDetails {
-  id        String @id @default(uuid())
-  title     String
-  userId    String @unique
-  user      User   @relation(fields: [userId], references: [id])
-}
-
-model UserCurrentOrganization {
-  id             String @id @default(uuid())
-  organization   String
-  userId         String @unique
-  user           User   @relation(fields: [userId], references: [id])
-}
-
-model UserExperienceSummary {
-  id           String @id @default(uuid())
-  years        Int
-  description  String?
-  userId       String @unique
-  user         User   @relation(fields: [userId], references: [id])
-}
-
-model UserCurrentStatus {
-  id       String @id @default(uuid())
-  status   String
-  userId   String @unique
-  user     User   @relation(fields: [userId], references: [id])
-}
-
-model UserSocialLinks {
-  id        String @id @default(uuid())
-  linkedin  String?
-  github    String?
-  twitter   String?
-  leetcode  String?
-  website   String?
-  userId    String  @unique
-  user      User    @relation(fields: [userId], references: [id])
 }
