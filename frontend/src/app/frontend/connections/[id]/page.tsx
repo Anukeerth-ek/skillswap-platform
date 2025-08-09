@@ -33,9 +33,7 @@ export default function ConnectionDetailPage() {
      const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
 
      const handleSubmitRequest = async () => {
-          console.log("user id",mentor?.id)
-          console.log("selecteddate",selectedDate)
-          console.log("selectedskillid", selectedSkillId)
+  
           
           if (!selectedDate || !mentor?.id || !selectedSkillId) {
                alert("Something is missing")

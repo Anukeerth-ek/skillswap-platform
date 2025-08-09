@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 interface Session {
   id: string;
   mentor: { name: string };
-  mentee: { name: string };
+  learner: { name: string };
   status: "PENDING" | "CONFIRMED" | "REJECTED";
   startTime: string;
   meetLink?: string;
@@ -21,13 +21,15 @@ const SessionsPage = () => {
     if (!token) return;
 
     try {
-      const res = await fetch("http://localhost:4000/api/sessions/my", {
+      const res = await fetch("http://localhost:4000/api/sessions/my-sessions", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
+      
       const data = await res.json();
+      console.log('data', data)
       setSessions(data.sessions || []);
     } catch (err) {
       console.error("Failed to fetch sessions:", err);
@@ -80,7 +82,7 @@ const SessionsPage = () => {
                 <strong>Mentor:</strong> {session.mentor.name}
               </p>
               <p>
-                <strong>Mentee:</strong> {session.mentee.name}
+                <strong>Mentee:</strong> {session.learner.name}
               </p>
               <p>
                 <strong>Time:</strong>{" "}
