@@ -40,21 +40,21 @@ export const acceptSession = async (req: any, res: any) => {
 
 export const requestSession = async (req: any, res: any) => {
      try {
-          const { startTime, mentorId, selectedSkillId } = req.body;
+          const { startTime, mentorId, skill } = req.body;
 
+          console.log("anukeerth", skill);
 
-
-          if (!mentorId || !selectedSkillId || !startTime) {
+          if (!mentorId || !skill || !startTime) {
                return res.status(400).json({ message: "mentorId, skillId and startTime are required" });
           }
-         
+
           const learnerId = req.userId; // Comes from verifyToken middleware
 
           const session = await prisma.session.create({
                data: {
                     mentor: { connect: { id: mentorId } },
                     learner: { connect: { id: learnerId } },
-                    skill: { connect: { id: selectedSkillId } },
+                    skill: { connect: { id: skill } },
                     scheduledAt: new Date(startTime),
                     status: "PENDING",
                },
@@ -69,23 +69,25 @@ export const requestSession = async (req: any, res: any) => {
 
 
 export const getMySessions = async (req: any, res: any) => {
-  try {
-    const userId = req.userId; // from JWT middleware
+     try {
+          const userId = req.userId;
 
-    const sessions = await prisma.session.findMany({
-      where: {
-        OR: [{ mentorId: userId }, { learnerId: userId }]
-      },
-      include: {
-        mentor: { select: { name: true } },
-        learner: { select: { name: true } }
-      },
-      orderBy: { scheduledAt: "desc" }
-    });
-console.log("sessionanukeert", sessions)
-    res.json({ sessions });
-  } catch (error) {
-    console.error("Error fetching sessions:", error);
-    res.status(500).json({ message: "Server error" });
-  }
+          const sessions = await prisma.session.findMany({
+               where: {
+                    OR: [{ mentorId: userId }, { learnerId: userId }],
+               },
+               include: {
+                    mentor: { select: { name: true } },
+                    learner: { select: { name: true } },
+                    skill: { select: { name: true } }, 
+               },
+               orderBy: { scheduledAt: "desc" },
+          });
+
+          console.log("sessionanukeert", sessions);
+          res.json({ sessions });
+     } catch (error) {
+          console.error("Error fetching sessions:", error);
+          res.status(500).json({ message: "Server error" });
+     }
 };
