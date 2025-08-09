@@ -7,8 +7,9 @@ interface Session {
   id: string;
   mentor: { name: string };
   learner: { name: string };
+  skill: {name: string};
   status: "PENDING" | "CONFIRMED" | "REJECTED";
-  startTime: string;
+  scheduledAt: string;
   meetLink?: string;
 }
 
@@ -79,14 +80,14 @@ const SessionsPage = () => {
               className="border p-4 rounded-lg shadow-sm flex flex-col gap-2"
             >
               <p>
-                <strong>Mentor:</strong> {session.mentor.name}
+                <strong>Learner:</strong> {session.learner.name}
               </p>
               <p>
-                <strong>Mentee:</strong> {session.learner.name}
+                <strong>Skill:</strong> {session.skill.name}
               </p>
               <p>
                 <strong>Time:</strong>{" "}
-                {new Date(session.startTime).toLocaleString()}
+                {new Date(session.scheduledAt).toLocaleString()}
               </p>
               <p>
                 <strong>Status:</strong>{" "}

@@ -285,7 +285,7 @@ const ProfileCreatePage = () => {
                                    />
                               </div>
                               {/* Profession Field */}
-                              <div>
+                              {/* <div>
                                    <label
                                         htmlFor="professionalDetail"
                                         className="block text-sm font-medium text-gray-700 mb-2"
@@ -302,10 +302,10 @@ const ProfileCreatePage = () => {
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                         placeholder="Enter your current profession"
                                    />
-                              </div>
+                              </div> */}
 
                               {/* Professional Experience in years*/}
-                              <div>
+                              {/* <div>
                                    <label
                                         htmlFor="yearsOfExperience"
                                         className="block text-sm font-medium text-gray-700 mb-2"
@@ -322,10 +322,10 @@ const ProfileCreatePage = () => {
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                         placeholder="Eg: If its is 5 year, enter 5"
                                    />
-                              </div>
+                              </div> */}
 
                               {/* Current organisation*/}
-                              <div>
+                              {/* <div>
                                    <label
                                         htmlFor="currentOrganization"
                                         className="block text-sm font-medium text-gray-700 mb-2"
@@ -342,7 +342,7 @@ const ProfileCreatePage = () => {
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                         placeholder="Your current organisation name"
                                    />
-                              </div>
+                              </div> */}
 
                               {/* Bio Field */}
                               <div>

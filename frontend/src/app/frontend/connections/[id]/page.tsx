@@ -30,16 +30,14 @@ export default function ConnectionDetailPage() {
      const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
      const [loggedInUserSkills, setLoggedInUserSkills] = useState<any[]>([]);
-     const [selectedSkillId, setSelectedSkillId] = useState<string | null>(null);
+     const [selectedSkillNames, setSelectedSkillNames] = useState<string | null>(null);
 
      const handleSubmitRequest = async () => {
-  
-          
-          if (!selectedDate || !mentor?.id || !selectedSkillId) {
-               alert("Something is missing")
-               return
-          };
-
+          console.log("anukeertfront", selectedSkillNames);
+          if (!selectedDate || !mentor?.id || !selectedSkillNames) {
+               alert("Something is missing");
+               return;
+          }
           const token = localStorage.getItem("token");
 
           const res = await fetch("http://localhost:4000/api/sessions/request", {
@@ -51,7 +49,7 @@ export default function ConnectionDetailPage() {
                body: JSON.stringify({
                     startTime: selectedDate.toISOString(),
                     mentorId: mentor.id,
-                    selectedSkillId: selectedSkillId,
+                    selectedSkillNames: selectedSkillNames,
                }),
           });
 
@@ -182,21 +180,26 @@ export default function ConnectionDetailPage() {
                          )}
                     </div>
 
-                    {loggedInUserSkills.length > 0 && (
+                    {mentor.skillsOffered?.length > 0 && (
                          <div className="mt-6">
                               <label htmlFor="skill" className="block mb-2 font-medium">
                                    Choose the skill you want mentorship on:
                               </label>
                               <select
                                    id="skill"
-                                   value={selectedSkillId || ""}
-                                   onChange={(e) => setSelectedSkillId(e.target.value)}
+                                   value={selectedSkillNames || ""}
+                                   onChange={(e) => {
+                                        const selectedId = e.target.value; // skill.id
+                                        const selectedSkill = mentor.skillsOffered.find((skill) => skill.id === selectedId);
+                                        setSelectedSkillNames(selectedSkill.name)
+                                      
+                                   }}
                                    className="border px-3 py-2 rounded w-full"
                               >
                                    <option value="" disabled>
                                         Select a skill
                                    </option>
-                                   {loggedInUserSkills.map((skill) => (
+                                   {mentor.skillsOffered.map((skill) => (
                                         <option key={skill.id} value={skill.id}>
                                              {skill.name}
                                         </option>
