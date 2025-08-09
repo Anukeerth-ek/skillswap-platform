@@ -42,16 +42,12 @@ export const requestSession = async (req: any, res: any) => {
      try {
           const { startTime, mentorId, selectedSkillId } = req.body;
 
-          console.log("reqbody", req.body);
 
-          console.log("selecteddate", startTime);
-          console.log("mentorid", mentorId);
-          console.log("selectedskillid", selectedSkillId);
 
           if (!mentorId || !selectedSkillId || !startTime) {
                return res.status(400).json({ message: "mentorId, skillId and startTime are required" });
           }
-          console.log("leran", req.userId);
+         
           const learnerId = req.userId; // Comes from verifyToken middleware
 
           const session = await prisma.session.create({
@@ -69,4 +65,27 @@ export const requestSession = async (req: any, res: any) => {
           console.error("Error creating session request", error);
           res.status(500).json({ message: "Internal server error" });
      }
+};
+
+
+export const getMySessions = async (req: any, res: any) => {
+  try {
+    const userId = req.userId; // from JWT middleware
+
+    const sessions = await prisma.session.findMany({
+      where: {
+        OR: [{ mentorId: userId }, { learnerId: userId }]
+      },
+      include: {
+        mentor: { select: { name: true } },
+        learner: { select: { name: true } }
+      },
+      orderBy: { scheduledAt: "desc" }
+    });
+console.log("sessionanukeert", sessions)
+    res.json({ sessions });
+  } catch (error) {
+    console.error("Error fetching sessions:", error);
+    res.status(500).json({ message: "Server error" });
+  }
 };
