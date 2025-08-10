@@ -37,7 +37,7 @@ app.use("/api/follow", followRoutes);
 app.use("/api", connectionRoutes);
 
 app.use("/api/sessions", meetSessionRoutes)
-app.use("/api/sessions", meetSessionRoutes);
+// app.use("/api/sessions", meetSessionRoutes);
 
 const server = http.createServer(app);
 initSocket(server);

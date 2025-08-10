@@ -30,6 +30,8 @@ model User {
   socialLinks         UserSocialLinks?
   skillsOffered       Skill[]                  @relation("SkillsOffered")
   skillsWanted        Skill[]                  @relation("SkillsWanted")
+
+  googleToken        GoogleToken?              @relation("UserGoogleToken")
 }
 
 model Skill {
@@ -69,14 +71,13 @@ model Session {
   scheduledAt DateTime
   status      SessionStatus @default(PENDING)
   feedback    String?
-  meetLink    String?       
   createdAt   DateTime      @default(now())
   skillId     String
+  meetLink    String?
   learner     User          @relation("LearnerSessions", fields: [learnerId], references: [id])
   mentor      User          @relation("MentorSessions", fields: [mentorId], references: [id])
   skill       Skill         @relation("SkillSessions", fields: [skillId], references: [id])
 }
-
 
 model UserProfessionDetails {
   id     String @id @default(uuid())
@@ -116,6 +117,17 @@ model UserSocialLinks {
   website  String?
   userId   String  @unique
   user     User    @relation(fields: [userId], references: [id])
+}
+
+model GoogleToken {
+  id          String   @id @default(uuid())
+  accessToken String
+  refreshToken String
+  scope       String?
+  tokenType   String?
+  expiryDate  BigInt?
+  userId      String   @unique
+  user        User     @relation("UserGoogleToken", fields: [userId], references: [id], onDelete: Cascade)
 }
 
 enum Role {

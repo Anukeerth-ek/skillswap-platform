@@ -1,10 +1,12 @@
 import express from 'express';
-import { acceptSession, getMySessions, requestSession } from '../controllers/meetSessionController';
+import {acceptSession,  deleteSession, getMySessions, requestSession } from '../controllers/meetSessionController';
 import { authenticateUser } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
-router.put("/sessions/:id/accept", acceptSession);
+router.patch("/approve/:id", acceptSession);
+
+router.delete("/delete/:id", deleteSession);
 
 router.post("/request", authenticateUser, requestSession); 
 
