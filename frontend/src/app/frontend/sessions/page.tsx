@@ -143,15 +143,15 @@ const SessionsPage = () => {
                                    {session.status === "PENDING" && (
                                         <div className="flex justify-between gap-2 mt-2">
                                  <div className="flex gap-2 mt-2">
-                                    <Button onClick={() => approveSession(session.id)}>Approve</Button>
-                                             <Button variant="destructive" onClick={() => rejectSession(session.id)}>
+                                    <Button onClick={() => approveSession(session.id)}  className="cursor-pointer">Approve</Button>
+                                             <Button variant="destructive" className="cursor-pointer" onClick={() => rejectSession(session.id)}>
                                                   Reject
                                              </Button>
                                             </div>
                                              <Button
                                                   variant="outline"
                                                   color="red"
-                                                  onClick={() => deleteSession(session.id)}
+                                                  onClick={() => deleteSession(session.id)}  className="cursor-pointer"
                                              >
                                                  <Trash2 />
                                              </Button>
