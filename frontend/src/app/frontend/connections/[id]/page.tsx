@@ -33,7 +33,7 @@ export default function ConnectionDetailPage() {
      const [selectedSkillNames, setSelectedSkillNames] = useState<string | null>(null);
 
      const handleSubmitRequest = async () => {
-          console.log("anukeertfront", selectedSkillNames);
+      
           if (!selectedDate || !mentor?.id || !selectedSkillNames) {
                alert("Something is missing");
                return;
