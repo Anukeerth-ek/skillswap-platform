@@ -4,9 +4,9 @@ import { authenticateUser } from '../middleware/authMiddleware';
 
 const router = express.Router();
 
-router.patch("/approve/:id", acceptSession);
+router.patch("/approve/:id", authenticateUser, acceptSession);
 
-router.delete("/delete/:id", deleteSession);
+router.delete("/delete/:id", authenticateUser, deleteSession);
 
 router.post("/request", authenticateUser, requestSession); 
 

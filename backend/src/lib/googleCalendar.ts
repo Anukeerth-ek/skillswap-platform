@@ -1,51 +1,68 @@
 import { google } from "googleapis";
 
 export const oAuth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  process.env.GOOGLE_REDIRECT_URI
+  process.env.GOOGLE_CLIENT_ID!,
+  process.env.GOOGLE_CLIENT_SECRET!,
+  process.env.GOOGLE_REDIRECT_URI!
 );
 
-export const createMeetEvent = async ({
+type CreateMeetArgs = {
+  summary: string;
+  description?: string;
+  startTime: string;
+  endTime: string;
+  timeZone?: string;
+  attendees?: { email: string }[];
+  tokens: {
+    accessToken: string;
+    refreshToken?: string;
+  };
+};
+
+export async function createMeetEvent({
   summary,
   description,
   startTime,
   endTime,
+  timeZone = "UTC",
+  attendees = [],
   tokens,
-}: {
-  summary: string;
-  description: string;
-  startTime: string;
-  endTime: string;
-  tokens: any; // OAuth tokens from DB
-}) => {
-  oAuth2Client.setCredentials(tokens); // <-- this is required
-  const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
-
-  const res = await calendar.events.insert({
-    calendarId: "primary",
-    conferenceDataVersion: 1,
-    requestBody: {
-      summary,
-      description,
-      start: {
-        dateTime: startTime,
-        timeZone: "Asia/Kolkata",
-      },
-      end: {
-        dateTime: endTime,
-        timeZone: "Asia/Kolkata",
-      },
-      conferenceData: {
-        createRequest: {
-          requestId: Math.random().toString(36).substring(7),
-          conferenceSolutionKey: { type: "hangoutsMeet" },
-        },
-      },
-    },
+}: CreateMeetArgs): Promise<string> {
+  oAuth2Client.setCredentials({
+    access_token: tokens.accessToken,
+    refresh_token: tokens.refreshToken,
   });
 
-  return res.data.hangoutLink;
-};
+  const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
+  const event = {
+    summary,
+    description,
+    start: { dateTime: startTime, timeZone },
+    end: { dateTime: endTime, timeZone },
+    attendees,
+    conferenceData: {
+      createRequest: {
+        requestId: `skillswap-${Date.now()}`,
+        conferenceSolutionKey: { type: "hangoutsMeet" },
+      },
+    },
+  };
 
+  const created = await calendar.events.insert({
+    calendarId: "primary",
+    requestBody: event as any,
+    conferenceDataVersion: 1,
+    sendUpdates: "all",
+  });
+
+  const meetLink =
+    created.data.hangoutLink ||
+    created.data.conferenceData?.entryPoints?.find(
+      (e) => e.entryPointType === "video"
+    )?.uri;
+
+  if (!meetLink) throw new Error("No Meet link returned from Calendar API");
+
+  return meetLink;
+}

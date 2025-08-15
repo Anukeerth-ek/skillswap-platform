@@ -1,18 +1,15 @@
 import { Request, Response } from "express";
 import { oAuth2Client } from "../lib/googleCalendar";
 import { saveTokensToDB } from "../lib/tokenStorage"; // your custom token DB logic
+import { prisma } from "../lib/prisma";
 
 export const startGoogleOAuth = (req: Request, res: Response) => {
-  console.log("anukeer", req)
-  const scopes = [
-    "https://www.googleapis.com/auth/calendar.events",
-  ];
+  const scopes = ["https://www.googleapis.com/auth/calendar.events"];
 
   const url = oAuth2Client.generateAuthUrl({
     access_type: "offline",
     scope: scopes,
     prompt: "consent",
-    state: String(req.query.userId),
   });
 
   res.redirect(url);
@@ -20,29 +17,33 @@ export const startGoogleOAuth = (req: Request, res: Response) => {
 
 export const handleGoogleOAuthCallback = async (req: Request, res: Response) => {
   const code = req.query.code as string;
-
-  if (!code) {
-    res.status(400).send("No code provided");
-    return
-  }
+  const userId = (req as any).user.id; // from authenticateUser middleware
 
   try {
     const { tokens } = await oAuth2Client.getToken(code);
 
-    // Get mentor ID from session or query param
-  const mentorUserId = req.query.state as string;
+    await prisma.googleToken.upsert({
+      where: { userId },
+      update: {
+        accessToken: tokens.access_token!,
+        refreshToken: tokens.refresh_token!,
+        scope: tokens.scope,
+        tokenType: tokens.token_type,
+        expiryDate: tokens.expiry_date ? BigInt(tokens.expiry_date) : null,
+      },
+      create: {
+        userId,
+        accessToken: tokens.access_token!,
+        refreshToken: tokens.refresh_token!,
+        scope: tokens.scope,
+        tokenType: tokens.token_type,
+        expiryDate: tokens.expiry_date ? BigInt(tokens.expiry_date) : null,
+      },
+    });
 
-    if (!mentorUserId) {
-      res.status(400).send("No mentor user ID provided");
-      return
-    }
-
-    await saveTokensToDB(mentorUserId, tokens as any);
-
-    res.redirect("http://localhost:3000/frontend/sessions");
+    res.send("✅ Google Calendar connected! You can now approve sessions.");
   } catch (error) {
-    console.error("Error exchanging code for tokens:", error);
-    res.status(500).send("Authentication failed");
+    console.error("OAuth callback error:", error);
+    res.status(500).send("Failed to connect Google account");
   }
 };
-

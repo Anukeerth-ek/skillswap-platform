@@ -14,6 +14,8 @@ import profileRoutes from "./routes/profile.routes"
 import connectionRoutes from "./routes/connectionRoutes"
 import followRoutes from "./routes/followRoutes"
 import meetSessionRoutes from './routes/meetSessionRoutes'
+import googleAuthRoutes from "./routes/googleAuthRoutes";
+import googleTokenRoutes from "./routes/googleTokenRoutes";
 
 dotenv.config();
 
@@ -38,6 +40,9 @@ app.use("/api", connectionRoutes);
 
 app.use("/api/sessions", meetSessionRoutes)
 // app.use("/api/sessions", meetSessionRoutes);
+
+app.use("/api/google", googleAuthRoutes);
+app.use("/api/google-token", googleTokenRoutes);
 
 const server = http.createServer(app);
 initSocket(server);

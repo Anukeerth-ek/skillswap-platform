@@ -1,109 +1,23 @@
-import prisma from "../prismaClient";
+import { Request, Response } from "express";
+import { prisma } from "../lib/prisma";
 import { createMeetEvent } from "../lib/googleCalendar";
-
-export const acceptSession = async (req: any, res: any) => {
-     const sessionId = req.params.id;
-     const { status } = req.body;
-     const allowedStatuses = ["CONFIRMED", "REJECTED", "CANCELLED", "COMPLETED"];
-
-     if (!allowedStatuses.includes(status)) {
-          return res.status(400).json({ message: "Invalid status" });
-     }
-
-     try {
-          const session = await prisma.session.findUnique({ where: { id: sessionId } });
-          console.log("session", session)
-          if (!session) return res.status(404).json({ message: "Session not found" });
-
-          let meetLink: any = session.meetLink;
-          console.log("helo", meetLink);
-          if (status === "CONFIRMED" && !meetLink) {
-               try {
-                    const startTime = session.scheduledAt.toISOString();
-                    const endTime = new Date(session.scheduledAt.getTime() + 60 * 60 * 1000).toISOString();
-
-                    console.log("mentor", session.mentorId);
-                    const mentorTokens = await prisma.googleToken.findUnique({
-                         where: { userId: session.mentorId },
-                    });
-                    if (!mentorTokens) {
-                         return res.status(400).json({ message: "Mentor Google tokens not found" });
-                    }
-
-                    meetLink = await createMeetEvent({
-                         summary: `SkillSwap: ${session.skillId}`,
-                         description: "Mentorship Session",
-                         startTime,
-                         endTime,
-                         tokens: {
-                              accessToken: mentorTokens.accessToken,
-                              refreshToken: mentorTokens.refreshToken,
-                              scope: mentorTokens.scope,
-                              tokenType: mentorTokens.tokenType,
-                              expiryDate: mentorTokens.expiryDate,
-                         },
-                    });
-               } catch (error) {
-                    console.error("Failed to create Google Meet event:", error);
-                    return res.status(500).json({ message: "Failed to create meeting link" });
-               }
-          }
-
-          const updated = await prisma.session.update({
-               where: { id: sessionId },
-               data: {
-                    status,
-                    meetLink,
-               },
-          });
-
-          res.json({ message: `Session ${status.toLowerCase()}`, session: updated });
-     } catch (error) {
-          console.error("Error updating session", error);
-          res.status(500).json({ message: "Internal server error" });
-     }
-};
-
-export const deleteSession = async (req: any, res: any) => {
-     const sessionId = req.params.id;
-     //   const userId = req.userId; // from your auth middleware
-
-     try {
-          // Optionally verify user owns this session or is allowed to delete
-          const session = await prisma.session.findUnique({ where: { id: sessionId } });
-          if (!session) return res.status(404).json({ message: "Session not found" });
-
-          //     if (session.mentorId === userId && session.learnerId !== userId) {
-          //       return res.status(403).json({ message: "Not authorized to delete this session" });
-          //     }
-
-          await prisma.session.delete({ where: { id: sessionId } });
-
-          res.json({ message: "Session deleted successfully" });
-     } catch (error) {
-          console.error("Error deleting session", error);
-          res.status(500).json({ message: "Internal server error" });
-     }
-};
-
-export const requestSession = async (req: any, res: any) => {
+import { AuthenticatedRequest } from "../middleware/authMiddleware";
+import { SessionStatus } from "@prisma/client";
+export const requestSession = async (req: AuthenticatedRequest, res: Response) => {
      try {
           const { startTime, mentorId, selectedSkillNames } = req.body;
-
-          console.log("anukeerth", req.body);
-
           if (!mentorId || !selectedSkillNames || !startTime) {
-               return res.status(400).json({ message: "mentorId, skillId and startTime are required" });
+               res.status(400).json({ message: "mentorId, selectedSkillNames and startTime are required" });
+               return;
           }
-          // 1️⃣ Find the skill by name
-          const skill = await prisma.skill.findUnique({
-               where: { name: selectedSkillNames },
-          });
-          if (!skill) {
-               return res.status(404).json({ message: `Skill '${selectedSkillNames}' not found` });
-          }
-          const learnerId = req.userId; // Comes from verifyToken middleware
 
+          const skill = await prisma.skill.findUnique({ where: { name: selectedSkillNames } });
+          if (!skill) {
+               res.status(404).json({ message: `Skill '${selectedSkillNames}' not found` });
+               return;
+          }
+
+          const learnerId = req.userId!;
           const session = await prisma.session.create({
                data: {
                     mentor: { connect: { id: mentorId } },
@@ -115,32 +29,140 @@ export const requestSession = async (req: any, res: any) => {
           });
 
           res.status(201).json({ message: "Session request created", session });
-     } catch (error) {
-          console.error("Error creating session request", error);
+          return;
+     } catch (e) {
+          console.error("requestSession error:", e);
           res.status(500).json({ message: "Internal server error" });
+          return;
      }
 };
 
-export const getMySessions = async (req: any, res: any) => {
+export const getMySessions = async (req: AuthenticatedRequest, res: Response) => {
      try {
-          const userId = req.userId;
-
+          const userId = req.userId!;
           const sessions = await prisma.session.findMany({
-               where: {
-                    OR: [{ mentorId: userId }, { learnerId: userId }],
-               },
+               where: { OR: [{ mentorId: userId }, { learnerId: userId }] },
                include: {
-                    mentor: { select: { name: true } },
-                    learner: { select: { name: true } },
+                    mentor: { select: { name: true, email: true } },
+                    learner: { select: { name: true, email: true } },
                     skill: { select: { name: true } },
                },
                orderBy: { scheduledAt: "desc" },
           });
 
-          console.log("sessionanukeert", sessions);
           res.json({ sessions });
-     } catch (error) {
-          console.error("Error fetching sessions:", error);
+          return;
+     } catch (e) {
+          console.error("getMySessions error:", e);
           res.status(500).json({ message: "Server error" });
+          return;
+     }
+};
+
+export const acceptSession = async (req: AuthenticatedRequest, res: Response) => {
+     const sessionId = String(req.params.id);
+     const { status } = req.body as { status: "CONFIRMED" | "REJECTED" | "CANCELLED" | "COMPLETED" };
+
+     const allowed: SessionStatus[] = [
+          SessionStatus.CONFIRMED,
+          SessionStatus.REJECTED,
+          SessionStatus.CANCELLED,
+          SessionStatus.COMPLETED,
+     ];
+
+     if (!allowed.includes(status as SessionStatus)) {
+          res.status(400).json({ message: "Invalid status" });
+          return;
+     }
+
+     try {
+          const session = await prisma.session.findUnique({
+               where: { id: sessionId },
+               include: {
+                    mentor: { select: { id: true, email: true } },
+                    learner: { select: { email: true } },
+                    skill: { select: { name: true } },
+               },
+          });
+
+          if (!session) {
+               res.status(404).json({ message: "Session not found" });
+               return;
+          }
+
+          // ✅ Only the mentor can approve/confirm this session
+          if (status === "CONFIRMED" && req.userId !== session.mentorId) {
+               res.status(403).json({ message: "Only the mentor can approve this session" });
+               return;
+          }
+
+          let meetLink = session.meetLink || null;
+
+          if (status === "CONFIRMED" && !meetLink) {
+               // get mentor’s google tokens (the approving user)
+               const mentorTokens = await prisma.googleToken.findUnique({
+                    where: { userId: session.mentorId },
+               });
+
+               if (!mentorTokens?.accessToken) {
+                    res.status(400).json({ message: "Mentor Google tokens not found" });
+                    return;
+               }
+
+               const startISO = session.scheduledAt.toISOString();
+               const endISO = new Date(session.scheduledAt.getTime() + 60 * 60 * 1000).toISOString();
+
+               const timeZone = "UTC"; // or mentor's actual timezone if stored
+
+               const link = await createMeetEvent({
+                    summary: `SkillSwap: ${session.skill.name}`,
+                    description: "Mentorship Session",
+                    startTime: startISO,
+                    endTime: endISO,
+                    timeZone,
+                    attendees: [
+                         ...(session.mentor.email ? [{ email: session.mentor.email }] : []),
+                         ...(session.learner.email ? [{ email: session.learner.email }] : []),
+                    ],
+                    tokens: {
+                         accessToken: mentorTokens.accessToken,
+                         refreshToken: mentorTokens.refreshToken || undefined,
+                    },
+               });
+
+               meetLink = link;
+          }
+
+          const updated = await prisma.session.update({
+               where: { id: sessionId },
+               data: {
+                    status: status as SessionStatus, // ✅ cast to Prisma enum
+                    meetLink: meetLink ?? undefined,
+               },
+          });
+
+          res.json({ message: `Session ${status.toLowerCase()}`, session: updated });
+     } catch (e) {
+          console.error("acceptSession error:", e);
+          res.status(500).json({ message: "Internal server error" });
+     }
+};
+
+export const deleteSession = async (req: AuthenticatedRequest, res: Response) => {
+     try {
+          const sessionId = String(req.params.id);
+          const session = await prisma.session.findUnique({ where: { id: sessionId } });
+          if (!session) {
+               res.status(404).json({ message: "Session not found" });
+               return;
+          }
+
+          await prisma.session.delete({ where: { id: sessionId } });
+          res.json({ message: "Session deleted successfully" });
+          return;
+     } catch (e) {
+          console.error("deleteSession error:", e);
+          res.status(500).json({ message: "Internal server error" });
+          return;
      }
 };
