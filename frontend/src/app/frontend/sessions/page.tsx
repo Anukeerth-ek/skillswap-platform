@@ -43,36 +43,38 @@ const SessionsPage = () => {
   }, []);
 
   const approveSession = async (id: string) => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
+    // const token = localStorage.getItem("token");
+    // if (!token) return;
 
-    try {
-      // 1️⃣ Check if Google tokens are saved
-      const res = await fetch("http://localhost:4000/api/google-token/status", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+    // try {
+    //   // 1️⃣ Check if Google tokens are saved
+    //   const res = await fetch("http://localhost:4000/api/google-token/status", {
+    //     headers: {
+    //       Authorization: `Bearer ${token}`,
+    //     },
+    //   });
 
-      if (!res.ok) {
-        alert("Failed to check Google Calendar connection.");
-        return;
-      }
+    //   if (!res.ok) {
+    //     alert("Failed to check Google Calendar connection.");
+    //     return;
+    //   }
 
-      const { hasTokens } = await res.json();
+    //   const { hasTokens } = await res.json();
 
-      // 2️⃣ If no tokens → redirect to OAuth flow, passing token in query string
-      if (!hasTokens) {
-        window.location.href = `http://localhost:4000/api/google/auth?token=${token}`;
-        return;
-      }
+    //   // 2️⃣ If no tokens → redirect to OAuth flow, passing token in query string
+    //   if (!hasTokens) {
+    //     window.location.href = `http://localhost:4000/api/google/auth?token=${token}`;
+    //     return;
+    //   }
 
-      // 3️⃣ If tokens exist → approve session
-      await updateSessionStatus(id, "CONFIRMED");
-    } catch (err) {
-      console.error("Error checking Google Calendar status:", err);
-      alert("Something went wrong while checking Google Calendar connection.");
-    }
+    //   // 3️⃣ If tokens exist → approve session
+    //   await updateSessionStatus(id, "CONFIRMED");
+    // } catch (err) {
+    //   console.error("Error checking Google Calendar status:", err);
+    //   alert("Something went wrong while checking Google Calendar connection.");
+    // }
+
+    await updateSessionStatus(id, "CONFIRMED");
   };
 
   const rejectSession = async (id: string) => {

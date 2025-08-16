@@ -62,6 +62,7 @@ export const getMySessions = async (req: AuthenticatedRequest, res: Response) =>
 export const acceptSession = async (req: AuthenticatedRequest, res: Response) => {
      const sessionId = String(req.params.id);
      const { status } = req.body as { status: "CONFIRMED" | "REJECTED" | "CANCELLED" | "COMPLETED" };
+     console.log("sta back", status);
 
      const allowed: SessionStatus[] = [
           SessionStatus.CONFIRMED,
@@ -76,6 +77,7 @@ export const acceptSession = async (req: AuthenticatedRequest, res: Response) =>
      }
 
      try {
+          console.log("[DB] Finding session with ID:", sessionId);
           const session = await prisma.session.findUnique({
                where: { id: sessionId },
                include: {
@@ -84,6 +86,8 @@ export const acceptSession = async (req: AuthenticatedRequest, res: Response) =>
                     skill: { select: { name: true } },
                },
           });
+
+          console.log("[DB] Session result:", session);
 
           if (!session) {
                res.status(404).json({ message: "Session not found" });
@@ -99,21 +103,27 @@ export const acceptSession = async (req: AuthenticatedRequest, res: Response) =>
           let meetLink = session.meetLink || null;
 
           if (status === "CONFIRMED" && !meetLink) {
-               // get mentor’s google tokens (the approving user)
+            //    console.log("[DB] Fetching mentor tokens for user:", session.mentorId);
                const mentorTokens = await prisma.googleToken.findUnique({
                     where: { userId: session.mentorId },
                });
+            //    console.log("[DB] Mentor tokens:", mentorTokens);
 
                if (!mentorTokens?.accessToken) {
                     res.status(400).json({ message: "Mentor Google tokens not found" });
                     return;
                }
 
+               if (!session.scheduledAt) {
+                    console.error("[ERROR] session.scheduledAt is null or undefined");
+               }
+
                const startISO = session.scheduledAt.toISOString();
                const endISO = new Date(session.scheduledAt.getTime() + 60 * 60 * 1000).toISOString();
 
-               const timeZone = "UTC"; // or mentor's actual timezone if stored
+               const timeZone = "UTC";
 
+            //    console.log("[Google API] Creating meet event...");
                const link = await createMeetEvent({
                     summary: `SkillSwap: ${session.skill.name}`,
                     description: "Mentorship Session",
@@ -121,29 +131,33 @@ export const acceptSession = async (req: AuthenticatedRequest, res: Response) =>
                     endTime: endISO,
                     timeZone,
                     attendees: [
-                         ...(session.mentor.email ? [{ email: session.mentor.email }] : []),
-                         ...(session.learner.email ? [{ email: session.learner.email }] : []),
+                         ...(session.mentor?.email ? [{ email: session.mentor.email }] : []),
+                         ...(session.learner?.email ? [{ email: session.learner.email }] : []),
                     ],
                     tokens: {
                          accessToken: mentorTokens.accessToken,
                          refreshToken: mentorTokens.refreshToken || undefined,
                     },
                });
+            //    console.log("[Google API] Meet link generated:", link);
 
                meetLink = link;
           }
 
+        //   console.log("[DB] Updating session with new status:", status);
           const updated = await prisma.session.update({
                where: { id: sessionId },
                data: {
-                    status: status as SessionStatus, // ✅ cast to Prisma enum
+                    status: status as SessionStatus,
                     meetLink: meetLink ?? undefined,
                },
           });
+        //   console.log("[DB] Updated session:", updated);
 
           res.json({ message: `Session ${status.toLowerCase()}`, session: updated });
-     } catch (e) {
-          console.error("acceptSession error:", e);
+     } catch (e:any) {
+        console.error("acceptSession error:", e instanceof Error ? e.message : e);
+
           res.status(500).json({ message: "Internal server error" });
      }
 };
