@@ -76,9 +76,11 @@ export const acceptSession = async (req: AuthenticatedRequest, res: Response) =>
           return;
      }
 
+     let session: any = null; // Declare session variable in outer scope
+
      try {
           console.log("[DB] Finding session with ID:", sessionId);
-          const session = await prisma.session.findUnique({
+          session = await prisma.session.findUnique({
                where: { id: sessionId },
                include: {
                     mentor: { select: { id: true, email: true } },
@@ -103,13 +105,14 @@ export const acceptSession = async (req: AuthenticatedRequest, res: Response) =>
           let meetLink = session.meetLink || null;
 
           if (status === "CONFIRMED" && !meetLink) {
-            //    console.log("[DB] Fetching mentor tokens for user:", session.mentorId);
+               console.log("[DB] Fetching mentor tokens for user:", session.mentorId);
                const mentorTokens = await prisma.googleToken.findUnique({
                     where: { userId: session.mentorId },
                });
-            //    console.log("[DB] Mentor tokens:", mentorTokens);
+               console.log("[DB] Mentor tokens found:", !!mentorTokens);
 
                if (!mentorTokens?.accessToken) {
+                    console.log("[ERROR] No Google tokens found for mentor:", session.mentorId);
                     res.status(400).json({ message: "Mentor Google tokens not found" });
                     return;
                }
@@ -123,7 +126,17 @@ export const acceptSession = async (req: AuthenticatedRequest, res: Response) =>
 
                const timeZone = "UTC";
 
-            //    console.log("[Google API] Creating meet event...");
+               console.log("[Google API] Creating meet event...");
+               console.log("[DEBUG] Event details:", {
+                 summary: `SkillSwap: ${session.skill.name}`,
+                 startTime: startISO,
+                 endTime: endISO,
+                 attendees: [
+                   ...(session.mentor?.email ? [{ email: session.mentor.email }] : []),
+                   ...(session.learner?.email ? [{ email: session.learner.email }] : []),
+                 ]
+               });
+               
                const link = await createMeetEvent({
                     summary: `SkillSwap: ${session.skill.name}`,
                     description: "Mentorship Session",
@@ -156,9 +169,34 @@ export const acceptSession = async (req: AuthenticatedRequest, res: Response) =>
 
           res.json({ message: `Session ${status.toLowerCase()}`, session: updated });
      } catch (e:any) {
-        console.error("acceptSession error:", e instanceof Error ? e.message : e);
+        console.error("acceptSession error:", e);
+        console.error("Error details:", {
+          message: e.message,
+          stack: e.stack,
+          status: status,
+          sessionId: sessionId,
+          userId: req.userId
+        });
 
-          res.status(500).json({ message: "Internal server error" });
+                 // Provide more specific error messages
+         if (e.message?.includes("Google tokens not found")) {
+           res.status(400).json({ message: "Google Calendar not connected. Please connect your Google account first." });
+         } else if (e.message?.includes("insufficient authentication scopes")) {
+           // Clear the invalid tokens and ask user to re-authenticate
+           try {
+             await prisma.googleToken.delete({
+               where: { userId: session.mentorId },
+             });
+             console.log("[DB] Cleared invalid Google tokens for user:", session.mentorId);
+           } catch (deleteError) {
+             console.error("[DB] Failed to clear invalid tokens:", deleteError);
+           }
+           res.status(400).json({ message: "Google Calendar needs to be reconnected. Please re-authenticate." });
+         } else if (e.message?.includes("Google Meet")) {
+           res.status(500).json({ message: "Failed to create Google Meet. Please try again." });
+         } else {
+           res.status(500).json({ message: "Internal server error", details: e.message });
+         }
      }
 };
 
