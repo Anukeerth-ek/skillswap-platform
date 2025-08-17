@@ -17,6 +17,7 @@ interface Session {
 const SessionsPage = () => {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
+  const [approvingSession, setApprovingSession] = useState<string | null>(null);
 
   const fetchSessions = async () => {
     const token = localStorage.getItem("token");
@@ -43,38 +44,45 @@ const SessionsPage = () => {
   }, []);
 
   const approveSession = async (id: string) => {
-    // const token = localStorage.getItem("token");
-    // if (!token) return;
+    const token = localStorage.getItem("token");
+    if (!token) return;
 
-    // try {
-    //   // 1️⃣ Check if Google tokens are saved
-    //   const res = await fetch("http://localhost:4000/api/google-token/status", {
-    //     headers: {
-    //       Authorization: `Bearer ${token}`,
-    //     },
-    //   });
+    setApprovingSession(id);
 
-    //   if (!res.ok) {
-    //     alert("Failed to check Google Calendar connection.");
-    //     return;
-    //   }
+    try {
+      // 1️⃣ Check if Google tokens are saved
+      const res = await fetch("http://localhost:4000/api/google-token/status", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
-    //   const { hasTokens } = await res.json();
+      if (!res.ok) {
+        console.error("Failed to check Google Calendar connection:", res.status);
+        // If we can't check, try to approve anyway and let the backend handle it
+        await updateSessionStatus(id, "CONFIRMED");
+        return;
+      }
 
-    //   // 2️⃣ If no tokens → redirect to OAuth flow, passing token in query string
-    //   if (!hasTokens) {
-    //     window.location.href = `http://localhost:4000/api/google/auth?token=${token}`;
-    //     return;
-    //   }
+      const { hasTokens } = await res.json();
 
-    //   // 3️⃣ If tokens exist → approve session
-    //   await updateSessionStatus(id, "CONFIRMED");
-    // } catch (err) {
-    //   console.error("Error checking Google Calendar status:", err);
-    //   alert("Something went wrong while checking Google Calendar connection.");
-    // }
+      // 2️⃣ If no tokens → redirect to OAuth flow, passing token in query string
+      if (!hasTokens) {
+        console.log("No Google tokens found, redirecting to OAuth...");
+        window.location.href = `http://localhost:4000/api/google/auth?token=${token}`;
+        return;
+      }
 
-    await updateSessionStatus(id, "CONFIRMED");
+      // 3️⃣ If tokens exist → approve session
+      console.log("Google tokens found, proceeding with approval...");
+      await updateSessionStatus(id, "CONFIRMED");
+    } catch (err) {
+      console.error("Error checking Google Calendar status:", err);
+      // If the check fails, try to approve anyway and let the backend handle it
+      await updateSessionStatus(id, "CONFIRMED");
+    } finally {
+      setApprovingSession(null);
+    }
   };
 
   const rejectSession = async (id: string) => {
@@ -98,14 +106,28 @@ const SessionsPage = () => {
         body: JSON.stringify({ status }),
       });
 
-      if (!res.ok) {
-        const data = await res.json();
-        alert(data.message || "Failed to update session status");
-      } else {
-        fetchSessions();
+             if (!res.ok) {
+         const data = await res.json();
+         console.error("Session update error:", data);
+         
+                   // Show more specific error messages
+          if (data.message?.includes("Google Calendar not connected") || data.message?.includes("Google Meet")) {
+            alert("Google Calendar needs to be reconnected. You'll be redirected to Google OAuth.");
+            // Redirect to OAuth flow to get fresh tokens with correct scopes
+            window.location.href = `http://localhost:4000/api/google/auth?token=${token}`;
+            return;
+          } else {
+            alert(data.message || "Failed to update session status");
+          }
+       } else {
+        await fetchSessions();
+        if (status === "CONFIRMED") {
+          alert("Session approved! Google Meet link has been created and sent to participants.");
+        }
       }
     } catch (error) {
       console.error("Error updating session status:", error);
+      alert("Failed to update session status. Please try again.");
     }
   };
 
@@ -179,13 +201,15 @@ console.log("youto", sessions)
                     <Button
                       onClick={() => approveSession(session.id)}
                       className="cursor-pointer"
+                      disabled={approvingSession === session.id}
                     >
-                      Approve
+                      {approvingSession === session.id ? "Creating Meet..." : "Approve"}
                     </Button>
                     <Button
                       variant="destructive"
                       className="cursor-pointer"
                       onClick={() => rejectSession(session.id)}
+                      disabled={approvingSession === session.id}
                     >
                       Reject
                     </Button>
@@ -201,15 +225,20 @@ console.log("youto", sessions)
               )}
 
               {session.status === "CONFIRMED" && session.meetLink && (
-                <a
-                  href={session.meetLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <Button className="mt-2" variant="default">
-                    Join Google Meet
-                  </Button>
-                </a>
+                <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <p className="text-sm text-green-800 mb-2">
+                    <strong>✅ Session Confirmed!</strong> Google Meet link has been created.
+                  </p>
+                  <a
+                    href={session.meetLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Button className="w-full" variant="default">
+                      🎥 Join Google Meet
+                    </Button>
+                  </a>
+                </div>
               )}
             </div>
           ))}
