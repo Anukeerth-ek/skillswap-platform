@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import React, { useCallback, useState } from "react";
 import ReactFlow, {
      MiniMap,
@@ -55,7 +56,7 @@ export default function RoadmapPage() {
                     }}
                >
                     <h3 style={{ marginBottom: "8px", fontSize: "16px", fontWeight: "bold" }}>Controls</h3>
-                    <button
+                    <Button variant="default"
                          onClick={addNewNode}
                          style={{
                               padding: "8px 12px",
@@ -67,7 +68,9 @@ export default function RoadmapPage() {
                          }}
                     >
                          ➕ Add Node
-                    </button>
+                    </Button>
+
+                    <Button variant="default">Save Changes</Button>
                </div>
 
                {/* React Flow Canvas (90% width) */}

@@ -74,6 +74,7 @@ model Session {
   createdAt   DateTime      @default(now())
   skillId     String
   meetLink    String?
+  roadmap     Json?  
   learner     User          @relation("LearnerSessions", fields: [learnerId], references: [id])
   mentor      User          @relation("MentorSessions", fields: [mentorId], references: [id])
   skill       Skill         @relation("SkillSessions", fields: [skillId], references: [id])
