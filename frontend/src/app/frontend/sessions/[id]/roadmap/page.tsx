@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ReactFlow, {
      MiniMap,
      Controls,
@@ -14,10 +14,23 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css";
 
+interface Session {
+     id: string;
+     mentor: { name: string };
+     learner: { name: string };
+     skill: { name: string };
+     status: "PENDING" | "CONFIRMED" | "REJECTED";
+     scheduledAt: string;
+     meetLink?: string;
+}
+
 export default function RoadmapPage() {
      const [nodes, setNodes, onNodesChange] = useNodesState([]); // empty
      const [edges, setEdges, onEdgesChange] = useEdgesState([]);
      const [nodeId, setNodeId] = useState(1);
+     const [session, setSession] = useState<Session | null>(null);
+     const [reactFlowInstance, setReactFlowInstance] = useState<any | null>(null);
+     const [token, setToken] = useState<string | null>(null);
 
      const onConnect = useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
@@ -41,6 +54,51 @@ export default function RoadmapPage() {
           setNodeId((id) => id + 1);
      };
 
+     useEffect(() => {
+          const stored = localStorage.getItem("token");
+          setToken(stored);
+     }, []);
+
+     useEffect(() => {
+          const saved = localStorage.getItem("selectedSession");
+
+          if (saved && token) {
+               const sessionData = JSON.parse(saved);
+               setSession(sessionData);
+
+               // fetch roadmap from backend
+               fetch(`http://localhost:4000/api/sessions/${sessionData.id}/roadmap`, {
+                    headers: {
+                         authorization: `Bearer ${token}`
+                    }
+               })
+                    .then((res) => res.json())
+                    .then((data) => {
+                         if (data?.nodes) {
+                              setNodes(data.nodes || []);
+                              setEdges(data.edges || []);
+                              if (reactFlowInstance) {
+                                   reactFlowInstance.setViewport(data.viewport || { x: 0, y: 0, zoom: 1 });
+                              }
+                         }
+                    });
+          }
+     }, [reactFlowInstance, token]);
+
+     const handleSave = async () => {
+          if (!reactFlowInstance || !session) return;
+
+          const flow = reactFlowInstance.toObject(); // { nodes, edges, viewport }
+          console.log("flow", flow);
+          await fetch(`http://localhost:4000/api/sessions/${session.id}/roadmap`, {
+               method: "POST",
+               headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+               body: JSON.stringify({ roadmap: flow }),
+          });
+
+          alert("Roadmap saved ✅");
+     };
+
      return (
           <div style={{ display: "flex", width: "100%", height: "100vh" }}>
                {/* Sidebar (10% width) */}
@@ -56,7 +114,8 @@ export default function RoadmapPage() {
                     }}
                >
                     <h3 style={{ marginBottom: "8px", fontSize: "16px", fontWeight: "bold" }}>Controls</h3>
-                    <Button variant="default"
+                    <Button
+                         variant="default"
                          onClick={addNewNode}
                          style={{
                               padding: "8px 12px",
@@ -70,7 +129,9 @@ export default function RoadmapPage() {
                          ➕ Add Node
                     </Button>
 
-                    <Button variant="default">Save Changes</Button>
+                    <Button variant="default" onClick={handleSave}>
+                         Save Changes
+                    </Button>
                </div>
 
                {/* React Flow Canvas (90% width) */}
@@ -84,6 +145,7 @@ export default function RoadmapPage() {
                          fitView
                          zoomOnScroll={false}
                          preventScrolling={false}
+                         onInit={setReactFlowInstance}
                     >
                          <MiniMap />
                          <Controls />

@@ -128,15 +128,15 @@ export const acceptSession = async (req: AuthenticatedRequest, res: Response) =>
 
                console.log("[Google API] Creating meet event...");
                console.log("[DEBUG] Event details:", {
-                 summary: `SkillSwap: ${session.skill.name}`,
-                 startTime: startISO,
-                 endTime: endISO,
-                 attendees: [
-                   ...(session.mentor?.email ? [{ email: session.mentor.email }] : []),
-                   ...(session.learner?.email ? [{ email: session.learner.email }] : []),
-                 ]
+                    summary: `SkillSwap: ${session.skill.name}`,
+                    startTime: startISO,
+                    endTime: endISO,
+                    attendees: [
+                         ...(session.mentor?.email ? [{ email: session.mentor.email }] : []),
+                         ...(session.learner?.email ? [{ email: session.learner.email }] : []),
+                    ],
                });
-               
+
                const link = await createMeetEvent({
                     summary: `SkillSwap: ${session.skill.name}`,
                     description: "Mentorship Session",
@@ -152,12 +152,12 @@ export const acceptSession = async (req: AuthenticatedRequest, res: Response) =>
                          refreshToken: mentorTokens.refreshToken || undefined,
                     },
                });
-            //    console.log("[Google API] Meet link generated:", link);
+               //    console.log("[Google API] Meet link generated:", link);
 
                meetLink = link;
           }
 
-        //   console.log("[DB] Updating session with new status:", status);
+          //   console.log("[DB] Updating session with new status:", status);
           const updated = await prisma.session.update({
                where: { id: sessionId },
                data: {
@@ -165,38 +165,40 @@ export const acceptSession = async (req: AuthenticatedRequest, res: Response) =>
                     meetLink: meetLink ?? undefined,
                },
           });
-        //   console.log("[DB] Updated session:", updated);
+          //   console.log("[DB] Updated session:", updated);
 
           res.json({ message: `Session ${status.toLowerCase()}`, session: updated });
-     } catch (e:any) {
-        console.error("acceptSession error:", e);
-        console.error("Error details:", {
-          message: e.message,
-          stack: e.stack,
-          status: status,
-          sessionId: sessionId,
-          userId: req.userId
-        });
+     } catch (e: any) {
+          console.error("acceptSession error:", e);
+          console.error("Error details:", {
+               message: e.message,
+               stack: e.stack,
+               status: status,
+               sessionId: sessionId,
+               userId: req.userId,
+          });
 
-                 // Provide more specific error messages
-         if (e.message?.includes("Google tokens not found")) {
-           res.status(400).json({ message: "Google Calendar not connected. Please connect your Google account first." });
-         } else if (e.message?.includes("insufficient authentication scopes")) {
-           // Clear the invalid tokens and ask user to re-authenticate
-           try {
-             await prisma.googleToken.delete({
-               where: { userId: session.mentorId },
-             });
-             console.log("[DB] Cleared invalid Google tokens for user:", session.mentorId);
-           } catch (deleteError) {
-             console.error("[DB] Failed to clear invalid tokens:", deleteError);
-           }
-           res.status(400).json({ message: "Google Calendar needs to be reconnected. Please re-authenticate." });
-         } else if (e.message?.includes("Google Meet")) {
-           res.status(500).json({ message: "Failed to create Google Meet. Please try again." });
-         } else {
-           res.status(500).json({ message: "Internal server error", details: e.message });
-         }
+          // Provide more specific error messages
+          if (e.message?.includes("Google tokens not found")) {
+               res.status(400).json({
+                    message: "Google Calendar not connected. Please connect your Google account first.",
+               });
+          } else if (e.message?.includes("insufficient authentication scopes")) {
+               // Clear the invalid tokens and ask user to re-authenticate
+               try {
+                    await prisma.googleToken.delete({
+                         where: { userId: session.mentorId },
+                    });
+                    console.log("[DB] Cleared invalid Google tokens for user:", session.mentorId);
+               } catch (deleteError) {
+                    console.error("[DB] Failed to clear invalid tokens:", deleteError);
+               }
+               res.status(400).json({ message: "Google Calendar needs to be reconnected. Please re-authenticate." });
+          } else if (e.message?.includes("Google Meet")) {
+               res.status(500).json({ message: "Failed to create Google Meet. Please try again." });
+          } else {
+               res.status(500).json({ message: "Internal server error", details: e.message });
+          }
      }
 };
 
@@ -214,6 +216,59 @@ export const deleteSession = async (req: AuthenticatedRequest, res: Response) =>
           return;
      } catch (e) {
           console.error("deleteSession error:", e);
+          res.status(500).json({ message: "Internal server error" });
+          return;
+     }
+};
+
+export const saveRoadmap = async (req: AuthenticatedRequest, res: Response) => {
+     console.log("we are in backe");
+     try {
+          console.log("again we are in ");
+          const sessionId = String(req.params.id);
+          const { roadmap } = req.body; // roadmap = { nodes, edges, viewport }
+          console.log("back", roadmap);
+          const session = await prisma.session.findUnique({ where: { id: sessionId } });
+          if (!session) {
+               res.status(404).json({ message: "Session not found" });
+               return;
+          }
+
+          const updated = await prisma.session.update({
+               where: { id: sessionId },
+               data: { roadmap },
+          });
+
+          res.json({ message: "Roadmap saved successfully", roadmap: updated.roadmap });
+          return;
+     } catch (e) {
+          console.error("saveRoadmap error:", e);
+          res.status(500).json({ message: "Internal server error" });
+          return;
+     }
+};
+
+// Get roadmap
+export const getRoadmap = async (req: AuthenticatedRequest, res: Response) => {
+     console.log("we are in backe");
+     try {
+          console.log("again we are in ");
+          const sessionId = String(req.params.id);
+
+          const session = await prisma.session.findUnique({
+               where: { id: sessionId },
+               select: { roadmap: true },
+          });
+
+          if (!session) {
+               res.status(404).json({ message: "Session not found" });
+               return;
+          }
+
+          res.json(session.roadmap || {});
+          return;
+     } catch (e) {
+          console.error("getRoadmap error:", e);
           res.status(500).json({ message: "Internal server error" });
           return;
      }
