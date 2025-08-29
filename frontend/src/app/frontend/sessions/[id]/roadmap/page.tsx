@@ -32,22 +32,42 @@ export default function RoadmapPage() {
      const [reactFlowInstance, setReactFlowInstance] = useState<any | null>(null);
      const [token, setToken] = useState<string | null>(null);
 
+     
      const onConnect = useCallback((params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)), [setEdges]);
 
+     const updateNodeLabel = (id: string, label: string) => {
+          setNodes((nds) =>
+               nds.map((n) => (n.id === id ? { ...n, data: { ...n.data, label, onChange: updateNodeLabel } } : n))
+          );
+     };
+
      const addNewNode = () => {
-          const newNode = {
-               id: `${nodeId}`,
-               position: { x: 150 * nodeId, y: 100 }, // auto place
-               data: { label: `Step ${nodeId}` },
-          };
+          setNodes((nds) => {
+               const lastNode = nds[nds.length - 1]; // get last node if exists
+               const newId = `${nodeId}`;
 
-          setNodes((nds) => [...nds, newNode]);
+               const newNode = {
+                    id: newId,
+                    type: "editable",
+                    position: lastNode
+                         ? { x: lastNode.position.x, y: lastNode.position.y + 120 } // 👈 place below last node
+                         : { x: 0, y: 0 }, // first node at (0,0)
+                    data: { label: `Step ${nodeId}`, onChange: updateNodeLabel },
+               };
 
-          // if there was a previous node, auto connect it
+               return [...nds, newNode];
+          });
+
+          // add edge to previous node
           if (nodeId > 1) {
+               const newEdgeId = `e${nodeId - 1}-${nodeId}-${Date.now()}`;
                setEdges((eds) => [
                     ...eds,
-                    { id: `e${nodeId - 1}-${nodeId}`, source: `${nodeId - 1}`, target: `${nodeId}` },
+                    {
+                         id: newEdgeId,
+                         source: `${nodeId - 1}`,
+                         target: `${nodeId}`,
+                    },
                ]);
           }
 
@@ -69,14 +89,19 @@ export default function RoadmapPage() {
                // fetch roadmap from backend
                fetch(`http://localhost:4000/api/sessions/${sessionData.id}/roadmap`, {
                     headers: {
-                         authorization: `Bearer ${token}`
-                    }
+                         authorization: `Bearer ${token}`,
+                    },
                })
                     .then((res) => res.json())
                     .then((data) => {
                          if (data?.nodes) {
                               setNodes(data.nodes || []);
                               setEdges(data.edges || []);
+                              const maxId =
+                                   data.nodes && data.nodes.length > 0
+                                        ? Math.max(...data.nodes.map((n: any) => parseInt(n.id)))
+                                        : 0;
+                              setNodeId(maxId + 1);
                               if (reactFlowInstance) {
                                    reactFlowInstance.setViewport(data.viewport || { x: 0, y: 0, zoom: 1 });
                               }
