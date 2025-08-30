@@ -31,7 +31,7 @@ export default function SessionDetail({ params }: { params: { id: string } }) {
     router.push(`/frontend/sessions/${session.id}/roadmap`)
   }
   const handleGotoChat = () => {
-    router.push(`/frontend/sessions/${session.id}/chat`)
+    router.push(`/frontend/chat`)
   }
   
      return (

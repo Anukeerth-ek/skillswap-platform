@@ -135,7 +135,7 @@ export default function MessagingUI() {
   const [messageInput, setMessageInput] = useState('');
 
   return (
-    <div className="flex h-screen bg-white">
+    <div className="flex bg-white" style={{height:"calc(100vh - 64px)"}}>
       {/* Sidebar */}
       <div className="w-80 border-r border-gray-200 flex flex-col">
         {/* Header */}
