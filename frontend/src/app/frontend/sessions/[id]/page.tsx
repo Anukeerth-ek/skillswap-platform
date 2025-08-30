@@ -59,7 +59,7 @@ export default function SessionDetail({ params }: { params: { id: string } }) {
                          {/* )} */}
 
                          <Button variant="secondary" className="w-full sm:w-auto cursor-pointer" onClick={()=> handleGotoRoadmap()}>
-                              Create Roadmap
+                              View Roadmap
                          </Button>
 
                          <Button variant="outline" className="w-full sm:w-auto flex items-center gap-2 cursor-pointer" onClick={()=> handleGotoChat()}>
