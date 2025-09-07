@@ -7,7 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Share2, Bookmark } from "lucide-react";
 // import { useSession } from "next-auth/react";
 import { toast } from "sonner";
-import { useAuthUser } from "@/app/hooks/useAuth"; 
+import { useGetMyProfile } from "@/app/hooks/useGetMyProfile"; 
 
 type User = {
      id: string;
@@ -35,7 +35,7 @@ type User = {
 export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
 
      const [connectionSent, setConnectionSent] = useState(false);
-     const { user: currentUser } = useAuthUser();
+     const { user: currentUser } = useGetMyProfile();
      
      useEffect(() => {
           if (!currentUser?.id || !user?.id) return;

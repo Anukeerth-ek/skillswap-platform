@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { ConnectionCard } from "../connectionCard/index";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ConnectionDetailSideBar } from "../connectionDetailPage";
+import { useGetMyProfile } from "@/app/hooks/useGetMyProfile";
+
 
 type User = {
   id: string;
@@ -61,6 +63,8 @@ export const SearchResults = () => {
           setIsSidebarOpen(true);
      };
 
+    const {user:myData, loading:myDataLoading} =  useGetMyProfile()
+     console.log("user", myData)
      return (
           <>
                <div className="flex-1 p-6">

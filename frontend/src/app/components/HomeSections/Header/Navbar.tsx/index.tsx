@@ -4,7 +4,7 @@ import React from "react";
 import { Home, UserPlus, BookOpen, Users, MessageCircle, Bell, LogOut, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useAuthUser } from "@/app/hooks/useAuth";
+import { useGetMyProfile } from "@/app/hooks/useGetMyProfile";
 import Link from "next/link";
 import {
      DropdownMenu,
@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export const Navbar = () => {
-     const { user, loading } = useAuthUser();
+     const { user, loading } = useGetMyProfile();
 
      const displayName = loading ? "Loading..." : user?.name || "Guest";
      const avatarLetter = user?.name?.charAt(0)?.toUpperCase() || "G";

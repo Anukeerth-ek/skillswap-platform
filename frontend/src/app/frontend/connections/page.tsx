@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useEffect } from "react";
-import { useAuthUser } from "@/app/hooks/useAuth";
+import { useGetMyProfile } from "@/app/hooks/useGetMyProfile";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -68,7 +68,7 @@ export default function ConnectionListPage() {
      }
 
      const [usersConnection, setUsersConnection] = useState<UserConnection[]>([]);
-     const { user: currentUser } = useAuthUser();
+     const { user: currentUser } = useGetMyProfile();
 
      const router = useRouter()
 
