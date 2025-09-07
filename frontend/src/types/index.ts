@@ -104,12 +104,11 @@ export interface User {
   name: string;
   email: string;
   password: string;
-  bio?: string | null;
   avatarUrl?: string | null;
   role: Role;
   timeZone?: string | null;
   createdAt: string;
-
+  bio?: string;
   // Embedded Relations
   professionDetails?: UserProfessionDetails | null;
   currentOrganization?: UserCurrentOrganization | null;

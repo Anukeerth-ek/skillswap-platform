@@ -7,39 +7,15 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Share2, Bookmark } from "lucide-react";
 // import { useSession } from "next-auth/react";
 import { toast } from "sonner";
-import { useGetMyProfile } from "@/app/hooks/useGetMyProfile"; 
-
-type User = {
-     id: string;
-     name: string;
-     email: string;
-     bio?: string;
-     avatarUrl?: string;
-     role: "LEARNER" | "MENTOR" | string;
-     timeZone?: string;
-     createdAt: string;
-
-     skillsOffered: { id: string; name: string }[];
-     skillsWanted: { id: string; name: string }[];
-
-     sessionsAsMentor: { id: string }[];
-     sessionsAsLearner: { id: string }[];
-
-     sentConnections: { id: string; receiverId: string }[];
-     receivedConnections: { id: string; senderId: string }[];
-
-     followers: { id: string; followerId: string }[];
-     following: { id: string; followingId: string }[];
-};
+import { useGetMyProfile } from "@/app/hooks/useGetMyProfile";
+import { User } from "@/types";
 
 export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
-
      const [connectionSent, setConnectionSent] = useState(false);
      const { user: currentUser } = useGetMyProfile();
-     
+
      useEffect(() => {
           if (!currentUser?.id || !user?.id) return;
-
 
           const sent = user.receivedConnections?.some((connection) => connection.senderId === currentUser.id);
           const received = user.sentConnections?.some((connection) => connection.receiverId === currentUser.id);
@@ -52,7 +28,6 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
      const [isFollowing, setIsFollowing] = useState(false);
 
      const handleSendConnection = async () => {
-         
           if (!currentUser?.id) {
                toast.error("You must be logged in to connect");
                return;
@@ -90,7 +65,6 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
                toast.error("Something went wrong");
           }
      };
-
 
      return (
           <div className=" bg-gray-900 text-white p-6">

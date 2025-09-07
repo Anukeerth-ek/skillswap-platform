@@ -6,80 +6,24 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sh
 import { ConnectionDetailSideBar } from "../connectionDetailPage";
 import { useGetMyProfile } from "@/app/hooks/useGetMyProfile";
 import { useGetUserConnections } from "@/app/hooks/useGetUserConnection";
+import { User } from "@/types";
 
-type User = {
-     id: string;
-     name: string;
-     email: string;
-     bio?: string;
-     avatarUrl?: string;
-     role: "LEARNER" | "MENTOR" | string;
-     timeZone?: string;
-     createdAt: string;
-
-     skillsOffered: { id: string; name: string }[];
-     skillsWanted: { id: string; name: string }[];
-
-     sessionsAsMentor: { id: string }[];
-     sessionsAsLearner: { id: string }[];
-
-     sentConnections: { id: string; receiverId: string }[];
-     receivedConnections: { id: string; senderId: string }[];
-
-     followers: { id: string; followerId: string }[];
-     following: { id: string; followingId: string }[];
+type SearchResultsProps = {
+     users: User[];
+     loading: boolean;
+     onUserClick: (user: User) => void;
 };
-
-export const SearchResults = () => {
-     const [users, setUsers] = useState<User[]>([]);
-     const [loading, setLoading] = useState(true);
+export const SearchResults = ({ users, loading, onUserClick }: SearchResultsProps) => {
      const [selectedUser, setSelectedUser] = useState<User | null>(null);
      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-     useEffect(() => {
-          const fetchUsers = async () => {
-               try {
-                    const token = localStorage.getItem("token");
-                    const res = await fetch("http://localhost:4000/api/profile/all", {
-                         headers: {
-                              Authorization: `Bearer ${token}`,
-                         },
-                    });
-                    const data = await res.json();
-                    setUsers(data.users);
-               } catch (error) {
-                    console.error("Failed to fetch users", error);
-               } finally {
-                    setLoading(false);
-               }
-          };
-
-          fetchUsers();
-     }, []);
 
      const handleCardClick = (user: User) => {
           setSelectedUser(user);
           setIsSidebarOpen(true);
+          onUserClick(user);
      };
 
-     const { user: myData, loading: myDataLoading } = useGetMyProfile();
-     // console.log("mydata", myData)
-
-     const {
-          usersConnection,
-
-          loading: currentUserDataLoading,
-          error,
-     } = useGetUserConnections(myData?.id);
-     console.log("userconnection", usersConnection);
-
-     const connectedIds = new Set(usersConnection.map((connection) => connection.user.id));
-
-     const filterConnectedUser = users.filter((user) => !connectedIds.has(user.id));
-
-     if (myDataLoading) return <p>User data Loading...</p>;
-     if (currentUserDataLoading) return <p>Current user data loading...</p>;
-     if (error) return <p> we got an error</p>;
+     if (loading) return <p>Loading...</p>;
      return (
           <>
                <div className="flex-1 p-6">
@@ -89,19 +33,18 @@ export const SearchResults = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                         {filterConnectedUser &&
-                              filterConnectedUser?.map((user) => (
-                                   <ConnectionCard
-                                        key={user.id}
-                                        name={user.name}
-                                        role={user.role}
-                                        avatar={user.avatarUrl || "/default-avatar.png"}
-                                        hourRate={Math.floor(Math.random() * 20) + 15}
-                                        experience={"5Years of Experience"}
-                                        skills={user.skillsOffered.map((s) => s.name)}
-                                        handleShowConnectionDetail={() => handleCardClick(user)}
-                                   />
-                              ))}
+                         {users.map((user) => (
+                              <ConnectionCard
+                                   key={user.id}
+                                   name={user.name}
+                                   role={user.role}
+                                   avatar={user.avatarUrl || "/default-avatar.png"}
+                                   hourRate={Math.floor(Math.random() * 20) + 15}
+                                   experience={"5Years of Experience"}
+                                   skills={user.skillsOffered.map((s) => s.name)}
+                                   handleShowConnectionDetail={() => handleCardClick(user)}
+                              />
+                         ))}
                     </div>
                </div>
 
