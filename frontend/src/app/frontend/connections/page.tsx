@@ -14,6 +14,7 @@ import { useEffect } from "react";
 import { useGetMyProfile } from "@/app/hooks/useGetMyProfile";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useGetUserConnections } from "@/app/hooks/useGetUserConnection";
 
 // interface connection {
 //      id: string;
@@ -67,21 +68,23 @@ export default function ConnectionListPage() {
           };
      }
 
-     const [usersConnection, setUsersConnection] = useState<UserConnection[]>([]);
+     // const [usersConnection, setUsersConnection] = useState<UserConnection[]>([]);
      const { user: currentUser } = useGetMyProfile();
 
      const router = useRouter()
 
-     useEffect(() => {
-          if (!currentUser?.id) return;
-          const fetchUsersConnection = async () => {
-               const res = await fetch(`http://localhost:4000/api/connections/${currentUser?.id}`);
-               const data = await res.json();
-               console.table("dfjdklf", data);
-               setUsersConnection(data.connections);
-          };
-          fetchUsersConnection();
-     }, [currentUser?.id]);
+     // useEffect(() => {
+     //      if (!currentUser?.id) return;
+     //      const fetchUsersConnection = async () => {
+     //           const res = await fetch(`http://localhost:4000/api/connections/${currentUser?.id}`);
+     //           const data = await res.json();
+     //           console.table("dfjdklf", data);
+     //           setUsersConnection(data.connections);
+     //      };
+     //      fetchUsersConnection();
+     // }, [currentUser?.id]);
+
+     const {usersConnection, setUsersConnection, loading, error} = useGetUserConnections(currentUser?.id)
 
      const filteredConnections = useMemo(() => {
           return usersConnection?.filter((connection) => {
