@@ -5,31 +5,30 @@ import { ConnectionCard } from "../connectionCard/index";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ConnectionDetailSideBar } from "../connectionDetailPage";
 import { useGetMyProfile } from "@/app/hooks/useGetMyProfile";
-
+import { useGetUserConnections } from "@/app/hooks/useGetUserConnection";
 
 type User = {
-  id: string;
-  name: string;
-  email: string;
-  bio?: string;
-  avatarUrl?: string;
-  role: "LEARNER" | "MENTOR" | string;
-  timeZone?: string;
-  createdAt: string;
+     id: string;
+     name: string;
+     email: string;
+     bio?: string;
+     avatarUrl?: string;
+     role: "LEARNER" | "MENTOR" | string;
+     timeZone?: string;
+     createdAt: string;
 
-  skillsOffered: { id: string; name: string }[];
-  skillsWanted: { id: string; name: string }[];
+     skillsOffered: { id: string; name: string }[];
+     skillsWanted: { id: string; name: string }[];
 
-  sessionsAsMentor: { id: string }[];
-  sessionsAsLearner: { id: string }[];
+     sessionsAsMentor: { id: string }[];
+     sessionsAsLearner: { id: string }[];
 
-  sentConnections: { id: string; receiverId: string }[];
-  receivedConnections: { id: string; senderId: string }[];
+     sentConnections: { id: string; receiverId: string }[];
+     receivedConnections: { id: string; senderId: string }[];
 
-  followers: { id: string; followerId: string }[];
-  following: { id: string; followingId: string }[];
+     followers: { id: string; followerId: string }[];
+     following: { id: string; followingId: string }[];
 };
-
 
 export const SearchResults = () => {
      const [users, setUsers] = useState<User[]>([]);
@@ -63,8 +62,24 @@ export const SearchResults = () => {
           setIsSidebarOpen(true);
      };
 
-    const {user:myData, loading:myDataLoading} =  useGetMyProfile()
-     console.log("user", myData)
+     const { user: myData, loading: myDataLoading } = useGetMyProfile();
+     // console.log("mydata", myData)
+
+     const {
+          usersConnection,
+
+          loading: currentUserDataLoading,
+          error,
+     } = useGetUserConnections(myData?.id);
+     console.log("userconnection", usersConnection);
+
+     const connectedIds = new Set(usersConnection.map((connection) => connection.user.id));
+
+     const filterConnectedUser = users.filter((user) => !connectedIds.has(user.id));
+
+     if (myDataLoading) return <p>User data Loading...</p>;
+     if (currentUserDataLoading) return <p>Current user data loading...</p>;
+     if (error) return <p> we got an error</p>;
      return (
           <>
                <div className="flex-1 p-6">
@@ -74,8 +89,8 @@ export const SearchResults = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                         {users &&
-                              users?.map((user) => (
+                         {filterConnectedUser &&
+                              filterConnectedUser?.map((user) => (
                                    <ConnectionCard
                                         key={user.id}
                                         name={user.name}

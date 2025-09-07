@@ -17,7 +17,14 @@ interface UserConnection {
   };
 }
 
-export function useGetUserConnections(userId?: string) {
+interface UseGetUserConnectionsReturn {
+  usersConnection: UserConnection[];
+  loading: boolean;
+  error: string | null;
+  setUsersConnection?: React.Dispatch<React.SetStateAction<UserConnection[]>>;
+}
+
+export function useGetUserConnections(userId?: string):UseGetUserConnectionsReturn {
   const [usersConnection, setUsersConnection] = useState<UserConnection[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
