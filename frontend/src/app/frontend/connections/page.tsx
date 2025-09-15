@@ -180,7 +180,7 @@ export default function ConnectionListPage() {
                     // ✅ Re-fetch the accepted connections to update the table
                     const updated = await fetch(`http://localhost:4000/api/connections/${currentUser?.id}`);
                     const data = await updated.json();
-                    setUsersConnection(data);
+                    setUsersConnection?.(data);
                } else {
                     const error = await res.json();
                     toast.error(error.message || "Failed to accept");

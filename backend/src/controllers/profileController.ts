@@ -161,10 +161,10 @@ export const getAllProfiles = async (req: Request, res: Response) => {
                where: currentUserId ? { id: { not: currentUserId } } : {},
                include: {
                     skillsOffered: true,
-                    // professionDetails: true,
-                    // currentOrganization: true,
-                    // experienceSummary: true,
-                    // currentStatus: true,
+                    professionDetails: true,
+                    currentOrganization: true,
+                    experienceSummary: true,
+                    currentStatus: true,
                     socialLinks: true,
                     receivedConnections: {
                          select: {
