@@ -33,7 +33,7 @@ export const SearchResults = ({ users, loading, onUserClick }: SearchResultsProp
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                         {users.map((user) => (
+                         {users.length > 0 ? users.map((user) => (
                               <ConnectionCard
                                    key={user.id}
                                    name={user.name}
@@ -44,7 +44,7 @@ export const SearchResults = ({ users, loading, onUserClick }: SearchResultsProp
                                    skills={user.skillsOffered.map((s) => s.name)}
                                    handleShowConnectionDetail={() => handleCardClick(user)}
                               />
-                         ))}
+                         )) : <p className="text-white text-center font-semibold ">No User Found, Please adjust the applied Filter. </p>}
                     </div>
                </div>
 

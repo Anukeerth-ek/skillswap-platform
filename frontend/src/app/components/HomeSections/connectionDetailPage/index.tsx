@@ -9,6 +9,7 @@ import { Share2, Bookmark } from "lucide-react";
 import { toast } from "sonner";
 import { useGetMyProfile } from "@/app/hooks/useGetMyProfile";
 import { User } from "@/types";
+import { formatDate } from "@/utils/formatData";
 
 export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
      const [connectionSent, setConnectionSent] = useState(false);
@@ -93,7 +94,7 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
                          <AvatarFallback>JP</AvatarFallback>
                     </Avatar>
                     <h2 className="text-xl font-semibold mb-1">{user?.name}</h2>
-                    <p className="text-gray-400 mb-4">{user?.professionDetails?.title}</p>
+                    <p className="text-gray-400 mb-4">{user?.professionDetails?.title || "Not Provided"}</p>
 
                     <div className="flex flex-wrap gap-2 justify-center mb-4">
                          {user.skillsOffered.map((skill, idx) => (
@@ -118,7 +119,7 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
                     </div> */}
                     <div className="flex justify-between">
                          <span className="text-gray-400">Company Name</span>
-                         <span className="text-white">{user?.currentOrganization?.organization}</span>
+                         <span className="text-white">{user?.currentOrganization?.organization || "Not Provided"}</span>
                     </div>
                     {/* <div className="flex justify-between">
                          <span className="text-gray-400">Current Profession</span>
@@ -126,20 +127,20 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
                     </div> */}
                     <div className="flex justify-between">
                          <span className="text-gray-400">Experience</span>
-                         <span className="text-white">{user?.experienceSummary?.years} Years</span>
+                         <span className="text-white">{user?.experienceSummary?.years || "Not Provided"} Years</span>
                     </div>
 
                     <div className="flex justify-between">
                          <span className="text-gray-400">On this platform</span>
                          <span className="text-white">
-                              {user?.createdAt ? new Date(user?.createdAt).toLocaleDateString() : "Today"}
+                              {user?.createdAt ? formatDate(user?.createdAt) : "Today"}
                          </span>
                     </div>
                </div>
 
                <div className="mb-6">
                     <h3 className="font-medium mb-3">Bio</h3>
-                    <p className="text-gray-400 text-sm leading-relaxed">{user?.bio}</p>
+                    <p className="text-gray-400 text-sm leading-relaxed">{user?.bio || "Not Provided"}</p>
                </div>
 
                {/* <div className="mb-6">
