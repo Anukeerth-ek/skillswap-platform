@@ -13,29 +13,30 @@ const ProfileCreatePage = () => {
           bio: string;
           avatarUrl: string;
           timeZone: string;
-          professionDetails: string;
-          currentOrganization: string;
-          experienceSummary: string;
+          professionDetails: { title: string };
+          currentOrganization: { organization: string };
+          experienceSummary: { years: string };
           skillsOffered: string[];
           skillsWanted: string[];
      };
+
      // type Skill = {
      //      id: string;
      //      name: string;
      //      category: string | null;
      // };
-       interface UserProfileApiResponse {
-                         name?: string;
-                         bio?: string;
-                         avatarUrl?: string;
-                         timeZone?: string;
-                         professionDetails?: { title?: string };
-                         currentOrganization?: { organization?: string };
-                         experienceSummary?: { years?: number };
-                         // currentStatus?: { status?: string };
-                         skillsOffered?: { name: string }[];
-                         skillsWanted?: { name: string }[];
-                    }
+     interface UserProfileApiResponse {
+          name?: string;
+          bio?: string;
+          avatarUrl?: string;
+          timeZone?: string;
+          professionDetails?: { title?: string };
+          currentOrganization?: { organization?: string };
+          experienceSummary?: { years?: number };
+          // currentStatus?: { status?: string };
+          skillsOffered?: { name: string }[];
+          skillsWanted?: { name: string }[];
+     }
      interface HandleSubmitEvent extends React.FormEvent<HTMLFormElement> {}
      // type Profile = {
      //      name: string;
@@ -51,9 +52,9 @@ const ProfileCreatePage = () => {
           bio: "",
           avatarUrl: "",
           timeZone: "",
-          professionDetails: "",
-          currentOrganization: "",
-          experienceSummary: "",
+          professionDetails: { title: "" },
+          currentOrganization: { organization: "" },
+          experienceSummary: { years: "" },
           skillsOffered: [],
           skillsWanted: [],
      });
@@ -95,10 +96,19 @@ const ProfileCreatePage = () => {
 
      const handleInputChange = (e: InputChangeEvent): void => {
           const { name, value } = e.target;
-          setFormData((prev) => ({
-               ...prev,
-               [name]: value,
-          }));
+
+          setFormData((prev) => {
+               if (name === "professionName") {
+                    return { ...prev, professionDetails: { title: value } };
+               }
+               if (name === "currentOrganization") {
+                    return { ...prev, currentOrganization: { organization: value } };
+               }
+               if (name === "experienceSummary") {
+                    return { ...prev, experienceSummary: { years: value } };
+               }
+               return { ...prev, [name]: value }; // fallback for simple fields
+          });
      };
 
      const addSkillOffered = () => {
@@ -166,9 +176,9 @@ const ProfileCreatePage = () => {
                formDataToSend.append("bio", formData.bio || "");
                formDataToSend.append("timeZone", formData.timeZone || "");
 
-               formDataToSend.append("professionalDetail", formData.professionDetails);
-               formDataToSend.append("currentOrganization", formData.currentOrganization);
-               formDataToSend.append("yearsOfExperience", formData.experienceSummary);
+               formDataToSend.append("professionName", formData.professionDetails.title);
+               formDataToSend.append("currentOrganization", formData.currentOrganization.organization);
+               formDataToSend.append("yearsOfExperience", formData.experienceSummary.years);
 
                if (avatarFile) {
                     formDataToSend.append("avatar", avatarFile); // 👈 this is the actual file
@@ -195,7 +205,6 @@ const ProfileCreatePage = () => {
 
                if (response.ok) {
                     router.push("/");
-                
                } else {
                     const errData = await response.json();
                     console.error("Failed to create profile", errData);
@@ -213,6 +222,7 @@ const ProfileCreatePage = () => {
                router.push("/"); // or redirect to /login
           }
      }, []);
+
      useEffect(() => {
           const fetchProfile = async () => {
                const token = localStorage.getItem("token");
@@ -224,7 +234,7 @@ const ProfileCreatePage = () => {
                });
 
                const data = await res.json();
-             
+
                if (res.ok && data.user) {
                     setProfile(data.user);
                     setIsEdit(true); // ✅ important
@@ -234,12 +244,25 @@ const ProfileCreatePage = () => {
                          bio: (data.user as UserProfileApiResponse).bio || "",
                          avatarUrl: (data.user as UserProfileApiResponse).avatarUrl || "",
                          timeZone: (data.user as UserProfileApiResponse).timeZone || "",
-                         professionDetails: (data.user as UserProfileApiResponse).professionDetails?.title || "",
-                         currentOrganization: (data.user as UserProfileApiResponse).currentOrganization?.organization || "",
-                         experienceSummary: (data.user as UserProfileApiResponse).experienceSummary?.years?.toString() || "",
-                         //   currentStatus: (data.user as UserProfileApiResponse).currentStatus?.status || "",
-                         skillsOffered: (data.user as UserProfileApiResponse).skillsOffered?.map((s: { name: string }) => s.name) || [],
-                         skillsWanted: (data.user as UserProfileApiResponse).skillsWanted?.map((s: { name: string }) => s.name) || [],
+
+                         professionDetails: {
+                              title: (data.user as UserProfileApiResponse).professionDetails?.title || "",
+                         },
+                         currentOrganization: {
+                              organization: (data.user as UserProfileApiResponse).currentOrganization?.organization || "",
+                         },
+                         experienceSummary: {
+                              years: (data.user as UserProfileApiResponse).experienceSummary?.years?.toString() || "",
+                         },
+
+                         // currentStatus: { status: (data.user as UserProfileApiResponse).currentStatus?.status || "" },
+
+                         skillsOffered:
+                              (data.user as UserProfileApiResponse).skillsOffered?.map((s: { name: string }) => s.name) ||
+                              [],
+                         skillsWanted:
+                              (data.user as UserProfileApiResponse).skillsWanted?.map((s: { name: string }) => s.name) ||
+                              [],
                     });
 
                     if (data.user.avatarUrl) {
@@ -250,7 +273,6 @@ const ProfileCreatePage = () => {
 
           fetchProfile();
      }, []);
-
 
      return (
           <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
@@ -277,7 +299,7 @@ const ProfileCreatePage = () => {
                                         type="text"
                                         id="name"
                                         name="name"
-                                        value={formData.name}
+                                        value={formData.name || ""}
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
@@ -285,47 +307,47 @@ const ProfileCreatePage = () => {
                                    />
                               </div>
                               {/* Profession Field */}
-                              {/* <div>
+                              <div>
                                    <label
-                                        htmlFor="professionalDetail"
+                                        htmlFor="professionDetails"
                                         className="block text-sm font-medium text-gray-700 mb-2"
                                    >
                                         Please Add your profession*
                                    </label>
                                    <input
                                         type="text"
-                                        id="professionalDetail"
-                                        name="professionalDetail"
-                                        value={formData.professionDetails}
+                                        id="professionName"
+                                        name="professionName"
+                                        value={formData.professionDetails.title || ""}
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                         placeholder="Enter your current profession"
                                    />
-                              </div> */}
+                              </div>
 
                               {/* Professional Experience in years*/}
-                              {/* <div>
+                              <div>
                                    <label
-                                        htmlFor="yearsOfExperience"
+                                        htmlFor="experienceSummary"
                                         className="block text-sm font-medium text-gray-700 mb-2"
                                    >
                                         Enter your professional experience (In years)*
                                    </label>
                                    <input
                                         type="text"
-                                        id="yearsOfExperience"
-                                        name="yearsOfExperience"
-                                        value={formData.experienceSummary}
+                                        id="experienceSummary"
+                                        name="experienceSummary"
+                                        value={formData.experienceSummary.years || ""}
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                         placeholder="Eg: If its is 5 year, enter 5"
                                    />
-                              </div> */}
+                              </div>
 
                               {/* Current organisation*/}
-                              {/* <div>
+                              <div>
                                    <label
                                         htmlFor="currentOrganization"
                                         className="block text-sm font-medium text-gray-700 mb-2"
@@ -336,13 +358,13 @@ const ProfileCreatePage = () => {
                                         type="text"
                                         id="currentOrganization"
                                         name="currentOrganization"
-                                        value={formData.currentOrganization}
+                                        value={formData.currentOrganization.organization || ""}
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
                                         placeholder="Your current organisation name"
                                    />
-                              </div> */}
+                              </div>
 
                               {/* Bio Field */}
                               <div>
@@ -352,7 +374,7 @@ const ProfileCreatePage = () => {
                                    <textarea
                                         id="bio"
                                         name="bio"
-                                        value={formData.bio}
+                                        value={formData.bio || ""}
                                         onChange={handleInputChange}
                                         rows={4}
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors resize-none"

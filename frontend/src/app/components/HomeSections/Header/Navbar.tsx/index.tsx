@@ -28,7 +28,7 @@ export const Navbar = () => {
                          <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
                               <span className="text-white font-bold">L</span>
                          </div>
-                         <span className="text-xl font-semibold">Leaning</span>
+                         <span className="text-xl font-semibold">Swapper</span>
                     </div>
                </div>
                <div className="flex items-center space-x-6">
