@@ -20,11 +20,6 @@ const ProfileCreatePage = () => {
           skillsWanted: string[];
      };
 
-     // type Skill = {
-     //      id: string;
-     //      name: string;
-     //      category: string | null;
-     // };
      interface UserProfileApiResponse {
           name?: string;
           bio?: string;
@@ -33,19 +28,9 @@ const ProfileCreatePage = () => {
           professionDetails?: { title?: string };
           currentOrganization?: { organization?: string };
           experienceSummary?: { years?: number };
-          // currentStatus?: { status?: string };
           skillsOffered?: { name: string }[];
           skillsWanted?: { name: string }[];
      }
-     interface HandleSubmitEvent extends React.FormEvent<HTMLFormElement> {}
-     // type Profile = {
-     //      name: string;
-     //      bio: string;
-     //      avatarUrl: string;
-     //      timeZone: string;
-     //      skillsOffered: Skill[];
-     //      skillsWanted: Skill[];
-     // };
 
      const [formData, setFormData] = useState<ProfileData>({
           name: "",
@@ -63,7 +48,6 @@ const ProfileCreatePage = () => {
      const [newSkillNeeded, setNewSkillNeeded] = useState("");
      const [isSubmitting, setIsSubmitting] = useState(false);
      const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-     const [profile, setProfile] = useState<ProfileData | null>(null);
      const [isEdit, setIsEdit] = useState(false);
 
      useEffect(() => {
@@ -76,7 +60,6 @@ const ProfileCreatePage = () => {
           });
      }, []);
 
-     // Common timezones for selection
      const commonTimezones = [
           "UTC",
           "America/New_York",
@@ -92,19 +75,17 @@ const ProfileCreatePage = () => {
           "Asia/Kolkata",
      ];
 
-     interface InputChangeEvent extends React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement> {}
-
-     const handleInputChange = (e: InputChangeEvent): void => {
+     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>): void => {
           const { name, value } = e.target;
 
           setFormData((prev) => {
-               if (name === "professionName") {
+               if (name === "professionTitle") {
                     return { ...prev, professionDetails: { title: value } };
                }
-               if (name === "currentOrganization") {
+               if (name === "organization") {
                     return { ...prev, currentOrganization: { organization: value } };
                }
-               if (name === "experienceSummary") {
+               if (name === "experienceYears") {
                     return { ...prev, experienceSummary: { years: value } };
                }
                return { ...prev, [name]: value }; // fallback for simple fields
@@ -121,11 +102,7 @@ const ProfileCreatePage = () => {
           }
      };
 
-     interface RemoveSkillFn {
-          (skillToRemove: string): void;
-     }
-
-     const removeSkillOffered: RemoveSkillFn = (skillToRemove) => {
+     const removeSkillOffered = (skillToRemove: string) => {
           setFormData((prev) => ({
                ...prev,
                skillsOffered: prev.skillsOffered.filter((skill) => skill !== skillToRemove),
@@ -142,22 +119,14 @@ const ProfileCreatePage = () => {
           }
      };
 
-     interface RemoveSkillNeededFn {
-          (skillToRemove: string): void;
-     }
-
-     const removeSkillNeeded: RemoveSkillNeededFn = (skillToRemove) => {
+     const removeSkillNeeded = (skillToRemove: string) => {
           setFormData((prev) => ({
                ...prev,
                skillsWanted: prev.skillsWanted.filter((skill) => skill !== skillToRemove),
           }));
      };
 
-     // interface ApiResponse {
-     //      ok: boolean;
-     //      // Add more fields if your API returns them
-     // }
-     const handleSubmit = async (e: HandleSubmitEvent): Promise<void> => {
+     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
           e.preventDefault();
           setIsSubmitting(true);
 
@@ -176,12 +145,13 @@ const ProfileCreatePage = () => {
                formDataToSend.append("bio", formData.bio || "");
                formDataToSend.append("timeZone", formData.timeZone || "");
 
-               formDataToSend.append("professionName", formData.professionDetails.title);
-               formDataToSend.append("currentOrganization", formData.currentOrganization.organization);
-               formDataToSend.append("yearsOfExperience", formData.experienceSummary.years);
+               // ✅ Add nested fields consistently
+               formDataToSend.append("professionTitle", formData.professionDetails.title);
+               formDataToSend.append("organization", formData.currentOrganization.organization);
+               formDataToSend.append("experienceYears", formData.experienceSummary.years);
 
                if (avatarFile) {
-                    formDataToSend.append("avatar", avatarFile); // 👈 this is the actual file
+                    formDataToSend.append("avatar", avatarFile);
                }
 
                formData.skillsOffered.forEach((skill) => {
@@ -191,9 +161,8 @@ const ProfileCreatePage = () => {
                formData.skillsWanted.forEach((skill) => {
                     formDataToSend.append("skillsWanted[]", skill);
                });
-               const url = isEdit
-                    ? "http://localhost:4000/api/profile/update" // PUT for update
-                    : "http://localhost:4000/api/profile"; // POST for create
+
+               const url = isEdit ? "http://localhost:4000/api/profile/update" : "http://localhost:4000/api/profile";
 
                const response = await fetch(url, {
                     method: isEdit ? "PUT" : "POST",
@@ -207,10 +176,10 @@ const ProfileCreatePage = () => {
                     router.push("/");
                } else {
                     const errData = await response.json();
-                    console.error("Failed to create profile", errData);
+                    console.error("Failed to save profile", errData);
                }
           } catch (error) {
-               console.error("Error creating profile:", error);
+               console.error("Error saving profile:", error);
           } finally {
                setIsSubmitting(false);
           }
@@ -219,7 +188,7 @@ const ProfileCreatePage = () => {
      useEffect(() => {
           const token = localStorage.getItem("token");
           if (!token) {
-               router.push("/"); // or redirect to /login
+               router.push("/");
           }
      }, []);
 
@@ -236,15 +205,13 @@ const ProfileCreatePage = () => {
                const data = await res.json();
 
                if (res.ok && data.user) {
-                    setProfile(data.user);
-                    setIsEdit(true); // ✅ important
+                    setIsEdit(true);
 
                     setFormData({
                          name: (data.user as UserProfileApiResponse).name || "",
                          bio: (data.user as UserProfileApiResponse).bio || "",
                          avatarUrl: (data.user as UserProfileApiResponse).avatarUrl || "",
                          timeZone: (data.user as UserProfileApiResponse).timeZone || "",
-
                          professionDetails: {
                               title: (data.user as UserProfileApiResponse).professionDetails?.title || "",
                          },
@@ -254,15 +221,8 @@ const ProfileCreatePage = () => {
                          experienceSummary: {
                               years: (data.user as UserProfileApiResponse).experienceSummary?.years?.toString() || "",
                          },
-
-                         // currentStatus: { status: (data.user as UserProfileApiResponse).currentStatus?.status || "" },
-
-                         skillsOffered:
-                              (data.user as UserProfileApiResponse).skillsOffered?.map((s: { name: string }) => s.name) ||
-                              [],
-                         skillsWanted:
-                              (data.user as UserProfileApiResponse).skillsWanted?.map((s: { name: string }) => s.name) ||
-                              [],
+                         skillsOffered: (data.user as UserProfileApiResponse).skillsOffered?.map((s) => s.name) || [],
+                         skillsWanted: (data.user as UserProfileApiResponse).skillsWanted?.map((s) => s.name) || [],
                     });
 
                     if (data.user.avatarUrl) {
@@ -274,6 +234,7 @@ const ProfileCreatePage = () => {
           fetchProfile();
      }, []);
 
+     console.log("formdata", formData);
      return (
           <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-12 px-4">
                <div className="max-w-2xl mx-auto">
@@ -309,16 +270,16 @@ const ProfileCreatePage = () => {
                               {/* Profession Field */}
                               <div>
                                    <label
-                                        htmlFor="professionDetails"
+                                        htmlFor="professionTitle"
                                         className="block text-sm font-medium text-gray-700 mb-2"
                                    >
                                         Please Add your profession*
                                    </label>
                                    <input
                                         type="text"
-                                        id="professionName"
-                                        name="professionName"
-                                        value={formData.professionDetails.title || ""}
+                                        id="professionTitle"
+                                        name="professionTitle" // ✅ matches handleInputChange
+                                        value={formData.professionDetails.title}
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
@@ -329,36 +290,33 @@ const ProfileCreatePage = () => {
                               {/* Professional Experience in years*/}
                               <div>
                                    <label
-                                        htmlFor="experienceSummary"
+                                        htmlFor="experienceYears"
                                         className="block text-sm font-medium text-gray-700 mb-2"
                                    >
                                         Enter your professional experience (In years)*
                                    </label>
                                    <input
                                         type="text"
-                                        id="experienceSummary"
-                                        name="experienceSummary"
-                                        value={formData.experienceSummary.years || ""}
+                                        id="experienceYears"
+                                        name="experienceYears" // ✅ matches handleInputChange
+                                        value={formData.experienceSummary.years}
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"
-                                        placeholder="Eg: If its is 5 year, enter 5"
+                                        placeholder="Eg: If it's 5 years, enter 5"
                                    />
                               </div>
 
                               {/* Current organisation*/}
                               <div>
-                                   <label
-                                        htmlFor="currentOrganization"
-                                        className="block text-sm font-medium text-gray-700 mb-2"
-                                   >
+                                   <label htmlFor="organization" className="block text-sm font-medium text-gray-700 mb-2">
                                         Enter your current organisation name
                                    </label>
                                    <input
                                         type="text"
-                                        id="currentOrganization"
-                                        name="currentOrganization"
-                                        value={formData.currentOrganization.organization || ""}
+                                        id="organization"
+                                        name="organization" // ✅ matches handleInputChange
+                                        value={formData.currentOrganization.organization}
                                         onChange={handleInputChange}
                                         required
                                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors"

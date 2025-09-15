@@ -13,6 +13,17 @@ const profileSchema = z.object({
   timeZone: z.string().optional(),
   skillsOffered: z.array(z.string()).optional(),
   skillsWanted: z.array(z.string()).optional(),
+
+  professionTitle: z.string().optional(),
+  organization: z.string().optional(),
+  experienceYears: z.string().optional(), // keep as string since coming from req.body
+  experienceDescription: z.string().optional(),
+  currentStatus: z.string().optional(),
+
+  linkedin: z.string().url().optional(),
+  github: z.string().url().optional(),
+  twitter: z.string().url().optional(),
+  website: z.string().url().optional(),
 });
 
 
@@ -224,7 +235,7 @@ export const getUserProfile = async (req: Request & { userId?: string }, res: Re
         socialLinks: true,
       },
     });
-
+console.log("from backend", user)
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return 
