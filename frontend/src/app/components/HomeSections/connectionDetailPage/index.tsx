@@ -65,7 +65,7 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
                toast.error("Something went wrong");
           }
      };
-
+     console.log("user", user);
      return (
           <div className=" bg-gray-900 text-white p-6">
                <div className="flex items-center justify-between mb-6">
@@ -93,7 +93,7 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
                          <AvatarFallback>JP</AvatarFallback>
                     </Avatar>
                     <h2 className="text-xl font-semibold mb-1">{user?.name}</h2>
-                    <p className="text-gray-400 mb-4">Teacher</p>
+                    <p className="text-gray-400 mb-4">{user?.professionDetails?.title}</p>
 
                     <div className="flex flex-wrap gap-2 justify-center mb-4">
                          {user.skillsOffered.map((skill, idx) => (
@@ -112,18 +112,23 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
                </div>
 
                <div className="space-y-4 mb-6">
-                    <div className="flex justify-between">
+                    {/* <div className="flex justify-between">
                          <span className="text-gray-400">Readiness</span>
                          <span className="text-green-400">Hired</span>
+                    </div> */}
+                    <div className="flex justify-between">
+                         <span className="text-gray-400">Company Name</span>
+                         <span className="text-white">{user?.currentOrganization?.organization}</span>
                     </div>
+                    {/* <div className="flex justify-between">
+                         <span className="text-gray-400">Current Profession</span>
+                         <span className="text-white">{user?.professionDetails?.title}</span>
+                    </div> */}
                     <div className="flex justify-between">
                          <span className="text-gray-400">Experience</span>
-                         <span className="text-white">15 years</span>
+                         <span className="text-white">{user?.experienceSummary?.years} Years</span>
                     </div>
-                    <div className="flex justify-between">
-                         <span className="text-gray-400">Dialogue</span>
-                         <span className="text-white">Zoom</span>
-                    </div>
+
                     <div className="flex justify-between">
                          <span className="text-gray-400">On this platform</span>
                          <span className="text-white">
@@ -133,7 +138,7 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
                </div>
 
                <div className="mb-6">
-                    <h3 className="font-medium mb-3">Teacher description</h3>
+                    <h3 className="font-medium mb-3">Bio</h3>
                     <p className="text-gray-400 text-sm leading-relaxed">{user?.bio}</p>
                </div>
 
