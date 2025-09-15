@@ -9,7 +9,7 @@ interface TeacherCardProps {
      role: string;
      avatar: string;
      hourRate: number;
-     experience: string;
+     experience: number | undefined;
      skills: string[];
      isBookmarked?: boolean;
      handleShowConnectionDetail?: () => void;
@@ -73,7 +73,7 @@ export const ConnectionCard: React.FC<TeacherCardProps> = ({
                          <DollarSign className="w-4 h-4 text-purple-400" />
                          <span className="text-white font-semibold">${hourRate}/h</span>
                     </div>
-                    <span className="text-gray-400">{experience}</span>
+                    <span className="text-gray-400">{experience ? ` ${experience } Years` : "Not Provided"}</span>
                </div>
           </div>
      );
