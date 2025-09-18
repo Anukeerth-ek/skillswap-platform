@@ -16,7 +16,7 @@ import followRoutes from "./routes/followRoutes"
 import meetSessionRoutes from './routes/meetSessionRoutes'
 import googleAuthRoutes from "./routes/googleAuthRoutes";
 import googleTokenRoutes from "./routes/googleTokenRoutes";
-
+import filteredProfileRoutes from  "./routes/filteredRoutes"
 dotenv.config();
 
 const app = express();
@@ -32,6 +32,8 @@ app.use("/api/profiles", profileRoutes);
 app.use("/api/learnersBooking", learnerRoutes);
 app.use("/api/mentorBooking", mentorRoutes);
 app.use("/api/profile", profileRoutes);
+
+app.use("/api/filtered-profile", filteredProfileRoutes);
 
 app.use("/api/connections", connectionRoutes);
 app.use("/api/follow", followRoutes);
