@@ -4,8 +4,6 @@ import React, { useEffect, useState } from "react";
 import { ConnectionCard } from "../connectionCard/index";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { ConnectionDetailSideBar } from "../connectionDetailPage";
-import { useGetMyProfile } from "@/app/hooks/useGetMyProfile";
-import { useGetUserConnections } from "@/app/hooks/useGetUserConnection";
 import { User } from "@/types";
 
 type SearchResultsProps = {
@@ -13,6 +11,7 @@ type SearchResultsProps = {
      loading: boolean;
      onUserClick: (user: User) => void;
 };
+
 export const SearchResults = ({ users, loading, onUserClick }: SearchResultsProps) => {
      const [selectedUser, setSelectedUser] = useState<User | null>(null);
      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -23,29 +22,44 @@ export const SearchResults = ({ users, loading, onUserClick }: SearchResultsProp
           onUserClick(user);
      };
 
+     // Close sidebar if selected user no longer in filtered results
+     useEffect(() => {
+          if (selectedUser && !users.find((u) => u.id === selectedUser.id)) {
+               setSelectedUser(null);
+               setIsSidebarOpen(false);
+          }
+     }, [users]);
+
      if (loading) return <p>Loading...</p>;
+
      return (
           <>
                <div className="flex-1 p-6">
                     <div className="flex items-center justify-between mb-6">
                          <h2 className="text-xl font-semibold text-white">Search Results</h2>
-                         <span className="text-gray-400">{loading ? "Loading..." : `${users?.length} results found`}</span>
+                         <span className="text-gray-400">{users?.length} results found</span>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                         {users.length > 0 ? users.map((user) => (
-                              <ConnectionCard
-                                   key={user.id}
-                                   name={user.name}
-                                   role={user.role}
-                                   avatar={user.avatarUrl || "/default-avatar.png"}
-                                   hourRate={Math.floor(Math.random() * 20) + 15}
-                                   experience={user?.experienceSummary?.years}
-                                   skills={user.skillsOffered.map((s) => s.name)}
-                                   handleShowConnectionDetail={() => handleCardClick(user)}
-                              />
-                         )) : <p className="text-white text-center font-semibold ">No User Found, Please adjust the applied Filter. </p>}
-                    </div>
+                    {users?.length > 0 ? (
+                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                              {users.map((user) => (
+                                   <ConnectionCard
+                                        key={user.id}
+                                        name={user.name}
+                                        role={user.role}
+                                        avatar={user.avatarUrl || "/default-avatar.png"}
+                                        hourRate={Math.floor(Math.random() * 20) + 15}
+                                        experience={user?.experienceSummary?.years}
+                                        skills={user.skillsOffered.map((s) => s.name)}
+                                        handleShowConnectionDetail={() => handleCardClick(user)}
+                                   />
+                              ))}
+                         </div>
+                    ) : (
+                         <p className="text-white text-center font-semibold">
+                              No User Found, Please adjust the applied Filter.
+                         </p>
+                    )}
                </div>
 
                <Sheet open={isSidebarOpen} onOpenChange={setIsSidebarOpen}>

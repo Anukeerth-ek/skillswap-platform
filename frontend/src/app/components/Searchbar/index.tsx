@@ -9,7 +9,7 @@ export const SearchBar = ({handleUserSearch}:any) => {
       <div className="relative flex-1">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
         <Input
-          placeholder="Python"
+          placeholder="Search Skill Swap"
           className="pl-10 bg-gray-800 border-gray-700 text-white placeholder-gray-400"
           onChange={handleUserSearch}
         />

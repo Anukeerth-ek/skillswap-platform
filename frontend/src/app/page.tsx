@@ -7,12 +7,21 @@ import { SearchResults } from "../app/components/HomeSections/searchResult";
 import { User } from "@/types";
 import { useGetMyProfile } from "./hooks/useGetMyProfile";
 import { useGetUserConnections } from "./hooks/useGetUserConnection";
+import { useRouter, useSearchParams } from "next/navigation";
 // import { ConnectionDetailSideBar } from '../app/components/HomeSections/connectionDetailPage';
 
 export default function Home() {
      const [searchTerm, setSearchTerm] = useState("");
      const [users, setUsers] = useState<User[]>([]);
      const [loading, setLoading] = useState(true);
+
+     const [filters, setFilters] = useState({
+          search: "",
+          professional: [] as string[],
+          experience: [] as string[],
+          company: "",
+          sort: "most-experienced",
+     });
 
      useEffect(() => {
           const fetchUsers = async () => {
@@ -46,8 +55,8 @@ export default function Home() {
      const connectedIds = new Set(usersConnection.map((c) => c.user.id));
 
      const filteredUsers = users
-          .filter((user) => !connectedIds.has(user.id))
-          .filter((user) => {
+          ?.filter((user) => !connectedIds.has(user.id))
+          ?.filter((user) => {
                console.log("anu", user);
                return (
                     user.name.toLowerCase().includes(searchTerm) ||
@@ -55,14 +64,58 @@ export default function Home() {
                );
           });
 
+     const router = useRouter();
+     const searchParams = useSearchParams();
+useEffect(() => {
+  const params = new URLSearchParams();
+  if (filters.search) params.set("search", filters.search);
+  if (filters.company) params.set("company", filters.company);
+  if (filters.professional.length) params.set("professional", filters.professional.join(","));
+  if (filters.experience.length) params.set("experience", filters.experience.join(","));
+  if (filters.sort) params.set("sort", filters.sort);
+
+  router.replace(`?${params.toString()}`);
+}, [filters]);
+
+useEffect(() => {
+  const fetchUsers = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      const params = new URLSearchParams();
+
+      if (filters.search) params.set("search", filters.search);
+      if (filters.company) params.set("company", filters.company);
+      if (filters.professional.length) params.set("professional", filters.professional.join(","));
+      if (filters.experience.length) params.set("experience", filters.experience.join(","));
+      if (filters.sort) params.set("sort", filters.sort);
+
+      const res = await fetch(`http://localhost:4000/api/profile/filter?${params.toString()}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const data = await res.json();
+         setUsers(data.users || []);
+         console.log("user", users)
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchUsers();
+}, [filters]);
+
+
      if (myDataLoading || connectionLoading) return <p>Loading...</p>;
      if (error) return <p>Error loading connections</p>;
-console.log("hey", filteredUsers)
+     console.log("hey", filteredUsers);
      return (
           <div className="min-h-screen bg-gray-900">
                {/* <Navbar /> */}
                <div className="flex">
-                    <LeftSidebar />
+                    <LeftSidebar filters={filters} setFilters={setFilters} />
                     <div className="flex-1 flex flex-col">
                          <div className="p-6">
                               <SearchBar handleUserSearch={handleUserSearch} />
