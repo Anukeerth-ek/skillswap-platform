@@ -4,35 +4,40 @@ import pool from "../config/db"; // PostgreSQL pool
 export const getFilteredProfile = async (req: Request, res: Response) => {
   const { search, company, professional, experience, sort } = req.query;
   
-     let query = `
-    SELECT
-      u.id,
-      u.name,
-      u.email,
-      u."avatarUrl",
-      u."createdAt",
-      jsonb_build_object(
-        'organization', co.organization
-      ) AS "currentOrganization",
-      jsonb_build_object(
-        'years', es.years,
-        'description', es.description
-      ) AS "experienceSummary",
-      COALESCE(
-        jsonb_agg(DISTINCT jsonb_build_object(
-          'id', s.id,
-          'name', s.name,
-          'category', s.category
-        )) FILTER (WHERE s.id IS NOT NULL),
-        '[]'
-      ) AS "skillsOffered"
-    FROM "User" u
-    LEFT JOIN "UserCurrentOrganization" co ON co."userId" = u.id
-    LEFT JOIN "UserExperienceSummary" es ON es."userId" = u.id
-    LEFT JOIN "_SkillsOffered" us ON us."A" = u.id
-    LEFT JOIN "Skill" s ON s.id = us."B"
-    WHERE 1=1
-  `;
+    let query = `
+  SELECT
+    u.id,
+    u.name,
+    u.email,
+    u."avatarUrl",
+    u."createdAt",
+    jsonb_build_object(
+      'organization', co.organization
+    ) AS "currentOrganization",
+    jsonb_build_object(
+      'years', es.years,
+      'description', es.description
+    ) AS "experienceSummary",
+    jsonb_build_object(
+      'title', pd.title
+    ) AS "professionDetails",
+    COALESCE(
+      jsonb_agg(DISTINCT jsonb_build_object(
+        'id', s.id,
+        'name', s.name,
+        'category', s.category
+      )) FILTER (WHERE s.id IS NOT NULL),
+      '[]'
+    ) AS "skillsOffered"
+  FROM "User" u
+  LEFT JOIN "UserCurrentOrganization" co ON co."userId" = u.id
+  LEFT JOIN "UserExperienceSummary" es ON es."userId" = u.id
+  LEFT JOIN "UserProfessionDetails" pd ON pd."userId" = u.id
+  LEFT JOIN "_SkillsOffered" us ON us."A" = u.id
+  LEFT JOIN "Skill" s ON s.id = us."B"
+  WHERE 1=1
+`;
+
 
      const values: any[] = [];
      let i = 1;
@@ -77,7 +82,7 @@ export const getFilteredProfile = async (req: Request, res: Response) => {
           }
      }
 
-     query += ` GROUP BY u.id, co.organization, es.years, es.description`;
+    query += ` GROUP BY u.id, co.organization, es.years, es.description, pd.title`;
 
      // 🔍 Sorting
      if (sort === "least-experienced") {
