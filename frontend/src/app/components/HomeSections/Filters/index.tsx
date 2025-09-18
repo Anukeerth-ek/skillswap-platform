@@ -69,6 +69,17 @@ export const LeftSidebar = ({ filters, setFilters }: any) => {
                                    Least Experienced
                               </Label>
                          </div>
+
+                         <div className="flex items-center space-x-2">
+                              <RadioGroupItem
+                                   value="recent-added-profile"
+                                   id="recent-added-profile"
+                                   className="border-purple-400 text-purple-400"
+                              />
+                              <Label htmlFor="recent-added-profile" className="text-sm">
+                                   Newly Added Profile
+                              </Label>
+                         </div>
                     </RadioGroup>
                </div>
 

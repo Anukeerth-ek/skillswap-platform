@@ -57,7 +57,7 @@ export default function Home() {
      const filteredUsers = users
           ?.filter((user) => !connectedIds.has(user.id))
           ?.filter((user) => {
-               console.log("anu", user);
+              
                return (
                     user.name.toLowerCase().includes(searchTerm) ||
                     user.skillsOffered.some((s) => s.name.toLowerCase().includes(searchTerm))

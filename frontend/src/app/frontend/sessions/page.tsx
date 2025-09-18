@@ -154,7 +154,6 @@ const SessionsPage = () => {
                console.error("Error deleting session:", error);
           }
      };
-     console.log("youto", sessions);
 
      const router = useRouter();
 

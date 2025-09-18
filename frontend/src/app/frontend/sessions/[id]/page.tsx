@@ -21,7 +21,6 @@ export default function SessionDetail({ params }: { params: { id: string } }) {
      useEffect(() => {
           const saved = localStorage.getItem("selectedSession");
           if (saved) {
-               console.log("anukee", JSON.parse(saved));
                setSession(JSON.parse(saved));
           }
      }, []);

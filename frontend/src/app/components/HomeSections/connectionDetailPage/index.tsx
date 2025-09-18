@@ -66,7 +66,7 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
                toast.error("Something went wrong");
           }
      };
-     console.log("user", user);
+
      return (
           <div className=" bg-gray-900 text-white p-6">
                <div className="flex items-center justify-between mb-6">
