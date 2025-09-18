@@ -9,17 +9,17 @@ import { User } from "@/types";
 type SearchResultsProps = {
      users: User[];
      loading: boolean;
-     onUserClick: (user: User) => void;
+     // onUserClick: (user: User) => void;
 };
 
-export const SearchResults = ({ users, loading, onUserClick }: SearchResultsProps) => {
+export const SearchResults = ({ users, loading,  }: SearchResultsProps) => {
      const [selectedUser, setSelectedUser] = useState<User | null>(null);
      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
      const handleCardClick = (user: User) => {
           setSelectedUser(user);
           setIsSidebarOpen(true);
-          onUserClick(user);
+          // onUserClick(user);
      };
 
      // Close sidebar if selected user no longer in filtered results
@@ -42,15 +42,15 @@ export const SearchResults = ({ users, loading, onUserClick }: SearchResultsProp
 
                     {users?.length > 0 ? (
                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                              {users.map((user) => (
+                              {users?.map((user) => (
                                    <ConnectionCard
-                                        key={user.id}
-                                        name={user.name}
-                                        role={user.role}
-                                        avatar={user.avatarUrl || "/default-avatar.png"}
+                                        key={user?.id}
+                                        name={user?.name}
+                                        role={user?.role}
+                                        avatar={user?.avatarUrl || "/default-avatar.png"}
                                         hourRate={Math.floor(Math.random() * 20) + 15}
                                         experience={user?.experienceSummary?.years}
-                                        skills={user.skillsOffered.map((s) => s.name)}
+                                        skills={user?.skillsOffered?.map((s) => s.name) || []} 
                                         handleShowConnectionDetail={() => handleCardClick(user)}
                                    />
                               ))}

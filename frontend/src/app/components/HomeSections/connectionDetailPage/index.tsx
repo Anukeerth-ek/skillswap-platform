@@ -41,7 +41,7 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
                          "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                         senderId: currentUser.id,
+                         senderId: currentUser?.id,
                          receiverId: user.id,
                     }),
                });
@@ -97,7 +97,7 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
                     <p className="text-gray-400 mb-4">{user?.professionDetails?.title || "Not Provided"}</p>
 
                     <div className="flex flex-wrap gap-2 justify-center mb-4">
-                         {user.skillsOffered.map((skill, idx) => (
+                         {user?.skillsOffered?.map((skill, idx) => (
                               <Badge
                                    key={idx}
                                    className={`${
