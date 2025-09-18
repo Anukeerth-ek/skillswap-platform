@@ -4,8 +4,7 @@
      "main": "dist/server.ts",
      "scripts": {
           "dev": "concurrently \"npm:neon-proxy\" \"npm:server\"",
-   "server": "ts-node-dev --respawn --transpile-only src/server.ts"
-,
+          "server": "ts-node-dev --respawn --transpile-only src/server.ts",
           "neon-proxy": "npx neonctl proxy --project-id br-snowy-rice-a9l36bjs",
           "build": "tsc",
           "start": "node dist/server.ts",
@@ -22,6 +21,7 @@
      "description": "",
      "dependencies": {
           "@prisma/client": "^6.10.1",
+          "@types/pg": "^8.15.5",
           "bcryptjs": "^3.0.2",
           "cors": "^2.8.5",
           "dotenv": "^16.5.0",
@@ -29,6 +29,7 @@
           "googleapis": "^155.0.0",
           "jsonwebtoken": "^9.0.2",
           "multer": "^2.0.1",
+          "pg": "^8.16.3",
           "socket.io": "^4.8.1",
           "zod": "^3.25.67"
      },
