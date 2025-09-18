@@ -117,7 +117,7 @@ export const LeftSidebar = ({ filters, setFilters }: any) => {
                     </div>
                </div>
 
-               <h3 className="font-medium mb-3">Professional</h3>
+               {/* <h3 className="font-medium mb-3">Professional</h3>
                <div className="flex flex-col space-y-2">
                     {["frontend", "backend", "fullstack", "devops", "python", "more"].map((role) => (
                          <div key={role} className="flex items-center space-x-2">
@@ -132,7 +132,7 @@ export const LeftSidebar = ({ filters, setFilters }: any) => {
                               </Label>
                          </div>
                     ))}
-               </div>
+               </div> */}
 
                {/* <div>
         <h3 className="font-medium mb-3">Hour Rate</h3>

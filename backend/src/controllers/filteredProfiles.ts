@@ -2,9 +2,9 @@ import { Request, Response } from "express";
 import pool from "../config/db"; // PostgreSQL pool
 
 export const getFilteredProfile = async (req: Request, res: Response) => {
-  const { search, company, professional, experience, sort } = req.query;
-  
-    let query = `
+     const { search, company, professional, experience, sort } = req.query;
+
+     let query = `
   SELECT
     u.id,
     u.name,
@@ -37,7 +37,6 @@ export const getFilteredProfile = async (req: Request, res: Response) => {
   LEFT JOIN "Skill" s ON s.id = us."B"
   WHERE 1=1
 `;
-
 
      const values: any[] = [];
      let i = 1;
@@ -82,7 +81,7 @@ export const getFilteredProfile = async (req: Request, res: Response) => {
           }
      }
 
-    query += ` GROUP BY u.id, co.organization, es.years, es.description, pd.title`;
+     query += ` GROUP BY u.id, co.organization, es.years, es.description, pd.title`;
 
      // 🔍 Sorting
      if (sort === "least-experienced") {
@@ -90,7 +89,6 @@ export const getFilteredProfile = async (req: Request, res: Response) => {
      } else if (sort === "recent-added-profile") {
           query += ` ORDER BY u."createdAt" DESC`;
      } else {
-
           query += ` ORDER BY es.years DESC NULLS LAST`;
      }
 
