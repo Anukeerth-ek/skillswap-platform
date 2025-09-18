@@ -31,7 +31,7 @@ export const SearchResults = ({ users, loading,  }: SearchResultsProps) => {
      }, [users]);
 
      if (loading) return <p>Loading...</p>;
-
+     console.log("user", users)
      return (
           <>
                <div className="flex-1 p-6">
