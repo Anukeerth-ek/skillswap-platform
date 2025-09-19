@@ -12,7 +12,7 @@ type SearchResultsProps = {
      // onUserClick: (user: User) => void;
 };
 
-export const SearchResults = ({ users, loading,  }: SearchResultsProps) => {
+export const SearchResults = ({ users, loading }: SearchResultsProps) => {
      const [selectedUser, setSelectedUser] = useState<User | null>(null);
      const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -47,9 +47,11 @@ export const SearchResults = ({ users, loading,  }: SearchResultsProps) => {
                                         name={user?.name}
                                         role={user?.role}
                                         avatar={user?.avatarUrl || "/default-avatar.png"}
-                                        hourRate={Math.floor(Math.random() * 20) + 15}
+                                        // hourRate={Math.floor(Math.random() * 20) + 15}
+                                        professionTitle={user?.professionDetails?.title}
+                                        companyName={user?.currentOrganization?.organization}
                                         experience={user?.experienceSummary?.years}
-                                        skills={user?.skillsOffered?.map((s) => s.name) || []} 
+                                        skills={user?.skillsOffered?.map((s) => s.name) || []}
                                         handleShowConnectionDetail={() => handleCardClick(user)}
                                    />
                               ))}

@@ -70,21 +70,21 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
      return (
           <div className=" bg-gray-900 text-white p-6">
                <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center justify-between w-full">
-                         <div className="flex items-center space-x-2">
+                    <div className="flex items-center justify-end w-full">
+                         {/* <div className="flex items-center justify-end space-x-2"> */}
                               <Button variant="ghost" size="icon">
                                    <Share2 className="w-4 h-4" />
                               </Button>
-                              <Button variant="ghost" size="icon">
+                              {/* <Button variant="ghost" size="icon">
                                    <Bookmark className="w-4 h-4" />
-                              </Button>
-                         </div>
-                         <Button
+                              </Button> */}
+                         {/* </div> */}
+                         {/* <Button
                               onClick={() => setIsFollowing(!isFollowing)}
                               className="border cursor-pointer hover:text-gray-100"
                          >
                               {isFollowing ? "Following" : "Follow"}
-                         </Button>
+                         </Button> */}
                     </div>
                </div>
 
