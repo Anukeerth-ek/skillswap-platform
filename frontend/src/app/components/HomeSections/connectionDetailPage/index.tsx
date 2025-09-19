@@ -10,12 +10,7 @@ import { toast } from "sonner";
 import { useGetMyProfile } from "@/app/hooks/useGetMyProfile";
 import { User } from "@/types";
 import { formatDate } from "@/utils/formatData";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
      const [connectionSent, setConnectionSent] = useState(false);
@@ -118,7 +113,11 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
                     </div> */}
                     <div className="flex justify-between">
                          <span className="text-gray-400">Experience</span>
-                         <span className="text-white">{user?.experienceSummary?.years || "Not Provided"} Years</span>
+                         <span className="text-white">
+                              {user?.experienceSummary?.years !== null
+                                   ? `${user?.experienceSummary?.years} Years`
+                                   : "Not Provided"}
+                         </span>
                     </div>
 
                     <div className="flex justify-between">
@@ -147,9 +146,9 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
                                         key={idx}
                                         className={`${
                                              // skill.name === "Python"
-                                                  // ? "bg-purple-600 hover:bg-purple-700"
-                                                  // : 
-                                                  "bg-gray-700 hover:bg-gray-600"
+                                             // ? "bg-purple-600 hover:bg-purple-700"
+                                             // :
+                                             "bg-gray-700 hover:bg-gray-600"
                                         }`}
                                    >
                                         {skill.name}

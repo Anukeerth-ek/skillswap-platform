@@ -13,6 +13,7 @@ import {
      DropdownMenuItem,
      DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
+import { usePathname } from "next/navigation";
 
 export const Navbar = () => {
      const { user, loading } = useGetMyProfile();
@@ -21,6 +22,9 @@ export const Navbar = () => {
      const avatarLetter = user?.name?.charAt(0)?.toUpperCase() || "G";
      const avatarUrl = user?.avatarUrl || "https://cdn.pixabay.com/photo/2023/02/18/11/00/icon-7797704_640.png";
 
+     const pathname = usePathname();
+
+     const isActive = (path: string) => pathname === path;
      return (
           <nav className="bg-gray-900 text-white px-6 py-4 flex items-center justify-between">
                <div className="flex items-center space-x-8">
@@ -32,32 +36,66 @@ export const Navbar = () => {
                     </div>
                </div>
                <div className="flex items-center space-x-6">
-                    <Button variant="ghost" size="sm" className="text-gray-300 hover:text-black cursor-pointer">
-                         <Home className="w-4 h-4 mr-2" />
-                         Home
-                    </Button>
-                    <Button
+                    <Link href="/">
+                         <Button
+                              variant="ghost"
+                              size="sm"
+                              className={
+                                   isActive("/")
+                                        ? "text-purple-400 hover:text-purple-900 cursor-pointer border-b-2 border-purple-400 "
+                                        : "text-gray-300 hover:text-black cursor-pointer"
+                              }
+                         >
+                              <Home className="w-4 h-4 mr-2" />
+                              Home
+                         </Button>
+                    </Link>
+                    {/* <Button
                          variant="ghost"
                          size="sm"
                          className="text-purple-400 hover:text-purple-900 cursor-pointer border-b-2 border-purple-400"
                     >
                          <UserPlus className="w-4 h-4 mr-2" />
                          Find SkillMate
-                    </Button>
+                    </Button> */}
                     <Link href="/frontend/connections">
-                         <Button variant="ghost" size="sm" className="text-gray-300 hover:text-black cursor-pointer =">
+                         <Button
+                              variant="ghost"
+                              size="sm"
+                              className={
+                                   isActive("/frontend/connections")
+                                        ? "text-purple-400 hover:text-purple-900 cursor-pointer border-b-2 border-purple-400 "
+                                        : "text-gray-300 hover:text-black cursor-pointer"
+                              }
+                         >
                               <Users className="w-4 h-4 mr-2" />
                               My Connections
                          </Button>
                     </Link>
                     <Link href="/frontend/sessions">
-                         <Button variant="ghost" size="sm" className="text-gray-300 hover:text-black cursor-pointer">
+                         <Button
+                              variant="ghost"
+                              size="sm"
+                              className={
+                                   isActive("/frontend/sessions")
+                                        ? "text-purple-400 hover:text-purple-900 cursor-pointer border-b-2 border-purple-400 "
+                                        : "text-gray-300 hover:text-black cursor-pointer"
+                              }
+                         >
                               <BookOpen className="w-4 h-4 mr-2" />
-                              Sessions
+                              My Sessions
                          </Button>
                     </Link>
                     <Link href="/frontend/chat">
-                         <Button variant="ghost" size="sm" className="text-gray-300 hover:text-black cursor-pointer">
+                         <Button
+                              variant="ghost"
+                              size="sm"
+                              className={
+                                   isActive("/frontend/chat")
+                                        ? "text-purple-400 hover:text-purple-900 cursor-pointer border-b-2 border-purple-400 "
+                                        : "text-gray-300 hover:text-black cursor-pointer"
+                              }
+                         >
                               <MessageCircle className="w-4 h-4 mr-2" />
                               Messages
                          </Button>
