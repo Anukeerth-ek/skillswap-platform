@@ -235,7 +235,7 @@ export const getUserProfile = async (req: Request & { userId?: string }, res: Re
         socialLinks: true,
       },
     });
-console.log("from backend", user)
+
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return 

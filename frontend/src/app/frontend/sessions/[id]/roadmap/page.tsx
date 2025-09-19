@@ -114,7 +114,7 @@ export default function RoadmapPage() {
           if (!reactFlowInstance || !session) return;
 
           const flow = reactFlowInstance.toObject(); // { nodes, edges, viewport }
-          console.log("flow", flow);
+
           await fetch(`http://localhost:4000/api/sessions/${session.id}/roadmap`, {
                method: "POST",
                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },

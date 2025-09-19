@@ -75,7 +75,7 @@ export default function Home() {
 
      const connectedIds = new Set(usersConnection.map((c) => c.user.id));
      const visibleUsers = users?.filter((user) => !connectedIds.has(user.id));
-     console.log("visible", visibleUsers);
+
      return (
           <div className="min-h-screen bg-gray-900">
                <div className="flex">

@@ -62,7 +62,6 @@ export const getMySessions = async (req: AuthenticatedRequest, res: Response) =>
 export const acceptSession = async (req: AuthenticatedRequest, res: Response) => {
      const sessionId = String(req.params.id);
      const { status } = req.body as { status: "CONFIRMED" | "REJECTED" | "CANCELLED" | "COMPLETED" };
-     console.log("sta back", status);
 
      const allowed: SessionStatus[] = [
           SessionStatus.CONFIRMED,
@@ -222,12 +221,12 @@ export const deleteSession = async (req: AuthenticatedRequest, res: Response) =>
 };
 
 export const saveRoadmap = async (req: AuthenticatedRequest, res: Response) => {
-     console.log("we are in backe");
+
      try {
-          console.log("again we are in ");
+
           const sessionId = String(req.params.id);
           const { roadmap } = req.body; // roadmap = { nodes, edges, viewport }
-          console.log("back", roadmap);
+
           const session = await prisma.session.findUnique({ where: { id: sessionId } });
           if (!session) {
                res.status(404).json({ message: "Session not found" });
@@ -250,9 +249,9 @@ export const saveRoadmap = async (req: AuthenticatedRequest, res: Response) => {
 
 // Get roadmap
 export const getRoadmap = async (req: AuthenticatedRequest, res: Response) => {
-     console.log("we are in backe");
+
      try {
-          console.log("again we are in ");
+
           const sessionId = String(req.params.id);
 
           const session = await prisma.session.findUnique({
