@@ -10,6 +10,12 @@ import { toast } from "sonner";
 import { useGetMyProfile } from "@/app/hooks/useGetMyProfile";
 import { User } from "@/types";
 import { formatDate } from "@/utils/formatData";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
      const [connectionSent, setConnectionSent] = useState(false);
@@ -66,16 +72,16 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
                toast.error("Something went wrong");
           }
      };
-
+     console.log("user", user);
      return (
           <div className=" bg-gray-900 text-white p-6">
                <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center justify-end w-full">
                          {/* <div className="flex items-center justify-end space-x-2"> */}
-                              <Button variant="ghost" size="icon">
-                                   <Share2 className="w-4 h-4" />
-                              </Button>
-                              {/* <Button variant="ghost" size="icon">
+                         <Button variant="ghost" size="icon">
+                              <Share2 className="w-4 h-4" />
+                         </Button>
+                         {/* <Button variant="ghost" size="icon">
                                    <Bookmark className="w-4 h-4" />
                               </Button> */}
                          {/* </div> */}
@@ -91,25 +97,10 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
                <div className="text-center mb-6">
                     <Avatar className="w-20 h-20 mx-auto mb-4">
                          <AvatarImage src="/api/placeholder/80/80" />
-                         <AvatarFallback>JP</AvatarFallback>
+                         <AvatarFallback>User</AvatarFallback>
                     </Avatar>
                     <h2 className="text-xl font-semibold mb-1">{user?.name}</h2>
                     <p className="text-gray-400 mb-4">{user?.professionDetails?.title || "Not Provided"}</p>
-
-                    <div className="flex flex-wrap gap-2 justify-center mb-4">
-                         {user?.skillsOffered?.map((skill, idx) => (
-                              <Badge
-                                   key={idx}
-                                   className={`${
-                                        skill.name === "Python"
-                                             ? "bg-purple-600 hover:bg-purple-700"
-                                             : "bg-gray-700 hover:bg-gray-600"
-                                   }`}
-                              >
-                                   {skill.name}
-                              </Badge>
-                         ))}
-                    </div>
                </div>
 
                <div className="space-y-4 mb-6">
@@ -131,10 +122,61 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
                     </div>
 
                     <div className="flex justify-between">
+                         <span className="text-gray-400">Skills Offering</span>
+                         <div className="flex flex-wrap gap-2 justify-center">
+                              {user?.skillsOffered?.map((skill, idx) => (
+                                   <Badge
+                                        key={idx}
+                                        className={`${
+                                             skill.name === "Python"
+                                                  ? "bg-purple-600 hover:bg-purple-700"
+                                                  : "bg-gray-700 hover:bg-gray-600"
+                                        }`}
+                                   >
+                                        {skill.name}
+                                   </Badge>
+                              ))}
+                         </div>
+                    </div>
+
+                    <div className="flex justify-between">
+                         <span className="text-gray-400">Skills Needed</span>
+                         <div className="flex flex-wrap gap-2 justify-center">
+                              {user?.skillsWanted?.slice(0, 2).map((skill, idx) => (
+                                   <Badge
+                                        key={idx}
+                                        className={`${
+                                             // skill.name === "Python"
+                                                  // ? "bg-purple-600 hover:bg-purple-700"
+                                                  // : 
+                                                  "bg-gray-700 hover:bg-gray-600"
+                                        }`}
+                                   >
+                                        {skill.name}
+                                   </Badge>
+                              ))}
+
+                              {user?.skillsWanted?.length > 2 && (
+                                   <TooltipProvider>
+                                        <Tooltip>
+                                             <TooltipTrigger asChild>
+                                                  <Badge className="bg-gray-700 hover:bg-gray-600 cursor-pointer">
+                                                       +{user.skillsWanted.length - 2}
+                                                  </Badge>
+                                             </TooltipTrigger>
+                                             <TooltipContent className="flex flex-col gap-1">
+                                                  {user.skillsWanted.slice(2).map((skill, idx) => (
+                                                       <span key={idx}>{skill.name}</span>
+                                                  ))}
+                                             </TooltipContent>
+                                        </Tooltip>
+                                   </TooltipProvider>
+                              )}
+                         </div>
+                    </div>
+                    <div className="flex justify-between">
                          <span className="text-gray-400">On this platform</span>
-                         <span className="text-white">
-                              {user?.createdAt ? formatDate(user?.createdAt) : "Today"}
-                         </span>
+                         <span className="text-white">{user?.createdAt ? formatDate(user?.createdAt) : "Today"}</span>
                     </div>
                </div>
 
