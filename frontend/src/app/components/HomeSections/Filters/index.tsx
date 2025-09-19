@@ -1,217 +1,315 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import { Search } from "lucide-react";
+import { Search, X, ChevronDown, ChevronUp, Filter } from "lucide-react";
 
-export const LeftSidebar = ({ filters, setFilters }: any) => {
-     const toggleFilter = (category: string, value: string) => {
-          setFilters((prev: any) => {
-               const updated = prev[category].includes(value)
-                    ? prev[category].filter((v: any) => v !== value)
-                    : [...prev[category], value];
+// Types
+interface Filters {
+     search: string;
+     professional: string[];
+     experience: string[];
+     company: string;
+     sort: string;
+     //   hourRate: [number, number];
+     readiness: string[];
+}
+
+interface LeftSidebarProps {
+     filters: Filters;
+     setFilters: React.Dispatch<React.SetStateAction<Filters>>;
+}
+
+interface CollapsedSections {
+     [key: string]: boolean;
+}
+
+interface SortOption {
+     value: string;
+     label: string;
+}
+
+interface ExperienceLevel {
+     value: string;
+     label: string;
+}
+
+interface AvailabilityStatus {
+     value: string;
+     label: string;
+     color: string;
+}
+
+interface CollapsibleSectionProps {
+     title: string;
+     children: React.ReactNode;
+     sectionKey: string;
+}
+
+const LeftSidebar: React.FC<LeftSidebarProps> = ({ filters, setFilters }) => {
+     const [collapsedSections, setCollapsedSections] = useState<CollapsedSections>({});
+     const [hourRate, setHourRate] = useState<[number, number]>([8, 39]);
+
+     const toggleFilter = (
+          category: keyof Pick<Filters, "professional" | "experience" | "readiness">,
+          value: string
+     ): void => {
+          setFilters((prev) => {
+               const currentValues = prev[category] as string[];
+               const updated = currentValues.includes(value)
+                    ? currentValues.filter((v) => v !== value)
+                    : [...currentValues, value];
                return { ...prev, [category]: updated };
           });
      };
 
-     // ✅ update company search
-     const handleSearchCompany = (e: React.ChangeEvent<HTMLInputElement>) => {
-          setFilters((prev: any) => ({ ...prev, company: e.target.value }));
+     const handleSearchCompany = (e: React.ChangeEvent<HTMLInputElement>): void => {
+          setFilters((prev) => ({ ...prev, company: e.target.value }));
      };
 
-     // ✅ update sort
-     const handleSortChange = (value: string) => {
-          setFilters((prev: any) => ({ ...prev, sort: value }));
+     const handleSortChange = (value: string): void => {
+          setFilters((prev) => ({ ...prev, sort: value }));
      };
 
-     // ✅ reset
-     const handleReset = () => {
-          setFilters({
+     //   const handleHourRateChange = (value: [number, number]): void => {
+     //     setHourRate(value);
+     //     setFilters((prev) => ({ ...prev, hourRate: value }));
+     //   };
+
+     const handleReset = (): void => {
+          const resetFilters: Filters = {
                search: "",
                professional: [],
                experience: [],
                company: "",
                sort: "most-experienced",
-          });
+
+               readiness: [],
+          };
+          setFilters(resetFilters);
+          setHourRate([8, 39]);
      };
+
+     const toggleSection = (section: string): void => {
+          setCollapsedSections((prev) => ({
+               ...prev,
+               [section]: !prev[section],
+          }));
+     };
+
+     const getActiveFiltersCount = (): number => {
+          let count = 0;
+          if (filters.company) count++;
+          if (filters.professional?.length) count += filters.professional.length;
+          if (filters.experience?.length) count += filters.experience.length;
+          if (filters.readiness?.length) count += filters.readiness.length;
+          return count;
+     };
+
+     const CollapsibleSection: React.FC<CollapsibleSectionProps> = ({ title, children, sectionKey }) => (
+          <div className="border-b border-gray-700 pb-4 cursor-pointer">
+               <button
+                    onClick={() => toggleSection(sectionKey)}
+                    className="flex items-center justify-between w-full mb-3 text-left hover:text-purple-300 transition-colors"
+               >
+                    <h3 className="font-medium text-sm uppercase tracking-wide">{title}</h3>
+                    {collapsedSections[sectionKey] ? (
+                         <ChevronDown className="w-4 h-4" />
+                    ) : (
+                         <ChevronUp className="w-4 h-4" />
+                    )}
+               </button>
+               {!collapsedSections[sectionKey] && <div className="space-y-3">{children}</div>}
+          </div>
+     );
+
      return (
-          <div className="w-64 bg-gray-900 text-white p-6 space-y-6">
-               <div className="flex items-center justify-between">
-                    <h2 className="text-xl font-semibold">Filters</h2>
-                    <Button onClick={handleReset} variant="ghost" size="sm" className="text-purple-400 hover:text-white">
-                         Reset All
+          <div className="w-72 h-[calc(100vh-64px)] overflow-auto bg-gradient-to-b from-gray-900 to-gray-950 text-white border-r border-gray-700 flex flex-col">
+               {/* Header */}
+               <div className="p-6 border-b border-gray-700">
+                    <div className="flex items-center justify-between mb-2">
+                         <div className="flex items-center gap-2">
+                              <Filter className="w-5 h-5 text-purple-400" />
+                              <h2 className="text-lg font-semibold">Filters</h2>
+                              {getActiveFiltersCount() > 0 && (
+                                   <span className="bg-purple-600 text-white text-xs px-2 py-1 rounded-full">
+                                        {getActiveFiltersCount()}
+                                   </span>
+                              )}
+                         </div>
+                         <Button
+                              onClick={handleReset}
+                              variant="ghost"
+                              size="sm"
+                              className="text-purple-400 cursor-pointer hover:text-white bg-purple-600/20 hover:bg-purple-600/30 text-xs"
+                         >
+                              {/* <X className="w-3 h-3 mr-1" /> */}
+                              Reset All
+                         </Button>
+                    </div>
+               </div>
+
+               {/* Scrollable content */}
+               <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                    {/* Company Search */}
+                    <CollapsibleSection title="Company" sectionKey="company">
+                         <div className="relative">
+                              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+                              <input
+                                   className="w-full pl-10 pr-4 py-3 rounded-lg text-sm bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none transition-all"
+                                   placeholder="Search company name..."
+                                   value={filters.company}
+                                   onChange={handleSearchCompany}
+                              />
+                              {filters.company && (
+                                   <button
+                                        onClick={() => setFilters((prev) => ({ ...prev, company: "" }))}
+                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white"
+                                   >
+                                        <X className="w-4 h-4" />
+                                   </button>
+                              )}
+                         </div>
+                    </CollapsibleSection>
+
+                    {/* ____Commenting this for now we will add this later____ */}
+
+                    {/* Availability */}
+                    {/* <CollapsibleSection title="Availability" sectionKey="readiness">
+                         <div className="space-y-3">
+                              {[
+                                   { value: "available", label: "Available Now", color: "text-green-400" },
+                                   { value: "busy", label: "Busy", color: "text-yellow-400" },
+                                   { value: "hired", label: "Currently Hired", color: "text-red-400" },
+                              ].map((status) => (
+                                   <div key={status.value} className="flex items-center space-x-3">
+                                        <Checkbox
+                                             id={status.value}
+                                             checked={filters.readiness?.includes(status.value)}
+                                             onCheckedChange={() => toggleFilter("readiness", status.value)}
+                                             className="border-purple-400 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
+                                        />
+                                        <Label
+                                             htmlFor={status.value}
+                                             className={`text-sm cursor-pointer hover:text-purple-300 ${status.color}`}
+                                        >
+                                             {status.label}
+                                        </Label>
+                                   </div>
+                              ))}
+                         </div>
+                    </CollapsibleSection> */}
+
+                    {/* Sort By */}
+                    <CollapsibleSection title="Sort By" sectionKey="sort">
+                         <RadioGroup value={filters.sort} onValueChange={handleSortChange} className=" space-y-1">
+                              {[
+                                   { value: "most-experienced", label: "Most Experienced" },
+                                   { value: "least-experienced", label: "Least Experienced" },
+                                   { value: "recent-added-profile", label: "Newly Added Profile" },
+                              ].map((option) => (
+                                   <div key={option.value} className="flex items-center space-x-3">
+                                        <RadioGroupItem
+                                             value={option.value}
+                                             id={option.value}
+                                             className="border-purple-400 text-purple-400 data-[state=checked]:border-purple-500 data-[state=checked]:bg-purple-500"
+                                        />
+                                        <Label
+                                             htmlFor={option.value}
+                                             className="text-sm cursor-pointer hover:text-purple-300"
+                                        >
+                                             {option.label}
+                                        </Label>
+                                   </div>
+                              ))}
+                         </RadioGroup>
+                    </CollapsibleSection>
+
+                    {/* Professional Roles */}
+                    {/* <CollapsibleSection title="Professional Role" sectionKey="professional">
+          <div className="grid grid-cols-1 gap-3">
+            {[
+              "Frontend Developer",
+              "Backend Developer", 
+              "Full Stack Developer",
+              "DevOps Engineer",
+              "Python Developer",
+              "Mobile Developer",
+              "Data Scientist",
+              "UI/UX Designer"
+            ].map((role) => (
+              <div key={role} className="flex items-center space-x-3">
+                <Checkbox
+                  id={role}
+                  checked={filters.professional?.includes(role)}
+                  onCheckedChange={() => toggleFilter("professional", role)}
+                  className="border-purple-400 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
+                />
+                <Label htmlFor={role} className="text-sm cursor-pointer hover:text-purple-300 flex-1">
+                  {role}
+                </Label>
+              </div>
+            ))}
+          </div>
+        </CollapsibleSection> */}
+
+                    {/* Hour Rate */}
+                    {/* <CollapsibleSection title="Hourly Rate" sectionKey="hourRate">
+          <div className="space-y-4">
+            <Slider
+              value={hourRate}
+              onValueChange={handleHourRateChange}
+              max={100}
+              min={5}
+              step={1}
+              className="w-full"
+            />
+            <div className="flex justify-between text-sm text-gray-400">
+              <span className="bg-gray-800 px-2 py-1 rounded">${hourRate[0]}</span>
+              <span className="bg-gray-800 px-2 py-1 rounded">${hourRate[1]}</span>
+            </div>
+          </div>
+        </CollapsibleSection> */}
+
+                    {/* Experience */}
+                    <CollapsibleSection title="Experience Level" sectionKey="experience">
+                         <div className="space-y-3">
+                              {[
+                                   { value: "0-1", label: "Entry Level (0-1 years)" },
+                                   { value: "1-3", label: "Junior (1-3 years)" },
+                                   { value: "4-8", label: "Mid-level (4-8 years)" },
+                                   { value: "9-14", label: "Senior (9-14 years)" },
+                                   { value: "15+", label: "Expert (15+ years)" },
+                              ].map((exp) => (
+                                   <div key={exp.value} className="flex items-center space-x-3">
+                                        <Checkbox
+                                             id={exp.value}
+                                             checked={filters.experience?.includes(exp.value)}
+                                             onCheckedChange={() => toggleFilter("experience", exp.value)}
+                                             className="border-purple-400 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
+                                        />
+                                        <Label htmlFor={exp.value} className="text-sm cursor-pointer hover:text-purple-300">
+                                             {exp.label}
+                                        </Label>
+                                   </div>
+                              ))}
+                         </div>
+                    </CollapsibleSection>
+               </div>
+
+               {/* Footer */}
+               {/* <div className="p-6 border-t border-gray-700">
+                    <Button
+                         onClick={handleReset}
+                         className="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 rounded-lg transition-colors"
+                    >
+                         Clear All Filters
                     </Button>
-               </div>
-
-               <div>
-                    <h3 className="font-medium mb-3">Sort By</h3>
-                    <RadioGroup value={filters.sort} onValueChange={handleSortChange} className="space-y-2">
-                         <div className="flex items-center space-x-2">
-                              <RadioGroupItem
-                                   value="most-experienced"
-                                   id="most-experienced"
-                                   className="border-purple-400 text-purple-400"
-                              />
-                              <Label htmlFor="most-experienced" className="text-sm">
-                                   Most Experienced
-                              </Label>
-                         </div>
-
-                         <div className="flex items-center space-x-2">
-                              <RadioGroupItem
-                                   value="least-experienced"
-                                   id="least-experienced"
-                                   className="border-purple-400 text-purple-400"
-                              />
-                              <Label htmlFor="least-experienced" className="text-sm">
-                                   Least Experienced
-                              </Label>
-                         </div>
-
-                         <div className="flex items-center space-x-2">
-                              <RadioGroupItem
-                                   value="recent-added-profile"
-                                   id="recent-added-profile"
-                                   className="border-purple-400 text-purple-400"
-                              />
-                              <Label htmlFor="recent-added-profile" className="text-sm">
-                                   Newly Added Profile
-                              </Label>
-                         </div>
-                    </RadioGroup>
-               </div>
-
-               <div>
-                    <h3 className="font-medium mb-3">Company Name</h3>
-
-                    {/* <div className="flex items-center space-x-2">
-                              <Checkbox
-                                   id="Google"
-                                   value="Google"
-                                   className="border-purple-400 data-[state=checked]:bg-purple-600"
-                              />
-                              <Label htmlFor="Google" className="text-sm">
-                                   Google
-                              </Label>
-                         </div>
-                         <div className="flex items-center space-x-2">
-                              <Checkbox
-                                   id="Meta"
-                                   value="Meta"
-                                   className="border-purple-400 data-[state=checked]:bg-purple-600"
-                              />
-                              <Label htmlFor="Meta" className="text-sm">
-                                   Meta
-                              </Label>
-                         </div> */}
-                    <div className="relative flex-1">
-                         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                         <input
-                              className="pl-10 font-light py-1 rounded-xs text-base bg-gray-800 border-gray-700 text-gray-500 placeholder-gray-400"
-                              placeholder="Search Company Name"
-                              value={filters.company}
-                              onChange={handleSearchCompany}
-                         />
-                    </div>
-               </div>
-
-               {/* <h3 className="font-medium mb-3">Professional</h3>
-               <div className="flex flex-col space-y-2">
-                    {["frontend", "backend", "fullstack", "devops", "python", "more"].map((role) => (
-                         <div key={role} className="flex items-center space-x-2">
-                              <Checkbox
-                                   id={role}
-                                   checked={filters.professional.includes(role)}
-                                   onCheckedChange={() => toggleFilter("professional", role)}
-                                   className="border-purple-400 data-[state=checked]:bg-purple-600"
-                              />
-                              <Label htmlFor={role} className="text-sm capitalize">
-                                   {role}
-                              </Label>
-                         </div>
-                    ))}
                </div> */}
-
-               {/* <div>
-        <h3 className="font-medium mb-3">Hour Rate</h3>
-        <Slider
-          defaultValue={[8, 39]}
-          max={100}
-          step={1}
-          className="w-full"
-        />
-        <div className="flex justify-between text-sm text-gray-400 mt-2">
-          <span>$8</span>
-          <span>$39</span>
-        </div>
-      </div> */}
-
-               {/* <div>
-                    <h3 className="font-medium mb-3">Readiness</h3>
-                    <div className="space-y-2">
-                         <div className="flex items-center space-x-2">
-                              <Checkbox
-                                   id="Available"
-                                   value="Available"
-                                   className="border-purple-400 data-[state=checked]:bg-purple-600"
-                              />
-                              <Label htmlFor="Available" className="text-sm">
-                                   Available
-                              </Label>
-                         </div>
-                         <div className="flex items-center space-x-2">
-                              <Checkbox
-                                   id="Connected"
-                                   value="Connected"
-                                   className="border-purple-400 data-[state=checked]:bg-purple-600"
-                              />
-                              <Label htmlFor="Connected" className="text-sm">
-                                   Hired
-                              </Label>
-                         </div>
-                    </div>
-               </div> */}
-
-               <div>
-                    <h3 className="font-medium mb-3">Experience</h3>
-                    {["1-3", "4-8", "9-14", "15+"].map((exp) => (
-                         <div key={exp} className="flex items-center space-x-2">
-                              <Checkbox
-                                   id={exp}
-                                   checked={filters.experience.includes(exp)}
-                                   onCheckedChange={() => toggleFilter("experience", exp)}
-                              />
-                              <Label htmlFor={exp} className="text-sm">
-                                   {exp}
-                              </Label>
-                         </div>
-                    ))}
-               </div>
-
-               {/* <div>
-        <h3 className="font-medium mb-3">Dialogue</h3>
-        <div className="space-y-2">
-          <div className="flex items-center space-x-2">
-            <Checkbox id="zoom" />
-            <Label htmlFor="zoom" className="text-sm">Zoom</Label>
           </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox id="google-meet" />
-            <Label htmlFor="google-meet" className="text-sm">Google Meet</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox id="skype" defaultChecked className="border-purple-400 data-[state=checked]:bg-purple-600" />
-            <Label htmlFor="skype" className="text-sm">Skype</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <Checkbox id="cisco" />
-            <Label htmlFor="cisco" className="text-sm">Cisco WebEx</Label>
-          </div>
-        </div>
-      </div> */}
-          </div>
-          // </div>
      );
 };
+
+export default LeftSidebar;
