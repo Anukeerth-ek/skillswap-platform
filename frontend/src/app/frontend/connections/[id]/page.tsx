@@ -7,22 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import dayjs from "dayjs";
+import { User } from "@/types";
 
-type User = {
-     id: string;
-     name: string;
-     email: string;
-     avatarUrl: string | null;
-     bio: string;
-     role: string;
-     timezone: string;
-     createdAt: string;
-     currentOrganization: string | null;
-     currentStatus: string | null;
-     socialLinks: any;
-     skillsOffered: any[];
-     skillsWanted: any[];
-};
+type Skill = { id: string; name: string }; 
 
 export default function ConnectionDetailPage() {
      const { id } = useParams();
@@ -106,7 +93,7 @@ export default function ConnectionDetailPage() {
                          </Avatar>
                          <div>
                               <h1 className="text-3xl font-semibold">{mentor.name}</h1>
-                              <p className="text-gray-500 mt-1">{mentor.bio}</p>
+                              <p className="text-gray-500 mt-1">{mentor.professionDetails?.title}</p>
                               <Badge variant="secondary" className="mt-2">
                                    {mentor.role}
                               </Badge>
@@ -120,7 +107,7 @@ export default function ConnectionDetailPage() {
                          </div>
                          <div>
                               <p className="text-sm text-gray-500">Timezone</p>
-                              <p className="font-medium">{mentor.timezone}</p>
+                              <p className="font-medium">{mentor.timeZone}</p>
                          </div>
                          <div>
                               <p className="text-sm text-gray-500">Joined</p>
@@ -190,8 +177,8 @@ export default function ConnectionDetailPage() {
                                    value={selectedSkillNames || ""}
                                    onChange={(e) => {
                                         const selectedId = e.target.value; // skill.id
-                                        const selectedSkill = mentor.skillsOffered.find((skill) => skill.id === selectedId);
-                                        setSelectedSkillNames(selectedSkill.name)
+                                        const selectedSkill:Skill | undefined= mentor?.skillsOffered?.find((skill) => skill.id === selectedId);
+                                        setSelectedSkillNames(selectedSkill?.name ?? null)
                                       
                                    }}
                                    className="border px-3 py-2 rounded w-full"
