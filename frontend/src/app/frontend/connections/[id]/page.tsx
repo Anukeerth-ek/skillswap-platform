@@ -84,7 +84,7 @@ export default function ConnectionDetailPage() {
 
      return (
           <>
-               <h2>User Detail Page</h2>
+             
                <div className="max-w-4xl mx-auto p-8 bg-white rounded-xl shadow-md mt-10">
                     <div className="flex items-center gap-6 border-b pb-6">
                          <Avatar className="w-24 h-24 ring-2 ring-gray-300 shadow-sm">
@@ -92,24 +92,40 @@ export default function ConnectionDetailPage() {
                               <AvatarFallback className="text-xl">{mentor.name?.charAt(0)}</AvatarFallback>
                          </Avatar>
                          <div>
-                              <h1 className="text-3xl font-semibold">{mentor.name}</h1>
-                              <p className="text-gray-500 mt-1">{mentor.professionDetails?.title}</p>
-                              <Badge variant="secondary" className="mt-2">
+                              <h1 className="text-3xl font-semibold mb-1.5">{mentor.name}</h1>
+                              <div className="flex items-center  gap-1">
+
+                               <p className="text-sm text-gray-500">I'm a</p>
+                              <p className="text-gray-700 font-medium">{mentor.professionDetails?.title}</p>
+                              </div>
+                              {/* <Badge variant="secondary" className="mt-2">
                                    {mentor.role}
-                              </Badge>
+                              </Badge> */}
+                               <div className="flex items-center justify-center gap-1">
+                              <p className="text-sm text-gray-500">Have</p>
+                              <p className="text-gray-700 font-medium">{mentor?.experienceSummary?.years} years of Experience</p>
+                         </div>
                          </div>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 text-gray-800">
-                         <div>
+                         {/* <div>
                               <p className="text-sm text-gray-500">Email</p>
                               <p className="font-medium">{mentor.email}</p>
-                         </div>
+                         </div> */}
                          <div>
                               <p className="text-sm text-gray-500">Timezone</p>
                               <p className="font-medium">{mentor.timeZone}</p>
                          </div>
                          <div>
+                              <p className="text-sm text-gray-500">Works At</p>
+                              <p className="font-medium">{mentor?.currentOrganization?.organization}</p>
+                         </div>
+                         <div>
+                              <h2 className="text-sm text-gray-500">About ME</h2>
+                              <p className="font-medium">{mentor?.bio}</p>
+                         </div>
+                         {/* <div>
                               <p className="text-sm text-gray-500">Joined</p>
                               <p className="font-medium">
                                    {new Date(mentor.createdAt).toLocaleDateString(undefined, {
@@ -118,15 +134,15 @@ export default function ConnectionDetailPage() {
                                         day: "numeric",
                                    })}
                               </p>
-                         </div>
+                         </div> */}
                     </div>
 
                     {mentor.skillsOffered?.length > 0 && (
                          <div className="mt-10">
-                              <h2 className="text-lg font-semibold mb-2">Skills Offered</h2>
+                              <h2 className="text-lg font-semibold mb-2">Skills Offering</h2>
                               <div className="flex flex-wrap gap-2">
                                    {mentor.skillsOffered.map((skill, index) => (
-                                        <Badge key={skill.id || index} variant="outline">
+                                        <Badge key={skill.id || index} variant="outline" className="bg-yellow-50 border-yellow-300 text-yellow-700">
                                              {skill.name}
                                         </Badge>
                                    ))}
@@ -136,13 +152,13 @@ export default function ConnectionDetailPage() {
 
                     {mentor.skillsWanted?.length > 0 && (
                          <div className="mt-6">
-                              <h2 className="text-lg font-semibold mb-2">Skills Wanted</h2>
+                              <h2 className="text-lg font-semibold mb-2">Skills Needed</h2>
                               <div className="flex flex-wrap gap-2">
                                    {mentor.skillsWanted.map((skill, index) => (
                                         <Badge
                                              key={skill.id || index}
                                              variant="outline"
-                                             className="bg-yellow-50 border-yellow-300 text-yellow-700"
+                                             
                                         >
                                              {skill.name}
                                         </Badge>
@@ -196,7 +212,7 @@ export default function ConnectionDetailPage() {
                     )}
 
                     <button
-                         className="bg-purple-500 py-2 px-4 rounded-3xl text-white align-middle cursor-pointer"
+                         className="bg-purple-500 py-2 px-4 rounded-3xl text-white align-middle cursor-pointer mt-4"
                          onClick={handleSubmitRequest}
                     >
                          Submit
