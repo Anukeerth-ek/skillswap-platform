@@ -204,7 +204,11 @@ const SessionsPage = () => {
                                         <div className="flex justify-between gap-2 mt-2">
                                              <div className="flex gap-2 mt-2">
                                                   <Button
-                                                       onClick={() => approveSession(session.id)}
+                                                       onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            e.preventDefault();
+                                                            approveSession(session.id);
+                                                       }}
                                                        className="cursor-pointer"
                                                        disabled={approvingSession === session.id}
                                                   >
@@ -213,22 +217,31 @@ const SessionsPage = () => {
                                                   <Button
                                                        variant="destructive"
                                                        className="cursor-pointer"
-                                                       onClick={() => rejectSession(session.id)}
+                                                       onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            e.preventDefault();
+                                                            rejectSession(session.id);
+                                                       }}
                                                        disabled={approvingSession === session.id}
                                                   >
                                                        Reject
                                                   </Button>
                                              </div>
-                                             <Button
-                                                  variant="outline"
-                                                  onClick={() => deleteSession(session.id)}
-                                                  className="cursor-pointer"
-                                             >
-                                                  <Trash2 />
-                                             </Button>
                                         </div>
                                    )}
-
+                                   <div className="flex justify-end">
+                                        <Button
+                                             variant="outline"
+                                             onClick={(e) => {
+                                                  e.stopPropagation();
+                                                  e.preventDefault();
+                                                  deleteSession(session.id);
+                                             }}
+                                             className="cursor-pointer"
+                                        >
+                                             <Trash2 />
+                                        </Button>
+                                   </div>
                                    {session.status === "CONFIRMED" && session.meetLink && (
                                         <div className="mt-3 p-3 bg-green-50 border border-green-200 rounded-lg">
                                              <p className="text-sm text-green-800 mb-2">
