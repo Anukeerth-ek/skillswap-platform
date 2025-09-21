@@ -213,7 +213,7 @@ export default function ConnectionListPage() {
      return (
           <div className="bg-white rounded-lg shadow-sm border">
                {/* Header */}
-               <div className="p-6 border-b">
+               {/* <div className="p-6 border-b">
                     <div className="flex items-center justify-between">
                          <div className="flex items-center gap-4">
                               <div className="relative">
@@ -295,7 +295,7 @@ export default function ConnectionListPage() {
                               </PopoverContent>
                          </Popover>
                     </div>
-               </div>
+               </div> */}
 
                {/* Table */}
                <div className="overflow-x-auto">
