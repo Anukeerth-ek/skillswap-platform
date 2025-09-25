@@ -18,9 +18,9 @@ export const SearchBar = ({handleUserSearch}:any) => {
         Code
         <ChevronDown className="w-4 h-4 ml-2" />
       </Button> */}
-      <Button className="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-8">
+      {/* <Button className="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-8">
         Search
-      </Button>
+      </Button> */}
     </div>
   );
 };

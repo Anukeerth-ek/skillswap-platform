@@ -15,6 +15,7 @@ import { useGetMyProfile } from "@/app/hooks/useGetMyProfile";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useGetUserConnections } from "@/app/hooks/useGetUserConnection";
+import { SearchBar } from "@/app/components/Searchbar";
 
 // interface connection {
 //      id: string;
@@ -26,14 +27,13 @@ import { useGetUserConnections } from "@/app/hooks/useGetUserConnection";
 //      avatar?: string;
 // }
 
-
-     interface IncomingRequest {
+interface IncomingRequest {
+     id: string;
+     sender: {
           id: string;
-          sender: {
-               id: string;
-               name: string;
-          };
-     }
+          name: string;
+     };
+}
 
 const departments = ["All Departments", "Management", "Office", "Development", "Marketing", "Sales & Business"];
 
@@ -53,6 +53,8 @@ export default function ConnectionListPage() {
      const [selectedDepartment, setSelectedDepartment] = useState("All Departments");
      const [selectedRows, setSelectedRows] = useState<string[]>([]);
      const [rowsPerPage, setRowsPerPage] = useState(10);
+     const [connectionLoading, setConnectionLoading] = useState(true);
+     const [searchResult, setSearchResult] = useState("");
      interface UserConnection {
           id: string;
           name?: string;
@@ -71,7 +73,7 @@ export default function ConnectionListPage() {
      // const [usersConnection, setUsersConnection] = useState<UserConnection[]>([]);
      const { user: currentUser } = useGetMyProfile();
 
-     const router = useRouter()
+     const router = useRouter();
 
      // useEffect(() => {
      //      if (!currentUser?.id) return;
@@ -84,8 +86,8 @@ export default function ConnectionListPage() {
      //      fetchUsersConnection();
      // }, [currentUser?.id]);
 
-     const {usersConnection, setUsersConnection, loading, error} = useGetUserConnections(currentUser?.id)
-
+     const { usersConnection, setUsersConnection, loading, error } = useGetUserConnections(currentUser?.id);
+console.log("user", usersConnection)
      const filteredConnections = useMemo(() => {
           return usersConnection?.filter((connection) => {
                const matchesSearch =
@@ -159,7 +161,7 @@ export default function ConnectionListPage() {
                setIncomingRequests(data || []);
           } catch (err) {
                toast.error("Failed to load connection requests");
-               console.log(err)
+               console.log(err);
           } finally {
                setLoadingRequests(false);
           }
@@ -210,13 +212,14 @@ export default function ConnectionListPage() {
           }
      };
 
+     if(connectionLoading) <p>Loading...</p>
      return (
           <div className="bg-white rounded-lg shadow-sm border">
                {/* Header */}
-               {/* <div className="p-6 border-b">
+               <div className="p-6 border-b">
                     <div className="flex items-center justify-between">
                          <div className="flex items-center gap-4">
-                              <div className="relative">
+                              {/* <div className="relative">
                                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                                    <Input
                                         placeholder="Search"
@@ -224,7 +227,8 @@ export default function ConnectionListPage() {
                                         onChange={(e) => setSearchTerm(e.target.value)}
                                         className="pl-10 w-80"
                                    />
-                              </div>
+                              </div> */}
+                              <SearchBar handleUserSearch={(e:any)=> setSearchResult(e.target.value)} />
                               <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
                                    <SelectTrigger className="w-48">
                                         <Filter className="h-4 w-4 mr-2" />
@@ -295,7 +299,7 @@ export default function ConnectionListPage() {
                               </PopoverContent>
                          </Popover>
                     </div>
-               </div> */}
+               </div>
 
                {/* Table */}
                <div className="overflow-x-auto">
@@ -330,11 +334,15 @@ export default function ConnectionListPage() {
                               </tr>
                          </thead>
                          <tbody className="bg-white divide-y divide-gray-200">
-                              {usersConnection.length > 0 ? (
+                              {usersConnection && usersConnection.length > 0 ? (
                                    usersConnection?.map((connection: any) => {
-                            
+
                                         return (
-                                             <tr className="hover:bg-gray-50 cursor-pointer"  key={connection.id} onClick={()=> router.push(`/frontend/connections/${connection.user.id}`)}>
+                                             <tr
+                                                  className="hover:bg-gray-50 cursor-pointer"
+                                                  key={connection.id}
+                                                  onClick={() => router.push(`/frontend/connections/${connection.user.id}`)}
+                                             >
                                                   <td className="px-6 py-4 whitespace-nowrap">
                                                        <Checkbox
                                                             checked={selectedRows.includes(connection.id)}
@@ -353,7 +361,7 @@ export default function ConnectionListPage() {
                                                             </AvatarFallback> */}
                                                             </Avatar>
                                                             <div className="text-sm font-medium text-gray-900">
-                                                                 {connection.user.name}
+                                                                 {connection?.user?.name}
                                                             </div>
                                                        </div>
                                                   </td>
@@ -410,7 +418,7 @@ export default function ConnectionListPage() {
                </div>
 
                {/* Pagination */}
-               <div className="px-6 py-3 border-t bg-gray-50">
+               {/* <div className="px-6 py-3 border-t bg-gray-50">
                     <div className="flex items-center justify-between">
                          <div className="flex items-center gap-2">
                               <span className="text-sm text-gray-700">1-8 of {filteredConnections.length}</span>
@@ -450,7 +458,7 @@ export default function ConnectionListPage() {
                               </Button>
                          </div>
                     </div>
-               </div>
+               </div> */}
           </div>
      );
 }
