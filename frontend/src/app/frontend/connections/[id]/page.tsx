@@ -8,8 +8,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import dayjs from "dayjs";
 import { User } from "@/types";
+import { Button } from "@/components/ui/button";
 
-type Skill = { id: string; name: string }; 
+type Skill = { id: string; name: string };
 
 export default function ConnectionDetailPage() {
      const { id } = useParams();
@@ -18,33 +19,45 @@ export default function ConnectionDetailPage() {
 
      const [loggedInUserSkills, setLoggedInUserSkills] = useState<any[]>([]);
      const [selectedSkillNames, setSelectedSkillNames] = useState<string | null>(null);
-
+     const [requestLoading, setRequestLoading] = useState(false);
+     const [requestStatus, setRequestStatus] = useState(false);
      const handleSubmitRequest = async () => {
-      
-          if (!selectedDate || !mentor?.id || !selectedSkillNames) {
-               alert("Something is missing");
-               return;
-          }
-          const token = localStorage.getItem("token");
+          try {
+               setRequestLoading(true);
+               if (!selectedDate || !mentor?.id || !selectedSkillNames) {
+                    alert("Something is missing");
+                    return;
+               }
+               if (requestStatus) {
+                    alert("Request already sent");
+                    return;
+               }
+               const token = localStorage.getItem("token");
 
-          const res = await fetch("http://localhost:4000/api/sessions/request", {
-               method: "POST",
-               headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-               },
-               body: JSON.stringify({
-                    startTime: selectedDate.toISOString(),
-                    mentorId: mentor.id,
-                    selectedSkillNames: selectedSkillNames,
-               }),
-          });
+               const res = await fetch("http://localhost:4000/api/sessions/request", {
+                    method: "POST",
+                    headers: {
+                         "Content-Type": "application/json",
+                         Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                         startTime: selectedDate.toISOString(),
+                         mentorId: mentor.id,
+                         selectedSkillNames: selectedSkillNames,
+                    }),
+               });
 
-          const data = await res.json();
-          if (res.ok) {
-               alert("Session request sent!");
-          } else {
-               alert(data.message || "Failed to request session");
+               const data = await res.json();
+               if (res.ok) {
+                    alert("Session request sent!");
+                    setRequestStatus(true);
+               } else {
+                    alert(data.message || "Failed to request session");
+               }
+          } catch (error) {
+               console.error("error: ", error);
+          } finally {
+               setRequestLoading(false);
           }
      };
 
@@ -84,7 +97,6 @@ export default function ConnectionDetailPage() {
 
      return (
           <>
-             
                <div className="max-w-4xl mx-auto p-8 bg-white rounded-xl shadow-md mt-10">
                     <div className="flex items-center gap-6 border-b pb-6">
                          <Avatar className="w-24 h-24 ring-2 ring-gray-300 shadow-sm">
@@ -94,17 +106,18 @@ export default function ConnectionDetailPage() {
                          <div>
                               <h1 className="text-3xl font-semibold mb-1.5">{mentor.name}</h1>
                               <div className="flex items-center  gap-1">
-
-                               <p className="text-sm text-gray-500">I'm a</p>
-                              <p className="text-gray-700 font-medium">{mentor.professionDetails?.title}</p>
+                                   <p className="text-sm text-gray-500">I'm a</p>
+                                   <p className="text-gray-700 font-medium">{mentor.professionDetails?.title}</p>
                               </div>
                               {/* <Badge variant="secondary" className="mt-2">
                                    {mentor.role}
                               </Badge> */}
-                               <div className="flex items-center justify-center gap-1">
-                              <p className="text-sm text-gray-500">Have</p>
-                              <p className="text-gray-700 font-medium">{mentor?.experienceSummary?.years} years of Experience</p>
-                         </div>
+                              <div className="flex items-center justify-center gap-1">
+                                   <p className="text-sm text-gray-500">Have</p>
+                                   <p className="text-gray-700 font-medium">
+                                        {mentor?.experienceSummary?.years} years of Experience
+                                   </p>
+                              </div>
                          </div>
                     </div>
 
@@ -142,7 +155,11 @@ export default function ConnectionDetailPage() {
                               <h2 className="text-lg font-semibold mb-2">Skills Offering</h2>
                               <div className="flex flex-wrap gap-2">
                                    {mentor.skillsOffered.map((skill, index) => (
-                                        <Badge key={skill.id || index} variant="outline" className="bg-yellow-50 border-yellow-300 text-yellow-700">
+                                        <Badge
+                                             key={skill.id || index}
+                                             variant="outline"
+                                             className="bg-yellow-50 border-yellow-300 text-yellow-700"
+                                        >
                                              {skill.name}
                                         </Badge>
                                    ))}
@@ -155,11 +172,7 @@ export default function ConnectionDetailPage() {
                               <h2 className="text-lg font-semibold mb-2">Skills Needed</h2>
                               <div className="flex flex-wrap gap-2">
                                    {mentor.skillsWanted.map((skill, index) => (
-                                        <Badge
-                                             key={skill.id || index}
-                                             variant="outline"
-                                             
-                                        >
+                                        <Badge key={skill.id || index} variant="outline">
                                              {skill.name}
                                         </Badge>
                                    ))}
@@ -193,9 +206,10 @@ export default function ConnectionDetailPage() {
                                    value={selectedSkillNames || ""}
                                    onChange={(e) => {
                                         const selectedId = e.target.value; // skill.id
-                                        const selectedSkill:Skill | undefined= mentor?.skillsOffered?.find((skill) => skill.id === selectedId);
-                                        setSelectedSkillNames(selectedSkill?.name ?? null)
-                                      
+                                        const selectedSkill: Skill | undefined = mentor?.skillsOffered?.find(
+                                             (skill) => skill.id === selectedId
+                                        );
+                                        setSelectedSkillNames(selectedSkill?.name ?? null);
                                    }}
                                    className="border px-3 py-2 rounded w-full"
                               >
@@ -211,12 +225,15 @@ export default function ConnectionDetailPage() {
                          </div>
                     )}
 
-                    <button
-                         className="bg-purple-500 py-2 px-4 rounded-3xl text-white align-middle cursor-pointer mt-4"
+                    <Button
+                         className={`bg-purple-500 py-2 px-4 rounded-3xl text-white align-middle cursor-pointer mt-4 ${
+                              requestLoading ? "cursor-not-allowed" : "cursor-pointer"
+                         }`}
                          onClick={handleSubmitRequest}
+                         disabled={requestLoading || requestStatus}
                     >
-                         Submit
-                    </button>
+                         {requestStatus ? "Already Sent" : requestLoading ? "Submitting..." : "Submit"}
+                    </Button>
                </div>
           </>
      );

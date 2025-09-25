@@ -18,13 +18,29 @@ export const requestSession = async (req: AuthenticatedRequest, res: Response) =
           }
 
           const learnerId = req.userId!;
+
+          // Prevent duplicate active requests: check for existing PENDING/CONFIRMED session
+          const existing = await prisma.session.findFirst({
+               where: {
+                    mentorId,
+                    learnerId,
+                    skillId: skill.id,
+                    status: { in: [SessionStatus.PENDING, SessionStatus.CONFIRMED] },
+               },
+          });
+
+          if (existing) {
+               res.status(400).json({ message: "A session request for this skill with this mentor already exists." });
+               return;
+          }
+
           const session = await prisma.session.create({
                data: {
                     mentor: { connect: { id: mentorId } },
                     learner: { connect: { id: learnerId } },
                     skill: { connect: { id: skill.id } },
                     scheduledAt: new Date(startTime),
-                    status: "PENDING",
+                    status: SessionStatus.PENDING,
                },
           });
 
@@ -221,9 +237,7 @@ export const deleteSession = async (req: AuthenticatedRequest, res: Response) =>
 };
 
 export const saveRoadmap = async (req: AuthenticatedRequest, res: Response) => {
-
      try {
-
           const sessionId = String(req.params.id);
           const { roadmap } = req.body; // roadmap = { nodes, edges, viewport }
 
@@ -249,9 +263,7 @@ export const saveRoadmap = async (req: AuthenticatedRequest, res: Response) => {
 
 // Get roadmap
 export const getRoadmap = async (req: AuthenticatedRequest, res: Response) => {
-
      try {
-
           const sessionId = String(req.params.id);
 
           const session = await prisma.session.findUnique({
