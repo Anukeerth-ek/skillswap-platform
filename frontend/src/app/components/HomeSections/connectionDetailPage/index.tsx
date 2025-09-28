@@ -36,7 +36,7 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
           }
 
           try {
-               const response = await fetch("http://localhost:4000/api/connections/request", {
+               const response = await fetch("https://skillswap-platform-ovuw.onrender.com/api/connections/request", {
                     method: "POST",
                     headers: {
                          "Content-Type": "application/json",

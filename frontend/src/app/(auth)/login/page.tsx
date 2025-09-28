@@ -93,7 +93,8 @@ export default function Page() {
           try {
                if (isLogin) {
                     // LOGIN LOGIC
-                    const res = await fetch("http://localhost:4000/api/auth/login", {
+                    const res = await fetch("https://skillswap-platform-ovuw.onrender.com/api/auth/login", {
+                    // const res = await fetch("http://localhost:4000/api/auth/login", {
                          method: "POST",
                          headers: { "Content-Type": "application/json" },
                          body: JSON.stringify({
@@ -115,7 +116,7 @@ export default function Page() {
                     localStorage.setItem("token", data.token);
 
                     // 🔍 Check if user has a profile
-                    const profileRes = await fetch("http://localhost:4000/api/profiles/me", {
+                    const profileRes = await fetch("https://skillswap-platform-ovuw.onrender.com/api/profiles/me", {
 
                          method: "GET",
                          headers: {
@@ -135,7 +136,7 @@ export default function Page() {
                     }
                } else {
                     // ✅ SIGNUP LOGIC
-                    const res = await fetch("http://localhost:4000/api/auth/signup", {
+                    const res = await fetch("https://skillswap-platform-ovuw.onrender.com/api/auth/signup", {
                          method: "POST",
                          headers: { "Content-Type": "application/json" },
                          body: JSON.stringify({
