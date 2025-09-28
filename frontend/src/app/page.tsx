@@ -6,7 +6,7 @@ import { SearchResults } from "../app/components/HomeSections/searchResult";
 import { User } from "@/types";
 import { useGetMyProfile } from "./hooks/useGetMyProfile";
 import { useGetUserConnections } from "./hooks/useGetUserConnection";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
      const [users, setUsers] = useState<User[]>([]);
@@ -26,7 +26,7 @@ export default function Home() {
      const { usersConnection, loading: connectionLoading, error } = useGetUserConnections(myData?.id);
 
      const router = useRouter();
-     const searchParams = useSearchParams();
+     // const searchParams = useSearchParams();
 
      // Update URL when filters change
      useEffect(() => {
@@ -38,7 +38,7 @@ export default function Home() {
           if (filters.sort) params.set("sort", filters.sort);
 
           router.replace(`?${params.toString()}`);
-     }, [filters]);
+     }, [filters, router]);
 
      // Fetch users when filters change
      useEffect(() => {

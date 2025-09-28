@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Plus, X, Clock, Book, Lightbulb } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 // import { User } from "../../types";
 
 const ProfileCreatePage = () => {
@@ -190,7 +191,7 @@ const ProfileCreatePage = () => {
           if (!token) {
                router.push("/");
           }
-     }, []);
+     }, [router]);
 
      useEffect(() => {
           const fetchProfile = async () => {
@@ -353,7 +354,7 @@ const ProfileCreatePage = () => {
                                    />
 
                                    {avatarPreview && (
-                                        <img
+                                        <Image
                                              src={avatarPreview}
                                              alt="Preview"
                                              className="w-24 h-24 rounded-full mt-3 object-cover border border-gray-300"

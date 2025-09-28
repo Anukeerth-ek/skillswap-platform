@@ -3,70 +3,72 @@
 import { useEffect, useState } from "react";
 
 interface UserConnection {
-  id: string;
-  name?: string;
-  jobTitle?: string;
-  department: string;
-  email?: string;
-  avatar?: string;
-  user: {
-    id: string;
-    name: string;
-    skillsOffered?: { name: string }[];
-    skillsWanted?: { name: string }[];
-  };
+     id: string;
+     name?: string;
+     jobTitle?: string;
+     department: string;
+     email?: string;
+     avatar?: string;
+     user: {
+          id: string;
+          name: string;
+          skillsOffered?: { name: string }[];
+          skillsWanted?: { name: string }[];
+     };
 }
 
 interface UseGetUserConnectionsReturn {
-  usersConnection: UserConnection[];
-  loading: boolean;
-  error: string | null;
-  setUsersConnection?: React.Dispatch<React.SetStateAction<UserConnection[]>>;
+     usersConnection: UserConnection[];
+     loading: boolean;
+     error: string | null;
+     setUsersConnection?: React.Dispatch<React.SetStateAction<UserConnection[]>>;
 }
 
-export function useGetUserConnections(userId?: string):UseGetUserConnectionsReturn {
-  const [usersConnection, setUsersConnection] = useState<UserConnection[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+export function useGetUserConnections(userId?: string): UseGetUserConnectionsReturn {
+     const [usersConnection, setUsersConnection] = useState<UserConnection[]>([]);
+     const [loading, setLoading] = useState(false);
+     const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!userId) return;
+     useEffect(() => {
+          if (!userId) return;
 
-    const controller = new AbortController();
-    const signal = controller.signal;
+          const controller = new AbortController();
+          const signal = controller.signal;
 
-    const fetchConnections = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await fetch(
-          `http://localhost:4000/api/connections/${userId}`,
-          { signal }
-        );
-        const data = await res.json();
+          const fetchConnections = async () => {
+               setLoading(true);
+               setError(null);
+               try {
+                    const res = await fetch(`http://localhost:4000/api/connections/${userId}`, { signal });
+                    const data = await res.json();
 
-        if (res.ok) {
-          setUsersConnection(data.connections || []);
-        } else {
-          setError(data.message || "Failed to fetch connections");
-        }
-      } catch (err: any) {
-        // Ignore abort errors
-        if (err.name !== "AbortError") {
-          setError("Something went wrong");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
+                    if (res.ok) {
+                         setUsersConnection(data.connections || []);
+                    } else {
+                         setError(data.message || "Failed to fetch connections");
+                    }
+               } catch (err: unknown) {
+                    if (err instanceof Error) {
+                         // It's a real Error object
+                         if (err.name !== "AbortError") {
+                              setError(err.message || "Something went wrong");
+                         }
+                    } else {
+                         // fallback for non-Error thrown values
+                         setError("Something went wrong");
+                    }
+               } finally {
+                    setLoading(false);
+               }
+          };
 
-    fetchConnections();
+          fetchConnections();
 
-    // ✅ Cleanup: abort request if component unmounts or userId changes
-    return () => {
-      controller.abort();
-    };
-  }, [userId]);
+          // ✅ Cleanup: abort request if component unmounts or userId changes
+          return () => {
+               controller.abort();
+          };
+     }, [userId]);
 
-  return { usersConnection, loading, error, setUsersConnection };
+     return { usersConnection, loading, error, setUsersConnection };
 }
