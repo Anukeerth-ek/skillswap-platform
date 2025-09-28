@@ -78,7 +78,7 @@ export default function ConnectionListPage() {
      // useEffect(() => {
      //      if (!currentUser?.id) return;
      //      const fetchUsersConnection = async () => {
-     //           const res = await fetch(`http://localhost:4000/api/connections/${currentUser?.id}`);
+     //           const res = await fetch(`https://skillswap-platform-ovuw.onrender.com/api/connections/${currentUser?.id}`);
      //           const data = await res.json();
      //           console.table("dfjdklf", data);
      //           setUsersConnection(data.connections);
@@ -130,7 +130,7 @@ console.log("user", usersConnection)
           }
           const fetchIncoming = async () => {
                try {
-                    const res = await fetch(`http://localhost:4000/api/connections/requests/incoming/${currentUser?.id}`);
+                    const res = await fetch(`https://skillswap-platform-ovuw.onrender.com/api/connections/requests/incoming/${currentUser?.id}`);
                     const data = await res.json();
 
                     if (res.ok) {
@@ -155,7 +155,7 @@ console.log("user", usersConnection)
           if (!currentUser?.id) return;
           setLoadingRequests(true);
           try {
-               const res = await fetch(`http://localhost:4000/api/connections/requests/incoming/${currentUser.id}`);
+               const res = await fetch(`https://skillswap-platform-ovuw.onrender.com/api/connections/requests/incoming/${currentUser.id}`);
                const data = await res.json();
 
                setIncomingRequests(data || []);
@@ -169,7 +169,7 @@ console.log("user", usersConnection)
 
      const handleAccept = async (connectionId: string) => {
           try {
-               const res = await fetch("http://localhost:4000/api/connections/accept", {
+               const res = await fetch("https://skillswap-platform-ovuw.onrender.com/api/connections/accept", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ connectionId }),
@@ -180,7 +180,7 @@ console.log("user", usersConnection)
                     setIncomingRequests((prev) => prev.filter((c) => c.id !== connectionId));
 
                     // ✅ Re-fetch the accepted connections to update the table
-                    const updated = await fetch(`http://localhost:4000/api/connections/${currentUser?.id}`);
+                    const updated = await fetch(`https://skillswap-platform-ovuw.onrender.com/api/connections/${currentUser?.id}`);
                     const data = await updated.json();
                     setUsersConnection?.(data);
                } else {
@@ -194,7 +194,7 @@ console.log("user", usersConnection)
 
      const handleDecline = async (connectionId: string) => {
           try {
-               const res = await fetch("http://localhost:4000/api/connections/decline", {
+               const res = await fetch("https://skillswap-platform-ovuw.onrender.com/api/connections/decline", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ connectionId }),

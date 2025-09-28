@@ -34,7 +34,7 @@ export default function ConnectionDetailPage() {
                }
                const token = localStorage.getItem("token");
 
-               const res = await fetch("http://localhost:4000/api/sessions/request", {
+               const res = await fetch("https://skillswap-platform-ovuw.onrender.com/api/sessions/request", {
                     method: "POST",
                     headers: {
                          "Content-Type": "application/json",
@@ -66,7 +66,7 @@ export default function ConnectionDetailPage() {
 
           const fetchData = async () => {
                try {
-                    const res = await fetch(`http://localhost:4000/api/profile/user/${id}`);
+                    const res = await fetch(`https://skillswap-platform-ovuw.onrender.com/api/profile/user/${id}`);
                     const data = await res.json();
                     setMentor(data.user);
                } catch (err) {
@@ -82,7 +82,7 @@ export default function ConnectionDetailPage() {
                const token = localStorage.getItem("token");
                if (!token) return;
 
-               const res = await fetch("http://localhost:4000/api/profile/me", {
+               const res = await fetch("https://skillswap-platform-ovuw.onrender.com/api/profile/me", {
                     headers: { Authorization: `Bearer ${token}` },
                });
 

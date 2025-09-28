@@ -54,7 +54,7 @@ export default function Home() {
                     if (filters.experience.length) params.set("experience", filters.experience.join(","));
                     if (filters.sort) params.set("sort", filters.sort);
 
-                    const res = await fetch(`http://localhost:4000/api/filtered-profile/filter?${params.toString()}`, {
+                    const res = await fetch(`https://skillswap-platform-ovuw.onrender.com/api/filtered-profile/filter?${params.toString()}`, {
                          headers: { Authorization: `Bearer ${token}` },
                     });
 

@@ -162,7 +162,7 @@ const ProfileCreatePage = () => {
                     formDataToSend.append("skillsWanted[]", skill);
                });
 
-               const url = isEdit ? "http://localhost:4000/api/profile/update" : "http://localhost:4000/api/profile";
+               const url = isEdit ? "https://skillswap-platform-ovuw.onrender.com/api/profile/update" : "https://skillswap-platform-ovuw.onrender.com/api/profile";
 
                const response = await fetch(url, {
                     method: isEdit ? "PUT" : "POST",
@@ -195,7 +195,7 @@ const ProfileCreatePage = () => {
      useEffect(() => {
           const fetchProfile = async () => {
                const token = localStorage.getItem("token");
-               const res = await fetch("http://localhost:4000/api/profile/me", {
+               const res = await fetch("https://skillswap-platform-ovuw.onrender.com/api/profile/me", {
                     method: "GET",
                     headers: {
                          Authorization: `Bearer ${token}`,

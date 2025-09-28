@@ -87,7 +87,7 @@ export default function RoadmapPage() {
                setSession(sessionData);
 
                // fetch roadmap from backend
-               fetch(`http://localhost:4000/api/sessions/${sessionData.id}/roadmap`, {
+               fetch(`https://skillswap-platform-ovuw.onrender.com/api/sessions/${sessionData.id}/roadmap`, {
                     headers: {
                          authorization: `Bearer ${token}`,
                     },
@@ -115,7 +115,7 @@ export default function RoadmapPage() {
 
           const flow = reactFlowInstance.toObject(); // { nodes, edges, viewport }
 
-          await fetch(`http://localhost:4000/api/sessions/${session.id}/roadmap`, {
+          await fetch(`https://skillswap-platform-ovuw.onrender.com/api/sessions/${session.id}/roadmap`, {
                method: "POST",
                headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
                body: JSON.stringify({ roadmap: flow }),

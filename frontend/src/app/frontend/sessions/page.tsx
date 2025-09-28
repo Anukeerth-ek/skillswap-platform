@@ -26,7 +26,7 @@ const SessionsPage = () => {
           if (!token) return;
 
           try {
-               const res = await fetch("http://localhost:4000/api/sessions/my-sessions", {
+               const res = await fetch("https://skillswap-platform-ovuw.onrender.com/api/sessions/my-sessions", {
                     headers: {
                          Authorization: `Bearer ${token}`,
                     },
@@ -53,7 +53,7 @@ const SessionsPage = () => {
 
           try {
                // 1️⃣ Check if Google tokens are saved
-               const res = await fetch("http://localhost:4000/api/google-token/status", {
+               const res = await fetch("https://skillswap-platform-ovuw.onrender.com/api/google-token/status", {
                     headers: {
                          Authorization: `Bearer ${token}`,
                     },
@@ -71,7 +71,7 @@ const SessionsPage = () => {
                // 2️⃣ If no tokens → redirect to OAuth flow, passing token in query string
                if (!hasTokens) {
                     console.log("No Google tokens found, redirecting to OAuth...");
-                    window.location.href = `http://localhost:4000/api/google/auth?token=${token}`;
+                    window.location.href = `https://skillswap-platform-ovuw.onrender.com/api/google/auth?token=${token}`;
                     return;
                }
 
@@ -96,7 +96,7 @@ const SessionsPage = () => {
           if (!token) return;
 
           try {
-               const res = await fetch(`http://localhost:4000/api/sessions/approve/${id}`, {
+               const res = await fetch(`https://skillswap-platform-ovuw.onrender.com/api/sessions/approve/${id}`, {
                     method: "PATCH",
                     headers: {
                          "Content-Type": "application/json",
@@ -113,7 +113,7 @@ const SessionsPage = () => {
                     if (data.message?.includes("Google Calendar not connected") || data.message?.includes("Google Meet")) {
                          alert("Google Calendar needs to be reconnected. You'll be redirected to Google OAuth.");
                          // Redirect to OAuth flow to get fresh tokens with correct scopes
-                         window.location.href = `http://localhost:4000/api/google/auth?token=${token}`;
+                         window.location.href = `https://skillswap-platform-ovuw.onrender.com/api/google/auth?token=${token}`;
                          return;
                     } else {
                          alert(data.message || "Failed to update session status");
@@ -137,7 +137,7 @@ const SessionsPage = () => {
           if (!confirm("Are you sure you want to delete this session?")) return;
 
           try {
-               const res = await fetch(`http://localhost:4000/api/sessions/delete/${id}`, {
+               const res = await fetch(`https://skillswap-platform-ovuw.onrender.com/api/sessions/delete/${id}`, {
                     method: "DELETE",
                     headers: {
                          Authorization: `Bearer ${token}`,
