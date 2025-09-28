@@ -28,7 +28,7 @@ export const SearchResults = ({ users, loading }: SearchResultsProps) => {
                setSelectedUser(null);
                setIsSidebarOpen(false);
           }
-     }, [users]);
+     }, [users, selectedUser]);
 
      if (loading) return <p>Loading...</p>;
      return (

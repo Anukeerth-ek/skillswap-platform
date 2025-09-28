@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Share2, Bookmark } from "lucide-react";
+import { Share2 } from "lucide-react";
 // import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { useGetMyProfile } from "@/app/hooks/useGetMyProfile";
@@ -27,7 +27,7 @@ export const ConnectionDetailSideBar = ({ user }: { user: User }) => {
           }
      }, [currentUser?.id, user]);
 
-     const [isFollowing, setIsFollowing] = useState(false);
+     // const [isFollowing, setIsFollowing] = useState(false);
 
      const handleSendConnection = async () => {
           if (!currentUser?.id) {

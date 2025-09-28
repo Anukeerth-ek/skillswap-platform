@@ -17,7 +17,7 @@ export default function ConnectionDetailPage() {
      const [mentor, setMentor] = useState<User | null>(null);
      const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-     const [loggedInUserSkills, setLoggedInUserSkills] = useState<any[]>([]);
+     const [loggedInUserSkills, setLoggedInUserSkills] = useState<Skill[]>([]);
      const [selectedSkillNames, setSelectedSkillNames] = useState<string | null>(null);
      const [requestLoading, setRequestLoading] = useState(false);
      const [requestStatus, setRequestStatus] = useState(false);
@@ -76,7 +76,7 @@ export default function ConnectionDetailPage() {
 
           fetchData();
      }, [id]);
-
+console.log("loggedInUserSkills", loggedInUserSkills)
      useEffect(() => {
           const fetchLoggedInUser = async () => {
                const token = localStorage.getItem("token");
@@ -106,7 +106,7 @@ export default function ConnectionDetailPage() {
                          <div>
                               <h1 className="text-3xl font-semibold mb-1.5">{mentor.name}</h1>
                               <div className="flex items-center  gap-1">
-                                   <p className="text-sm text-gray-500">I'm a</p>
+                                   <p className="text-sm text-gray-500">I&apos;m a</p>
                                    <p className="text-gray-700 font-medium">{mentor.professionDetails?.title}</p>
                               </div>
                               {/* <Badge variant="secondary" className="mt-2">

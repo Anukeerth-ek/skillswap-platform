@@ -1,10 +1,11 @@
 "use client"
 import React, { useState } from 'react';
-import { Search, Phone, MoreHorizontal, Send, Mic, Paperclip, ChevronDown } from 'lucide-react';
+import { Search, Phone, MoreHorizontal, Send, Mic, Paperclip } from 'lucide-react';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import Image from 'next/image';
 
 // Mock data
 const messages = [
@@ -255,7 +256,7 @@ export default function MessagingUI() {
                   <p className="text-sm">{msg.message}</p>
                   {msg.image && (
                     <div className="mt-2 rounded-lg overflow-hidden">
-                      <img 
+                      <Image 
                         src={msg.image} 
                         alt="Apartment view" 
                         className="w-full h-32 object-cover"

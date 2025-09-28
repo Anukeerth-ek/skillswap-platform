@@ -11,6 +11,8 @@ import ReactFlow, {
      useEdgesState,
      Connection,
      Edge,
+     ReactFlowInstance,
+     Node,
 } from "reactflow";
 import "reactflow/dist/style.css";
 
@@ -29,7 +31,7 @@ export default function RoadmapPage() {
      const [edges, setEdges, onEdgesChange] = useEdgesState([]);
      const [nodeId, setNodeId] = useState(1);
      const [session, setSession] = useState<Session | null>(null);
-     const [reactFlowInstance, setReactFlowInstance] = useState<any | null>(null);
+     const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance<Node, Edge> | null>(null);
      const [token, setToken] = useState<string | null>(null);
 
      
@@ -99,7 +101,7 @@ export default function RoadmapPage() {
                               setEdges(data.edges || []);
                               const maxId =
                                    data.nodes && data.nodes.length > 0
-                                        ? Math.max(...data.nodes.map((n: any) => parseInt(n.id)))
+                                        ? Math.max(...data.nodes.map((n: Node) => parseInt(n.id)))
                                         : 0;
                               setNodeId(maxId + 1);
                               if (reactFlowInstance) {
@@ -108,7 +110,7 @@ export default function RoadmapPage() {
                          }
                     });
           }
-     }, [reactFlowInstance, token]);
+     }, [reactFlowInstance, token, setEdges, setNodes]);
 
      const handleSave = async () => {
           if (!reactFlowInstance || !session) return;

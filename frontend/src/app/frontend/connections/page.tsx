@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, Filter, MoreHorizontal } from "lucide-react";
+import { Filter, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+// import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
@@ -17,15 +17,21 @@ import { useRouter } from "next/navigation";
 import { useGetUserConnections } from "@/app/hooks/useGetUserConnection";
 import { SearchBar } from "@/app/components/Searchbar";
 
-// interface connection {
-//      id: string;
-//      name: string;
-//      jobTitle: string;
-//      department: string;
-//      phoneNumber: string;
-//      email: string;
-//      avatar?: string;
-// }
+interface UserConnection {
+     id: string;
+     name?: string;
+     jobTitle?: string;
+     department: string;
+     email?: string;
+     avatar?: string;
+     user: {
+          id: string;
+          name: string;
+          skillsOffered?: { name: string }[];
+          skillsWanted?: { name: string }[];
+     };
+}
+type Skill = { id?: string; name: string };
 
 interface IncomingRequest {
      id: string;
@@ -52,23 +58,9 @@ export default function ConnectionListPage() {
      const [searchTerm, setSearchTerm] = useState("");
      const [selectedDepartment, setSelectedDepartment] = useState("All Departments");
      const [selectedRows, setSelectedRows] = useState<string[]>([]);
-     const [rowsPerPage, setRowsPerPage] = useState(10);
-     const [connectionLoading, setConnectionLoading] = useState(true);
-     const [searchResult, setSearchResult] = useState("");
-     interface UserConnection {
-          id: string;
-          name?: string;
-          jobTitle?: string;
-          department: string;
-          email?: string;
-          avatar?: string;
-          user: {
-               id: string;
-               name: string;
-               skillsOffered?: { name: string }[];
-               skillsWanted?: { name: string }[];
-          };
-     }
+     // const [rowsPerPage, setRowsPerPage] = useState(10);
+     // const [connectionLoading, setConnectionLoading] = useState(true);
+     // const [searchResult, setSearchResult] = useState("");
 
      // const [usersConnection, setUsersConnection] = useState<UserConnection[]>([]);
      const { user: currentUser } = useGetMyProfile();
@@ -87,7 +79,7 @@ export default function ConnectionListPage() {
      // }, [currentUser?.id]);
 
      const { usersConnection, setUsersConnection, loading, error } = useGetUserConnections(currentUser?.id);
-console.log("user", usersConnection)
+
      const filteredConnections = useMemo(() => {
           return usersConnection?.filter((connection) => {
                const matchesSearch =
@@ -101,7 +93,7 @@ console.log("user", usersConnection)
 
                return matchesSearch && matchesDepartment;
           });
-     }, [searchTerm, selectedDepartment]);
+     }, [searchTerm, selectedDepartment, usersConnection]);
 
      const handleRowSelect = (id: string) => {
           setSelectedRows((prev) => (prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]));
@@ -130,7 +122,9 @@ console.log("user", usersConnection)
           }
           const fetchIncoming = async () => {
                try {
-                    const res = await fetch(`https://skillswap-platform-ovuw.onrender.com/api/connections/requests/incoming/${currentUser?.id}`);
+                    const res = await fetch(
+                         `https://skillswap-platform-ovuw.onrender.com/api/connections/requests/incoming/${currentUser?.id}`
+                    );
                     const data = await res.json();
 
                     if (res.ok) {
@@ -155,7 +149,9 @@ console.log("user", usersConnection)
           if (!currentUser?.id) return;
           setLoadingRequests(true);
           try {
-               const res = await fetch(`https://skillswap-platform-ovuw.onrender.com/api/connections/requests/incoming/${currentUser.id}`);
+               const res = await fetch(
+                    `https://skillswap-platform-ovuw.onrender.com/api/connections/requests/incoming/${currentUser.id}`
+               );
                const data = await res.json();
 
                setIncomingRequests(data || []);
@@ -180,7 +176,9 @@ console.log("user", usersConnection)
                     setIncomingRequests((prev) => prev.filter((c) => c.id !== connectionId));
 
                     // ✅ Re-fetch the accepted connections to update the table
-                    const updated = await fetch(`https://skillswap-platform-ovuw.onrender.com/api/connections/${currentUser?.id}`);
+                    const updated = await fetch(
+                         `https://skillswap-platform-ovuw.onrender.com/api/connections/${currentUser?.id}`
+                    );
                     const data = await updated.json();
                     setUsersConnection?.(data);
                } else {
@@ -212,7 +210,8 @@ console.log("user", usersConnection)
           }
      };
 
-     if(connectionLoading) <p>Loading...</p>
+     if (loading) return <p>Loading...</p>;
+     if (error) return <p>Failed to fetch user connection </p>;
      return (
           <div className="bg-white rounded-lg shadow-sm border">
                {/* Header */}
@@ -228,7 +227,11 @@ console.log("user", usersConnection)
                                         className="pl-10 w-80"
                                    />
                               </div> */}
-                              <SearchBar handleUserSearch={(e:any)=> setSearchResult(e.target.value)} />
+                              <SearchBar
+                                   handleUserSearch={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                        setSearchTerm(e.target.value)
+                                   }
+                              />
                               <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
                                    <SelectTrigger className="w-48">
                                         <Filter className="h-4 w-4 mr-2" />
@@ -335,8 +338,7 @@ console.log("user", usersConnection)
                          </thead>
                          <tbody className="bg-white divide-y divide-gray-200">
                               {usersConnection && usersConnection.length > 0 ? (
-                                   usersConnection?.map((connection: any) => {
-
+                                   usersConnection?.map((connection: UserConnection) => {
                                         return (
                                              <tr
                                                   className="hover:bg-gray-50 cursor-pointer"
@@ -374,15 +376,17 @@ console.log("user", usersConnection)
                                                        </Badge>
                                                   </td>
                                                   <td className="px-6 py-4 whitespace-nowrap">
-                                                       {connection?.user?.skillsOffered?.map((item: any, index: number) => (
-                                                            <div key={index} className="text-sm text-gray-900">
-                                                                 {item.name}
-                                                            </div>
-                                                       ))}
+                                                       {connection?.user?.skillsOffered?.map(
+                                                            (item: Skill) => (
+                                                                 <div key={item.name} className="text-sm text-gray-900">
+                                                                      {item.name}
+                                                                 </div>
+                                                            )
+                                                       )}
                                                   </td>
                                                   <td className="px-6 py-4 whitespace-nowrap">
-                                                       {connection?.user?.skillsWanted?.map((item: any, index: number) => (
-                                                            <div key={index} className="text-sm text-gray-900">
+                                                       {connection?.user?.skillsWanted?.map((item: Skill) => (
+                                                            <div key={item.name} className="text-sm text-gray-900">
                                                                  {item.name}
                                                             </div>
                                                        ))}

@@ -17,7 +17,7 @@ interface Session {
 export default function SessionDetail({ params }: { params: { id: string } }) {
      const [session, setSession] = useState<Session | null>(null);
      const router = useRouter()
-
+     console.log("params", params)
      useEffect(() => {
           const saved = localStorage.getItem("selectedSession");
           if (saved) {

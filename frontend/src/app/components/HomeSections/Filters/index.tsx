@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
-import { Slider } from "@/components/ui/slider";
+// import { Slider } from "@/components/ui/slider";
 import { Search, X, ChevronDown, ChevronUp, Filter } from "lucide-react";
 
 // Types
@@ -26,15 +26,15 @@ interface CollapsedSections {
      [key: string]: boolean;
 }
 
-interface SortOption {
-     value: string;
-     label: string;
-}
+// interface SortOption {
+//      value: string;
+//      label: string;
+// }
 
-interface ExperienceLevel {
-     value: string;
-     label: string;
-}
+// interface ExperienceLevel {
+//      value: string;
+//      label: string;
+// }
 
 interface AvailabilityStatus {
      value: string;
@@ -50,7 +50,7 @@ interface CollapsibleSectionProps {
 
 const LeftSidebar: React.FC<LeftSidebarProps> = ({ filters, setFilters }) => {
      const [collapsedSections, setCollapsedSections] = useState<CollapsedSections>({});
-     const [hourRate, setHourRate] = useState<[number, number]>([8, 39]);
+     // const [hourRate, setHourRate] = useState<[number, number]>([8, 39]);
 
      const toggleFilter = (
           category: keyof Pick<Filters, "professional" | "experience" | "readiness">,
@@ -89,7 +89,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ filters, setFilters }) => {
                readiness: [],
           };
           setFilters(resetFilters);
-          setHourRate([8, 39]);
+          // setHourRate([8, 39]);
      };
 
      const toggleSection = (section: string): void => {

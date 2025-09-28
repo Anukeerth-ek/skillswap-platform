@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { json } from "stream/consumers";
+// import { json } from "stream/consumers";
 
 interface Session {
      id: string;
@@ -157,7 +157,7 @@ const SessionsPage = () => {
 
      const router = useRouter();
 
-     const handleSessions = (session: any) => {
+     const handleSessions = (session: Session) => {
           localStorage.setItem("selectedSession", JSON.stringify(session));
           router.push(`/frontend/sessions/${session.id}`);
      };

@@ -1,9 +1,13 @@
 import React from 'react';
-import { Search, ChevronDown } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Search} from 'lucide-react';
+// import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
-export const SearchBar = ({handleUserSearch}:any) => {
+type SearchBarProps = {
+  handleUserSearch: (e: React.ChangeEvent<HTMLInputElement>) => void;
+};
+
+export const SearchBar = ({ handleUserSearch }: SearchBarProps) => {
   return (
     <div className="flex items-center space-x-4 mb-6">
       <div className="relative flex-1">

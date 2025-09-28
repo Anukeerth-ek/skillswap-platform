@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Heart, DollarSign, Clock, Star, User } from "lucide-react";
+import { Heart, Clock, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -34,6 +34,7 @@ export const ConnectionCard: React.FC<TeacherCardProps> = ({
      const toggleBookmark = () => {
           setIsBookmark(!isBookmark);
      };
+     console.log("role", role)
      return (
           //    <div className="max-w-md mx-auto p-6 bg-gray-100">
           <div
