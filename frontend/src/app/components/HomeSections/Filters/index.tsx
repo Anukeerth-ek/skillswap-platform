@@ -36,11 +36,11 @@ interface CollapsedSections {
 //      label: string;
 // }
 
-interface AvailabilityStatus {
-     value: string;
-     label: string;
-     color: string;
-}
+// interface AvailabilityStatus {
+//      value: string;
+//      label: string;
+//      color: string;
+// }
 
 interface CollapsibleSectionProps {
      title: string;
