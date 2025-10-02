@@ -4,6 +4,8 @@ import { MessageCircleMore, Video } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { } from "next/types"
+
 interface Session {
      id: string;
      mentor: { name: string };
@@ -14,10 +16,10 @@ interface Session {
      meetLink?: string;
 }
 
-export default function SessionDetail({ params }: { params: { id: string } }) {
+export default function SessionDetail() {
      const [session, setSession] = useState<Session | null>(null);
      const router = useRouter()
-     console.log("params", params)
+
      useEffect(() => {
           const saved = localStorage.getItem("selectedSession");
           if (saved) {
