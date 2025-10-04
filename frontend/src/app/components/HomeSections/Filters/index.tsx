@@ -126,7 +126,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ filters, setFilters }) => {
      );
 
      return (
-          <div className="w-72 h-[calc(100vh-64px)] overflow-auto bg-gradient-to-b from-gray-900 to-gray-950 text-white border-r border-gray-700 flex flex-col">
+          <div className="w-72 sticky top-0 h-[calc(100vh-2px)] overflow-auto bg-gradient-to-b from-gray-900 to-gray-950 text-white border-r border-gray-700 flex flex-col">
                {/* Header */}
                <div className="p-6 border-b border-gray-700">
                     <div className="flex items-center justify-between mb-2">
@@ -275,7 +275,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ filters, setFilters }) => {
 
                     {/* Experience */}
                     <CollapsibleSection title="Experience Level" sectionKey="experience">
-                         <div className="space-y-3">
+                         <div className="space-y-4">
                               {[
                                    { value: "0-1", label: "Entry Level (0-1 years)" },
                                    { value: "1-3", label: "Junior (1-3 years)" },

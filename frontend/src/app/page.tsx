@@ -45,7 +45,13 @@ export default function Home() {
           const fetchUsers = async () => {
                try {
                     setLoading(true);
-                    const token = localStorage.getItem("token");
+
+                    const token = localStorage.getItem("token"); // may be null
+                    const headers: HeadersInit = {};
+
+                    if (token) {
+                         headers["Authorization"] = `Bearer ${token}`;
+                    }
 
                     const params = new URLSearchParams();
                     if (filters.search) params.set("search", filters.search);
@@ -54,9 +60,10 @@ export default function Home() {
                     if (filters.experience.length) params.set("experience", filters.experience.join(","));
                     if (filters.sort) params.set("sort", filters.sort);
 
-                    const res = await fetch(`https://skillswap-platform-ovuw.onrender.com/api/filtered-profile/filter?${params.toString()}`, {
-                         headers: { Authorization: `Bearer ${token}` },
-                    });
+                    const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
+
+                    const url = `${BASE_URL}/api/filtered-profile/filter?${params.toString()}`;
+                    const res = await fetch(url, { headers });
 
                     const data = await res.json();
                     setUsers(data.users || []);
