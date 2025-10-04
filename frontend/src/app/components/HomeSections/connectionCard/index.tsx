@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Heart, Clock, Star } from "lucide-react";
+import { Heart, Clock, Star, Dot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -39,7 +39,7 @@ export const ConnectionCard: React.FC<TeacherCardProps> = ({
           //    <div className="max-w-md mx-auto p-6 bg-gray-100">
           <div
                onClick={handleShowConnectionDetail}
-               className="group bg-gradient-to-br from-slate-800 to-slate-900 cursor-pointer rounded-2xl p-6 border border-slate-700/50 hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden"
+               className="group bg-gray-900 cursor-pointer rounded-2xl p-6 border border-slate-700/50 hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden"
           >
                {/* Subtle gradient overlay */}
                <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
@@ -94,7 +94,7 @@ export const ConnectionCard: React.FC<TeacherCardProps> = ({
                               <Badge
                                    key={index}
                                    className=//   {`
-                                   " rounded-full px-4 py-2 text-sm font-semibold border transition-all duration-200 hover:scale-105 bg-slate-700/80 text-gray-300 border-slate-600/50 hover:bg-slate-700 hover:text-white"
+                                   " rounded-full px-4 py-1 text-xs font-semibold border transition-all duration-200 hover:scale-105 bg-slate-700/80 text-gray-300 border-slate-600/50 hover:bg-slate-700 hover:text-white"
 
                                    //    isPython
                                    //      ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white border-purple-500/50 shadow-lg shadow-purple-500/20"
@@ -113,14 +113,15 @@ export const ConnectionCard: React.FC<TeacherCardProps> = ({
                {/* Footer with profession and experience */}
                <div className="flex items-center justify-between relative z-10">
                     <div className="flex items-center space-x-2">
-                         <Star className="w-4 h-4 text-purple-400" />
+                         <Star className="w-4 h-4 text-gray-400" />
+                         {/* <Dot className="text-gray-200"/> */}
                          <span className="text-white font-bold text-base tracking-wide">
                               {companyName ?? "Not Provided"}
                          </span>
                     </div>
 
                     <div className="flex items-center space-x-2 px-3 py-2">
-                         <Clock className="w-4 h-4 text-gray-400" />
+                         {/* <Clock className="w-4 h-4 text-gray-400" /> */}
                          <span className="text-gray-300 font-semibold text-sm">
                               {experience ? `${experience} Years` : "Not Provided"}
                          </span>
