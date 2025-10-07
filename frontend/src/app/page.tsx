@@ -40,18 +40,29 @@ export default function Home() {
           router.replace(`?${params.toString()}`);
      }, [filters, router]);
 
+     const getBaseUrl = () => {
+          // Use env variable if set
+          if (process.env.NEXT_PUBLIC_USERS_LIST_URL) {
+               return process.env.NEXT_PUBLIC_USERS_LIST_URL;
+          }
+
+          // Fallback based on environment
+          if (process.env.NODE_ENV === "production") {
+               return "https://skillswap-platform-ovuw.onrender.com";
+          } else {
+               return "http://localhost:4000";
+          }
+     };
+
      // Fetch users when filters change
      useEffect(() => {
           const fetchUsers = async () => {
                try {
                     setLoading(true);
 
-                    const token = localStorage.getItem("token"); // may be null
+                    const token = localStorage.getItem("token");
                     const headers: HeadersInit = {};
-
-                    if (token) {
-                         headers["Authorization"] = `Bearer ${token}`;
-                    }
+                    if (token) headers["Authorization"] = `Bearer ${token}`;
 
                     const params = new URLSearchParams();
                     if (filters.search) params.set("search", filters.search);
@@ -60,12 +71,10 @@ export default function Home() {
                     if (filters.experience.length) params.set("experience", filters.experience.join(","));
                     if (filters.sort) params.set("sort", filters.sort);
 
-                    const BASE_URL = process.env.NEXT_USERS_LIST_URL || "http://localhost:4000";
-console.log("BASE_URL", process.env.NEXT_USERS_LIST_URL)
-
+                    const BASE_URL = getBaseUrl();
                     const url = `${BASE_URL}/api/filtered-profile/filter?${params.toString()}`;
-                    const res = await fetch(url, { headers });
 
+                    const res = await fetch(url, { headers });
                     const data = await res.json();
                     setUsers(data.users || []);
                } catch (error) {
