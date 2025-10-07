@@ -60,8 +60,8 @@ export default function Home() {
                     if (filters.experience.length) params.set("experience", filters.experience.join(","));
                     if (filters.sort) params.set("sort", filters.sort);
 
-                    const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000";
-console.log("BASE_URL", process.env.NEXT_PUBLIC_API_URL)
+                    const BASE_URL = process.env.NEXT_USERS_LIST_URL || "http://localhost:4000";
+console.log("BASE_URL", process.env.NEXT_USERS_LIST_URL)
 
                     const url = `${BASE_URL}/api/filtered-profile/filter?${params.toString()}`;
                     const res = await fetch(url, { headers });
