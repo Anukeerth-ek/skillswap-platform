@@ -1,13 +1,13 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Filter, MoreHorizontal } from "lucide-react";
+import {  MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 // import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+// import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { useEffect } from "react";
@@ -15,7 +15,7 @@ import { useGetMyProfile } from "@/app/hooks/useGetMyProfile";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useGetUserConnections } from "@/app/hooks/useGetUserConnection";
-import { SearchBar } from "@/app/components/Searchbar";
+// import { SearchBar } from "@/app/components/Searchbar";
 
 interface UserConnection {
      id: string;
@@ -227,12 +227,12 @@ export default function ConnectionListPage() {
                                         className="pl-10 w-80"
                                    />
                               </div> */}
-                              <SearchBar
+                              {/* <SearchBar
                                    handleUserSearch={(e: React.ChangeEvent<HTMLInputElement>) =>
                                         setSearchTerm(e.target.value)
                                    }
-                              />
-                              <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
+                              /> */}
+                              {/* <Select value={selectedDepartment} onValueChange={setSelectedDepartment}>
                                    <SelectTrigger className="w-48">
                                         <Filter className="h-4 w-4 mr-2" />
                                         <SelectValue placeholder="Filters" />
@@ -244,7 +244,7 @@ export default function ConnectionListPage() {
                                              </SelectItem>
                                         ))}
                                    </SelectContent>
-                              </Select>
+                              </Select> */}
                          </div>
                          <Popover
                               open={showPopover}
