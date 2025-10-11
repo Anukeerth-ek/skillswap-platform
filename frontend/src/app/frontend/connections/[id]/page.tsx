@@ -7,8 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import dayjs from "dayjs";
-import { User } from "@/types";
 import { Button } from "@/components/ui/button";
+import { AlertCircle, Award, Briefcase, Calendar, CheckCircle2, Clock, MapPin, Target } from "lucide-react";
+import { User } from "@/types";
 
 type Skill = { id: string; name: string };
 
@@ -21,17 +22,27 @@ export default function ConnectionDetailPage() {
      const [selectedSkillNames, setSelectedSkillNames] = useState<string | null>(null);
      const [requestLoading, setRequestLoading] = useState(false);
      const [requestStatus, setRequestStatus] = useState(false);
+     const [errors, setErrors] = useState({ date: false, skill: false });
+     const [showSuccess, setShowSuccess] = useState(false);
+
      const handleSubmitRequest = async () => {
+          const newErrors = {
+               date: !selectedDate,
+               skill: !selectedSkillNames,
+          };
+
+          setErrors(newErrors);
+
+          if (newErrors.date || newErrors.skill) {
+               return;
+          }
+
+          if (requestStatus) {
+               alert("Request already sent");
+               return;
+          }
+
           try {
-               setRequestLoading(true);
-               if (!selectedDate || !mentor?.id || !selectedSkillNames) {
-                    alert("Something is missing");
-                    return;
-               }
-               if (requestStatus) {
-                    alert("Request already sent");
-                    return;
-               }
                const token = localStorage.getItem("token");
 
                const res = await fetch("https://skillswap-platform-ovuw.onrender.com/api/sessions/request", {
@@ -41,21 +52,25 @@ export default function ConnectionDetailPage() {
                          Authorization: `Bearer ${token}`,
                     },
                     body: JSON.stringify({
-                         startTime: selectedDate.toISOString(),
-                         mentorId: mentor.id,
+                         startTime: selectedDate?.toISOString(),
+                         mentorId: mentor?.id,
                          selectedSkillNames: selectedSkillNames,
                     }),
                });
 
                const data = await res.json();
                if (res.ok) {
-                    alert("Session request sent!");
                     setRequestStatus(true);
+                    setShowSuccess(true);
+
+                    // Hide success message after 3 seconds
+                    setTimeout(() => setShowSuccess(false), 3000);
                } else {
-                    alert(data.message || "Failed to request session");
+                    alert( "Failed to request session");
                }
           } catch (error) {
                console.error("error: ", error);
+               alert("An error occurred while sending the request");
           } finally {
                setRequestLoading(false);
           }
@@ -76,7 +91,7 @@ export default function ConnectionDetailPage() {
 
           fetchData();
      }, [id]);
-console.log("loggedInUserSkills", loggedInUserSkills)
+
      useEffect(() => {
           const fetchLoggedInUser = async () => {
                const token = localStorage.getItem("token");
@@ -97,143 +112,230 @@ console.log("loggedInUserSkills", loggedInUserSkills)
 
      return (
           <>
-               <div className="max-w-4xl mx-auto p-8 bg-white rounded-xl shadow-md mt-10">
-                    <div className="flex items-center gap-6 border-b pb-6">
-                         <Avatar className="w-24 h-24 ring-2 ring-gray-300 shadow-sm">
-                              <AvatarImage src={mentor.avatarUrl || ""} alt={mentor.name} />
-                              <AvatarFallback className="text-xl">{mentor.name?.charAt(0)}</AvatarFallback>
-                         </Avatar>
-                         <div>
-                              <h1 className="text-3xl font-semibold mb-1.5">{mentor.name}</h1>
-                              <div className="flex items-center  gap-1">
-                                   <p className="text-sm text-gray-500">I&apos;m a</p>
-                                   <p className="text-gray-700 font-medium">{mentor.professionDetails?.title}</p>
-                              </div>
-                              {/* <Badge variant="secondary" className="mt-2">
-                                   {mentor.role}
-                              </Badge> */}
-                              <div className="flex items-center justify-center gap-1">
-                                   <p className="text-sm text-gray-500">Have</p>
-                                   <p className="text-gray-700 font-medium">
-                                        {mentor?.experienceSummary?.years} years of Experience
-                                   </p>
-                              </div>
+               <div className="max-w-5xl mx-auto p-6 md:p-8">
+                    {/* Success Message */}
+                    {showSuccess && (
+                         <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+                              <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0" />
+                              <p className="text-green-800 font-medium">Mentorship request submitted successfully!</p>
                          </div>
-                    </div>
+                    )}
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8 text-gray-800">
-                         {/* <div>
-                              <p className="text-sm text-gray-500">Email</p>
-                              <p className="font-medium">{mentor.email}</p>
-                         </div> */}
-                         <div>
-                              <p className="text-sm text-gray-500">Timezone</p>
-                              <p className="font-medium">{mentor.timeZone}</p>
-                         </div>
-                         <div>
-                              <p className="text-sm text-gray-500">Works At</p>
-                              <p className="font-medium">{mentor?.currentOrganization?.organization}</p>
-                         </div>
-                         <div>
-                              <h2 className="text-sm text-gray-500">About ME</h2>
-                              <p className="font-medium">{mentor?.bio}</p>
-                         </div>
-                         {/* <div>
-                              <p className="text-sm text-gray-500">Joined</p>
-                              <p className="font-medium">
-                                   {new Date(mentor.createdAt).toLocaleDateString(undefined, {
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
-                                   })}
-                              </p>
-                         </div> */}
-                    </div>
+                    {/* Main Profile Card */}
+                    <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
+                         {/* Header Section */}
+                         <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-8 border-b">
+                              <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                                   <Avatar className="w-28 h-28 ring-4 ring-white shadow-xl">
+                                        <AvatarImage src={mentor.avatarUrl || ""} alt={mentor.name} />
+                                        <AvatarFallback className="text-2xl bg-purple-100 text-purple-700">
+                                             {mentor.name?.charAt(0)}
+                                        </AvatarFallback>
+                                   </Avatar>
 
-                    {mentor.skillsOffered?.length > 0 && (
-                         <div className="mt-10">
-                              <h2 className="text-lg font-semibold mb-2">Skills Offering</h2>
-                              <div className="flex flex-wrap gap-2">
-                                   {mentor.skillsOffered.map((skill, index) => (
-                                        <Badge
-                                             key={skill.id || index}
-                                             variant="outline"
-                                             className="bg-yellow-50 border-yellow-300 text-yellow-700"
+                                   <div className="flex-1 text-center md:text-left">
+                                        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">{mentor.name}</h1>
+                                        <div className="space-y-2">
+                                             <div className="flex items-center justify-center md:justify-start gap-2 text-gray-700">
+                                                  <Briefcase className="w-4 h-4 text-purple-600" />
+                                                  <span className="font-semibold">{mentor.professionDetails?.title}</span>
+                                             </div>
+                                             <div className="flex items-center justify-center md:justify-start gap-2 text-gray-600">
+                                                  <Award className="w-4 h-4 text-purple-600" />
+                                                  <span>{mentor?.experienceSummary?.years} years of experience</span>
+                                             </div>
+                                        </div>
+                                   </div>
+                              </div>
+                         </div>
+
+                         {/* Info Grid */}
+                         <div className="p-8">
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                   <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                                        <Clock className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                                        <div>
+                                             <p className="text-sm text-gray-500 mb-1">Timezone</p>
+                                             <p className="font-semibold text-gray-900">{mentor.timeZone}</p>
+                                        </div>
+                                   </div>
+
+                                   <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
+                                        <MapPin className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                                        <div>
+                                             <p className="text-sm text-gray-500 mb-1">Current Organization</p>
+                                             <p className="font-semibold text-gray-900">
+                                                  {mentor?.currentOrganization?.organization}
+                                             </p>
+                                        </div>
+                                   </div>
+                              </div>
+
+                              {/* About Section */}
+                              <div className="mb-8 p-6 bg-gradient-to-br from-purple-50 to-transparent rounded-lg border border-purple-100">
+                                   <div className="flex items-center gap-2 mb-3">
+                                        {/* <User className="w-5 h-5 text-purple-600" /> */}
+                                        <h2 className="text-lg font-semibold text-gray-900">About Me</h2>
+                                   </div>
+                                   <p className="text-gray-700 leading-relaxed">{mentor?.bio}</p>
+                              </div>
+
+                              {/* Skills Sections */}
+
+                              {mentor.skillsWanted?.length > 0 && (
+                                   <div className="mb-8">
+                                        <div className="flex items-center gap-2 mb-3">
+                                             <Target className="w-5 h-5 text-blue-600" />
+                                             <h2 className="text-lg font-semibold text-gray-900">
+                                                  Skills I Needed to Learn
+                                             </h2>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                             {mentor.skillsWanted.map((skill, index) => (
+                                                  <Badge
+                                                       key={skill.id || index}
+                                                       className="bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100 transition-colors px-4 py-1.5"
+                                                       variant="outline"
+                                                  >
+                                                       {skill.name}
+                                                  </Badge>
+                                             ))}
+                                        </div>
+                                   </div>
+                              )}
+
+                              {mentor.skillsOffered?.length > 0 && (
+                                   <div className="mb-6">
+                                        <div className="flex items-center gap-2 mb-3">
+                                             <Award className="w-5 h-5 text-purple-600" />
+                                             <h2 className="text-lg font-semibold text-gray-900">Skills I Can Teach</h2>
+                                        </div>
+                                        <div className="flex flex-wrap gap-2">
+                                             {mentor.skillsOffered.map((skill, index) => (
+                                                  <Badge
+                                                       key={skill.id || index}
+                                                       className="bg-purple-100 text-purple-700 border-purple-200 hover:bg-purple-200 transition-colors px-4 py-1.5"
+                                                       variant="outline"
+                                                  >
+                                                       {skill.name}
+                                                  </Badge>
+                                             ))}
+                                        </div>
+                                   </div>
+                              )}
+
+                              {/* Request Mentorship Section */}
+                              <div className="border-t pt-8">
+                                   <h2 className="text-2xl font-bold text-gray-900 mb-6">Sent Connection</h2>
+
+                                   <div className="space-y-6">
+                                        {/* Skill Selection */}
+                                        {mentor.skillsOffered?.length > 0 && (
+                                             <div>
+                                                  <label
+                                                       htmlFor="skill"
+                                                       className="block text-sm font-semibold text-gray-700 mb-2"
+                                                  >
+                                                       Choose a skill to learn *
+                                                  </label>
+                                                  <select
+                                                       id="skill"
+                                                       value={selectedSkillNames || ""}
+                                                       onChange={(e) => {
+                                                            setSelectedSkillNames(e.target.value);
+                                                            setErrors((prev) => ({ ...prev, skill: false }));
+                                                       }}
+                                                       className={`w-full border ${
+                                                            errors.skill ? "border-red-500" : "border-gray-300"
+                                                       } rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                                                  >
+                                                       <option value="">Select a skill</option>
+                                                       {mentor.skillsOffered.map((skill) => (
+                                                            <option key={skill.id} value={skill.id}>
+                                                                 {skill.name}
+                                                            </option>
+                                                       ))}
+                                                  </select>
+                                                  {errors.skill && (
+                                                       <div className="flex items-center gap-2 mt-2 text-red-600 text-sm">
+                                                            <AlertCircle className="w-4 h-4" />
+                                                            <span>Please select a skill</span>
+                                                       </div>
+                                                  )}
+                                             </div>
+                                        )}
+
+                                        {/* Date Selection - Placeholder */}
+                                        <div>
+                                             <label
+                                                  htmlFor="datetime"
+                                                  className="block text-sm font-semibold text-gray-700 mb-2"
+                                             >
+                                                  Preferred date and time *
+                                             </label>
+                                             <div className="relative">
+                                                  <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                                  <input
+                                                       type="datetime-local"
+                                                       value={
+                                                            selectedDate
+                                                                 ? new Date(
+                                                                        selectedDate.getTime() -
+                                                                             selectedDate.getTimezoneOffset() * 60000
+                                                                   )
+                                                                        .toISOString()
+                                                                        .slice(0, 16)
+                                                                 : ""
+                                                       }
+                                                       onChange={(e) => {
+                                                            setSelectedDate(
+                                                                 e.target.value ? new Date(e.target.value) : null
+                                                            );
+                                                            setErrors((prev) => ({ ...prev, date: false }));
+                                                       }}
+                                                       className={`w-full border ${
+                                                            errors.date ? "border-red-500" : "border-gray-300"
+                                                       } rounded-lg pl-11 pr-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all`}
+                                                  />
+                                             </div>
+                                             {errors.date && (
+                                                  <div className="flex items-center gap-2 mt-2 text-red-600 text-sm">
+                                                       <AlertCircle className="w-4 h-4" />
+                                                       <span>Please select a date and time</span>
+                                                  </div>
+                                             )}
+                                             {selectedDate && !errors.date && (
+                                                  <p className="mt-2 text-sm text-gray-600">
+                                                       Selected: {new Date(selectedDate).toLocaleString()}
+                                                  </p>
+                                             )}
+                                        </div>
+
+                                        {/* Submit Button */}
+                                        <Button
+                                             onClick={handleSubmitRequest}
+                                             disabled={requestLoading || requestStatus}
+                                             className={`w-full md:w-auto px-8 py-3 rounded-lg font-semibold transition-all ${
+                                                  requestStatus
+                                                       ? "bg-green-600 hover:bg-green-600"
+                                                       : "bg-purple-600 hover:bg-purple-700"
+                                             } text-white disabled:opacity-50 disabled:cursor-not-allowed`}
                                         >
-                                             {skill.name}
-                                        </Badge>
-                                   ))}
+                                             {requestStatus ? (
+                                                  <span className="flex items-center gap-2">
+                                                       <CheckCircle2 className="w-5 h-5" />
+                                                       Request Sent
+                                                  </span>
+                                             ) : requestLoading ? (
+                                                  "Submitting..."
+                                             ) : (
+                                                  "Submit Request"
+                                             )}
+                                        </Button>
+                                   </div>
                               </div>
                          </div>
-                    )}
-
-                    {mentor.skillsWanted?.length > 0 && (
-                         <div className="mt-6">
-                              <h2 className="text-lg font-semibold mb-2">Skills Needed</h2>
-                              <div className="flex flex-wrap gap-2">
-                                   {mentor.skillsWanted.map((skill, index) => (
-                                        <Badge key={skill.id || index} variant="outline">
-                                             {skill.name}
-                                        </Badge>
-                                   ))}
-                              </div>
-                         </div>
-                    )}
-                    <div style={{ maxWidth: 300, margin: "auto", padding: 20 }}>
-                         <label htmlFor="datetime">Pick a date and time:</label>
-                         <DatePicker
-                              selected={selectedDate}
-                              onChange={(date) => setSelectedDate(date)}
-                              showTimeSelect
-                              timeIntervals={15}
-                              dateFormat="yyyy/MM/dd h:mm aa"
-                              placeholderText="Click to select date & time"
-                              className="border rounded px-3 py-2 w-full"
-                         />
-
-                         {selectedDate && (
-                              <p className="mt-3 text-sm">Selected: {dayjs(selectedDate).format("YYYY-MM-DD HH:mm")}</p>
-                         )}
                     </div>
-
-                    {mentor.skillsOffered?.length > 0 && (
-                         <div className="mt-6">
-                              <label htmlFor="skill" className="block mb-2 font-medium">
-                                   Choose the skill you want mentorship on:
-                              </label>
-                              <select
-                                   id="skill"
-                                   value={selectedSkillNames || ""}
-                                   onChange={(e) => {
-                                        const selectedId = e.target.value; // skill.id
-                                        const selectedSkill: Skill | undefined = mentor?.skillsOffered?.find(
-                                             (skill) => skill.id === selectedId
-                                        );
-                                        setSelectedSkillNames(selectedSkill?.name ?? null);
-                                   }}
-                                   className="border px-3 py-2 rounded w-full"
-                              >
-                                   <option value="" disabled>
-                                        Select a skill
-                                   </option>
-                                   {mentor.skillsOffered.map((skill) => (
-                                        <option key={skill.id} value={skill.id}>
-                                             {skill.name}
-                                        </option>
-                                   ))}
-                              </select>
-                         </div>
-                    )}
-
-                    <Button
-                         className={`bg-purple-500 py-2 px-4 rounded-3xl text-white align-middle cursor-pointer mt-4 ${
-                              requestLoading ? "cursor-not-allowed" : "cursor-pointer"
-                         }`}
-                         onClick={handleSubmitRequest}
-                         disabled={requestLoading || requestStatus}
-                    >
-                         {requestStatus ? "Already Sent" : requestLoading ? "Submitting..." : "Submit"}
-                    </Button>
                </div>
           </>
      );
