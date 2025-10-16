@@ -10,6 +10,7 @@ import dayjs from "dayjs";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Award, Briefcase, Calendar, CheckCircle2, Clock, MapPin, Target } from "lucide-react";
 import { User } from "@/types";
+import { getBaseUrl } from "@/utils/getBaseUrl";
 
 type Skill = { id: string; name: string };
 
@@ -44,8 +45,11 @@ export default function ConnectionDetailPage() {
 
           try {
                const token = localStorage.getItem("token");
-
-               const res = await fetch("https://skillswap-platform-ovuw.onrender.com/api/sessions/request", {
+               const params = new URLSearchParams();
+               const BASE_URL = getBaseUrl();
+               const url = `${BASE_URL}/api/sessions/request?${params.toString()}`;
+               
+               const res = await fetch(url,{
                     method: "POST",
                     headers: {
                          "Content-Type": "application/json",
@@ -66,7 +70,7 @@ export default function ConnectionDetailPage() {
                     // Hide success message after 3 seconds
                     setTimeout(() => setShowSuccess(false), 3000);
                } else {
-                    alert( "Failed to request session");
+                    alert("Failed to request session");
                }
           } catch (error) {
                console.error("error: ", error);

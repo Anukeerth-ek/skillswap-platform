@@ -7,6 +7,7 @@ import { User } from "@/types";
 import { useGetMyProfile } from "./hooks/useGetMyProfile";
 import { useGetUserConnections } from "./hooks/useGetUserConnection";
 import { useRouter } from "next/navigation";
+import { getBaseUrl } from "@/utils/getBaseUrl";
 
 export default function Home() {
      const [users, setUsers] = useState<User[]>([]);
@@ -40,19 +41,19 @@ export default function Home() {
           router.replace(`?${params.toString()}`);
      }, [filters, router]);
 
-     const getBaseUrl = () => {
-          // Use env variable if set
-          if (process.env.NEXT_PUBLIC_USERS_LIST_URL) {
-               return process.env.NEXT_PUBLIC_USERS_LIST_URL;
-          }
+     // const getBaseUrl = () => {
+     //      // Use env variable if set
+     //      if (process.env.NEXT_PUBLIC_USERS_LIST_URL) {
+     //           return process.env.NEXT_PUBLIC_USERS_LIST_URL;
+     //      }
 
-          // Fallback based on environment
-          if (process.env.NODE_ENV === "production") {
-               return "https://skillswap-platform-ovuw.onrender.com";
-          } else {
-               return "http://localhost:4000";
-          }
-     };
+     //      // Fallback based on environment
+     //      if (process.env.NODE_ENV === "production") {
+     //           return "https://skillswap-platform-ovuw.onrender.com";
+     //      } else {
+     //           return "http://localhost:4000";
+     //      }
+     // };
 
      // Fetch users when filters change
      useEffect(() => {
