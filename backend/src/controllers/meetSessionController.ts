@@ -53,27 +53,40 @@ export const requestSession = async (req: AuthenticatedRequest, res: Response) =
      }
 };
 
-export const getMySessions = async (req: AuthenticatedRequest, res: Response) => {
-     try {
-          const userId = req.userId!;
-          const sessions = await prisma.session.findMany({
-               where: { OR: [{ mentorId: userId }, { learnerId: userId }] },
-               include: {
-                    mentor: { select: { name: true, email: true } },
-                    learner: { select: { name: true, email: true } },
-                    skill: { select: { name: true } },
-               },
-               orderBy: { scheduledAt: "desc" },
-          });
+export const getMySessions = async (req: Request, res: Response) => {
+  try {
+    const userId = req?.user?.id;
 
-          res.json({ sessions });
-          return;
-     } catch (e) {
-          console.error("getMySessions error:", e);
-          res.status(500).json({ message: "Server error" });
-          return;
-     }
+    const requestedSessions = await prisma.session.findMany({
+      where: { learnerId: userId },
+      include: {
+        mentor: { select: { name: true } },
+        learner: { select: { name: true } },
+        skill: { select: { name: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    const receivedSessions = await prisma.session.findMany({
+      where: { mentorId: userId },
+      include: {
+        mentor: { select: { name: true } },
+        learner: { select: { name: true } },
+        skill: { select: { name: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    res.json({
+      requestedSessions,
+      receivedSessions,
+    });
+  } catch (error) {
+    console.error("Error fetching sessions:", error);
+    res.status(500).json({ message: "Failed to fetch sessions" });
+  }
 };
+
 
 export const acceptSession = async (req: AuthenticatedRequest, res: Response) => {
      const sessionId = String(req.params.id);
