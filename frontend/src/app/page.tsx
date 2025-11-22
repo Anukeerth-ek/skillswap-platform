@@ -11,6 +11,7 @@ import { getBaseUrl } from "@/utils/getBaseUrl";
 import Hero from "./components/HomeSections/Hero";
 import Features from "./components/HomeSections/Features";
 import HowItWorks from "./components/HomeSections/HowItWorks";
+import Footer from "./components/HomeSections/Footer";
 
 export default function Home() {
      const [users, setUsers] = useState<User[]>([]);
@@ -121,6 +122,7 @@ export default function Home() {
                          </div>
                     </div>
                </div>
+               <Footer/>
           </div>
      );
 }
