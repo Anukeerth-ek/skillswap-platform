@@ -9,6 +9,7 @@ import { useGetUserConnections } from "./hooks/useGetUserConnection";
 import { useRouter } from "next/navigation";
 import { getBaseUrl } from "@/utils/getBaseUrl";
 import Hero from "./components/HomeSections/Hero";
+import Features from "./components/HomeSections/Features";
 
 export default function Home() {
      const [users, setUsers] = useState<User[]>([]);
@@ -97,7 +98,8 @@ export default function Home() {
 
      return (
           <div className="min-h-screen bg-gray-900">
-               <Hero/>
+               <Hero />
+               <Features/>
                <div className="flex">
                     <LeftSidebar filters={filters} setFilters={setFilters} />
                     <div className="flex-1 flex flex-col">
