@@ -2,6 +2,7 @@ import Hero from "./components/HomeSections/Hero";
 import Features from "./components/HomeSections/Features";
 import HowItWorks from "./components/HomeSections/HowItWorks";
 import Footer from "./components/HomeSections/Footer";
+import HomeCTA from "./components/HomeSections/HomeCTA";
 
 export default function Home() {
 
@@ -10,7 +11,8 @@ export default function Home() {
                <Hero />
                <Features />
                <HowItWorks/>
-               <Footer/>
+               <HomeCTA/>
+               <Footer />
           </div>
      );
 }
