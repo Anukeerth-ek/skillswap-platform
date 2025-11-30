@@ -5,7 +5,8 @@ export const aiQueryToFilters = async (req: Request, res: Response) => {
   const { message } = req.body;
 
   if (!message) {
-    return res.status(400).json({ error: "message is required" });
+      res.status(400).json({ error: "message is required" });
+      return
   }
 
   const prompt = `
@@ -46,10 +47,12 @@ export const aiQueryToFilters = async (req: Request, res: Response) => {
     const data:any = await response.json();
     const filters = JSON.parse(data.choices[0].message.content);
 
-    return res.json({ filters });
+    res.json({ filters });
+    return
 
   } catch (err) {
     console.error("AI filter error:", err);
-    return res.status(500).json({ error: "AI processing failed" });
+    res.status(500).json({ error: "AI processing failed" });
+    return
   }
 };

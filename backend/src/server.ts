@@ -16,7 +16,9 @@ import followRoutes from "./routes/followRoutes"
 import meetSessionRoutes from './routes/meetSessionRoutes'
 import googleAuthRoutes from "./routes/googleAuthRoutes";
 import googleTokenRoutes from "./routes/googleTokenRoutes";
-import filteredProfileRoutes from  "./routes/filteredRoutes"
+import filteredProfileRoutes from "./routes/filteredRoutes"
+import AiSearchRoutes from "./routes/aiSearchQuery"
+
 dotenv.config();
 
 const app = express();
@@ -39,6 +41,8 @@ app.use("/api/connections", connectionRoutes);
 app.use("/api/follow", followRoutes);
 
 app.use("/api", connectionRoutes);
+
+app.use("/aisearch/ai-query", AiSearchRoutes)
 
 app.use("/api/sessions", meetSessionRoutes)
 // app.use("/api/sessions", meetSessionRoutes);
