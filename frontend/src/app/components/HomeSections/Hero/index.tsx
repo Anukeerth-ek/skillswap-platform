@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 const Hero = () => {
   const router = useRouter()
   const goToFindConnectionPage = () => {
-    router.push('/frontend/findConnections')
+    router.push('/frontend/find-connections')
   }
 
   return (
