@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChevronDown, Search} from 'lucide-react';
+import { ChevronDown, Search, Sparkles} from 'lucide-react';
 // import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -19,13 +19,14 @@ export const SearchBar = ({ handleUserSearch }: SearchBarProps) => {
           onChange={handleUserSearch}
         />
       </div>
-      <Button variant="outline" className=" w-44 bg-gray-800 border-gray-700 text-white hover:bg-gray-700 text-left">
-        Code
-        <ChevronDown className="w-36 h-4 ml-2" />
-      </Button>
-      <Button className="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-16">
+      <Button variant="outline" className=" bg-gray-800 border-gray-700 text-white hover:bg-gray-700 text-left">
         Find Mate
+        {/* <ChevronDown className="w-36 h-4 ml-2" /> */}
+      </Button>
+      <Button className=" w-44 cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-16">
+        Use AI
+        <Sparkles />
       </Button>
     </div>
-  );
-};
+  )
+}
