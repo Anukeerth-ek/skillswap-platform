@@ -5,54 +5,55 @@ export const aiQueryToFilters = async (req: Request, res: Response) => {
   const { message } = req.body;
 
   if (!message) {
-      res.status(400).json({ error: "message is required" });
-      return
+    res.status(400).json({ error: "message is required" });
+    return;
   }
 
   const prompt = `
-  Convert the user message into filter values for finding mentors.
-  
-  Only return valid JSON fields:
-  {
-    "search": string | null,
-    "company": string | null,
-    "professional": string | null,
-    "experience": string | null,
-    "sort": string | null
-  }
+You are a query parser for a mentoring app.
 
-  Ensure:
-  - experience must be like: "1-3", "3-5", "5+", etc.
-  - professional should be job title if mentioned (e.g. "frontend developer")
-  - company must be single company name
-  - If a value is missing or irrelevant, set it to null.
+Extract filters ONLY in JSON format:
 
-  User message: "${message}"
-  `;
+{
+  "search": string | null,
+  "company": string | null,
+  "professional": string | null,
+  "experience": string | null,
+  "sort": string | null
+}
+
+Rules:
+- "experience" should be like "1-3", "3-5", "5+" etc.
+- If something is not present in user's message, return null.
+- No additional text outside JSON.
+
+User message: "${message}"
+`;
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini", // free / affordable
-        messages: [{ role: "user", content: prompt }],
-        response_format: { type: "json_object" }
-      })
-    });
+    const response = await fetch(
+      "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=" +
+      process.env.GEMINI_API_KEY,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+        }),
+      }
+    );
 
-    const data:any = await response.json();
-    const filters = JSON.parse(data.choices[0].message.content);
+    const jsonResponse: any = await response.json();
+
+    const aiText =
+      jsonResponse.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+
+    // Ensure valid JSON only
+    const filters = JSON.parse(aiText);
 
     res.json({ filters });
-    return
-
   } catch (err) {
-    console.error("AI filter error:", err);
-    res.status(500).json({ error: "AI processing failed" });
-    return
+    console.error("AI processing error:", err);
+    res.status(500).json({ error: "AI failed to extract filters" });
   }
 };
