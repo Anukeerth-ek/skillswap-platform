@@ -7,15 +7,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Textarea } from "@/components/ui/textarea";
 
 type SearchBarProps = {
-     handleUserSearch: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleUserSearch: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  smartSearch: (prompt: string) => void;
 };
 
-export const SearchBar = ({ handleUserSearch }: SearchBarProps) => {
+export const SearchBar = ({ handleUserSearch, smartSearch  }: SearchBarProps) => {
      const [open, setOpen] = useState(false);
      const [input, setInput] = useState("");
 
      const handleSearch = () => {
-          console.log("Searching for:", input);
+       console.log("Searching for:", input);
+        smartSearch(input); 
           setOpen(false);
      };
      return (

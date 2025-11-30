@@ -20,7 +20,7 @@ export const useGetMyProfile = () => {
           const fetchUser = async () => {
                const token: any = localStorage.getItem("token");
                localStorage.setItem("token", token);
-               window.dispatchEvent(new Event("userLoggedIn"));
+               // window.dispatchEvent(new Event("userLoggedIn"));
                if (!token) {
                     setLoading(false);
                     return;
