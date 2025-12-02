@@ -128,15 +128,30 @@ const FindConnections = () => {
      const connectedIds = new Set(usersConnection.map((c) => c.user.id));
      const visibleUsers = users?.filter((user) => !connectedIds.has(user.id));
 
-     const smartSearch = (prompt: string) => {
+     const smartSearch = async (prompt: string) => {
+          try {
+               const BASE_URL = getBaseUrl();
+               const res = await fetch(`${BASE_URL}/aisearch/ai-query`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: prompt }),
+               });
 
-          console.log("prompt", prompt)
-          setFilters((prev) => ({
-               ...prev,
-               search: prompt, 
-          }));
+               const data = await res.json();
+               console.log("AI Filters:", data.filters);
+
+               setFilters((prev) => ({
+                    ...prev,
+                    search: data.filters.search ?? "",
+                    company: data.filters.company ?? "",
+                    professional: data.filters.professional ? [data.filters.professional] : [],
+                    experience: data.filters.experience ? [data.filters.experience] : [],
+                    sort: data.filters.sort ?? prev.sort,
+               }));
+          } catch (err) {
+               console.error("Smart search failed", err);
+          }
      };
-
      return (
           <div className="flex mt-18">
                <LeftSidebar filters={filters} setFilters={setFilters} />
