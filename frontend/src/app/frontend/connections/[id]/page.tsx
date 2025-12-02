@@ -4,22 +4,22 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import DatePicker from "react-datepicker";
+// import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import dayjs from "dayjs";
+// import dayjs from "dayjs";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, Award, Briefcase, Calendar, CheckCircle2, Clock, MapPin, Target } from "lucide-react";
 import { User } from "@/types";
 import { getBaseUrl } from "@/utils/getBaseUrl";
 
-type Skill = { id: string; name: string };
+// type Skill = { id: string; name: string };
 
 export default function ConnectionDetailPage() {
      const { id } = useParams();
      const [mentor, setMentor] = useState<User | null>(null);
      const [selectedDate, setSelectedDate] = useState<Date | null>(null);
 
-     const [loggedInUserSkills, setLoggedInUserSkills] = useState<Skill[]>([]);
+     // const [loggedInUserSkills, setLoggedInUserSkills] = useState<Skill[]>([]);
      const [selectedSkillNames, setSelectedSkillNames] = useState<string | null>(null);
      const [requestLoading, setRequestLoading] = useState(false);
      const [requestStatus, setRequestStatus] = useState(false);
@@ -63,6 +63,7 @@ export default function ConnectionDetailPage() {
                });
 
                const data = await res.json();
+               console.log(data)
                if (res.ok) {
                     setRequestStatus(true);
                     setShowSuccess(true);
@@ -106,7 +107,8 @@ export default function ConnectionDetailPage() {
                });
 
                const data = await res.json();
-               setLoggedInUserSkills(data.user?.skillsOffered || []);
+               console.log(data)
+               // setLoggedInUserSkills(data.user?.skillsOffered || []);
           };
 
           fetchLoggedInUser();

@@ -18,7 +18,7 @@ interface Session {
 }
 
 const SessionsPage = () => {
-     const [sessions, setSessions] = useState<Session[]>([]);
+     // const [sessions, setSessions] = useState<Session[]>([]);
      const [loading, setLoading] = useState(true);
      const [approvingSession, setApprovingSession] = useState<string | null>(null);
 
@@ -40,7 +40,7 @@ const SessionsPage = () => {
                const data = await res.json();
                const fetchedSessions = data.sessions || [];
 
-               setSessions(fetchedSessions);
+               // setSessions(fetchedSessions);
 
                // ✅ Fetch user to separate sessions
                const userRes = await fetch("https://skillswap-platform-ovuw.onrender.com/api/profile/me", {
@@ -236,15 +236,25 @@ const SessionsPage = () => {
 };
 
 // ✅ Updated SessionCard with showActions prop
-const SessionCard = ({
-     session,
-     approvingSession,
-     approveSession,
-     rejectSession,
-     deleteSession,
-     handleSessions,
-     showActions, // ✅ Added this prop
-}: any) => (
+interface SessionCardProps {
+  session: Session;
+  approvingSession: string | null;
+  approveSession: (id: string) => Promise<void>;
+  rejectSession: (id: string) => Promise<void>;
+  deleteSession: (id: string) => Promise<void>;
+  handleSessions: (session: Session) => void;
+  showActions: boolean;
+}
+
+const SessionCard: React.FC<SessionCardProps> = ({
+  session,
+  approvingSession,
+  approveSession,
+  rejectSession,
+  deleteSession,
+  handleSessions,
+  showActions,
+}) => (
      <div
           key={session.id}
           className="border p-4 rounded-lg cursor-pointer shadow-sm flex flex-col gap-2"

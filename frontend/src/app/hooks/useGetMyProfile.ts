@@ -18,7 +18,13 @@ export const useGetMyProfile = () => {
 
      useEffect(() => {
           const fetchUser = async () => {
-               const token: any = localStorage.getItem("token");
+               const token = localStorage.getItem("token");
+
+               if (!token) {
+                    setLoading(false);
+                    return;
+               }
+
                localStorage.setItem("token", token);
                // window.dispatchEvent(new Event("userLoggedIn"));
                if (!token) {

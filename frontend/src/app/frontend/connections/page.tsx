@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import {  MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 // import { Input } from "@/components/ui/input";
@@ -41,7 +41,7 @@ interface IncomingRequest {
      };
 }
 
-const departments = ["All Departments", "Management", "Office", "Development", "Marketing", "Sales & Business"];
+// const departments = ["All Departments", "Management", "Office", "Development", "Marketing", "Sales & Business"];
 
 const getDepartmentColor = (department: string) => {
      const colors = {
@@ -55,8 +55,8 @@ const getDepartmentColor = (department: string) => {
 };
 
 export default function ConnectionListPage() {
-     const [searchTerm, setSearchTerm] = useState("");
-     const [selectedDepartment, setSelectedDepartment] = useState("All Departments");
+     // const [searchTerm, setSearchTerm] = useState("");
+     // const [selectedDepartment, setSelectedDepartment] = useState("All Departments");
      const [selectedRows, setSelectedRows] = useState<string[]>([]);
      // const [rowsPerPage, setRowsPerPage] = useState(10);
      // const [connectionLoading, setConnectionLoading] = useState(true);
@@ -80,28 +80,28 @@ export default function ConnectionListPage() {
 
      const { usersConnection, setUsersConnection, loading, error } = useGetUserConnections(currentUser?.id);
 
-     const filteredConnections = useMemo(() => {
-          return usersConnection?.filter((connection) => {
-               const matchesSearch =
-                    connection.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    connection.jobTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    connection.department?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                    connection.email?.toLowerCase().includes(searchTerm.toLowerCase());
+     // const filteredConnections = useMemo(() => {
+     //      return usersConnection?.filter((connection) => {
+     //           const matchesSearch =
+     //                connection.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     //                connection.jobTitle?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     //                connection.department?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+     //                connection.email?.toLowerCase().includes(searchTerm.toLowerCase());
 
-               const matchesDepartment =
-                    selectedDepartment === "All Departments" || connection.department === selectedDepartment;
+     //           const matchesDepartment =
+     //                selectedDepartment === "All Departments" || connection.department === selectedDepartment;
 
-               return matchesSearch && matchesDepartment;
-          });
-     }, [searchTerm, selectedDepartment, usersConnection]);
+     //           return matchesSearch && matchesDepartment;
+     //      });
+     // }, [searchTerm, selectedDepartment, usersConnection]);
 
      const handleRowSelect = (id: string) => {
           setSelectedRows((prev) => (prev.includes(id) ? prev.filter((rowId) => rowId !== id) : [...prev, id]));
      };
 
-     const handleSelectAll = () => {
-          setSelectedRows(selectedRows.length === filteredConnections.length ? [] : filteredConnections.map((c) => c.id));
-     };
+     // const handleSelectAll = () => {
+     //      setSelectedRows(selectedRows.length === filteredConnections.length ? [] : filteredConnections.map((c) => c.id));
+     // };
 
      // const getInitials = (name: string) => {
      //      return name
@@ -309,15 +309,7 @@ export default function ConnectionListPage() {
                     <table className="w-full">
                          <thead className="bg-gray-50">
                               <tr>
-                                   <th className="w-12 px-6 py-3 text-left">
-                                        <Checkbox
-                                             checked={
-                                                  selectedRows.length === filteredConnections.length &&
-                                                  filteredConnections.length > 0
-                                             }
-                                             onCheckedChange={handleSelectAll}
-                                        />
-                                   </th>
+                                   
                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                         connection Name
                                    </th>
