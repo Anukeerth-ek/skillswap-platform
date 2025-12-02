@@ -42,7 +42,7 @@ app.use("/api/follow", followRoutes);
 
 app.use("/api", connectionRoutes);
 
-app.use("/aisearch/ai-query", AiSearchRoutes)
+app.use("/aisearch", AiSearchRoutes)
 
 app.use("/api/sessions", meetSessionRoutes)
 // app.use("/api/sessions", meetSessionRoutes);
