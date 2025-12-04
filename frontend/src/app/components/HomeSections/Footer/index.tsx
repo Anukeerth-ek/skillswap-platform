@@ -9,9 +9,9 @@ const Footer = () => {
           <div className="col-span-1">
             <div className="flex items-center gap-2 mb-4">
               <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center font-bold text-xl text-primary-foreground">
-                S
+                L
               </div>
-              <span className="text-xl font-bold text-foreground">Swapper</span>
+              <span className="text-xl font-bold text-foreground">Zuno</span>
             </div>
             <p className="text-sm text-muted-foreground leading-relaxed">
               Connecting mentors and mentees worldwide to grow together and achieve their goals.
