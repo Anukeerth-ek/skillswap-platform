@@ -1,59 +1,62 @@
 import { Request, Response } from "express";
-import fetch from "node-fetch";
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+const apiKey = process.env.GEMINI_API_KEY;
+if (!apiKey) {
+  throw new Error("❌ GEMINI_API_KEY missing in env variables");
+}
+
+const genAI = new GoogleGenerativeAI(apiKey);
+const model = genAI.getGenerativeModel({
+  model: "gemini-2.0-flash"
+});
 
 export const aiQueryToFilters = async (req: Request, res: Response) => {
   const { message } = req.body;
+  console.log("backend message:", message);
 
   if (!message) {
     res.status(400).json({ error: "message is required" });
-    return;
+    return
   }
 
   const prompt = `
-You are a query parser for a mentoring app.
-
-Extract filters ONLY in JSON format:
-
+Extract structured search filters from the user message.
+Return ONLY valid JSON using below format:
 {
   "search": string | null,
   "company": string | null,
-  "professional": string | null,
-  "experience": string | null,
+  "professional": string[] | null,
+  "experience": number | null,
   "sort": string | null
 }
 
-Rules:
-- "experience" should be like "1-3", "3-5", "5+" etc.
-- If something is not present in user's message, return null.
-- No additional text outside JSON.
-
-User message: "${message}"
+User Query: "${message}"
 `;
 
   try {
-    const response = await fetch(
-      "https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=" +
-      process.env.GEMINI_API_KEY,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-        }),
-      }
-    );
+    const result = await model.generateContent([{ text: prompt }]);
+    const text = result.response.text();
 
-    const jsonResponse: any = await response.json();
+    console.log("RAW AI:", text);
 
-    const aiText =
-      jsonResponse.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    const jsonString = jsonMatch ? jsonMatch[0] : "{}";
 
-    // Ensure valid JSON only
-    const filters = JSON.parse(aiText);
+    let filters = {};
+    try {
+      filters = JSON.parse(jsonString);
+    } catch {
+      console.error("JSON parsing failed");
+    }
 
+    console.log("Extracted:", filters);
     res.json({ filters });
-  } catch (err) {
-    console.error("AI processing error:", err);
-    res.status(500).json({ error: "AI failed to extract filters" });
+    return
+
+  } catch (error: any) {
+    console.error("🔥 AI ERROR:", error?.response?.data || error);
+    res.status(500).json({ error: "AI failed", detail: error.message });
+    return
   }
 };
