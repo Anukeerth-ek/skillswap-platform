@@ -128,53 +128,48 @@ const FindConnections = () => {
      const connectedIds = new Set(usersConnection.map((c) => c.user.id));
      const visibleUsers = users?.filter((user) => !connectedIds.has(user.id));
 
- const smartSearch = async (prompt: string) => {
-  console.log("prompt:", prompt);
+     const smartSearch = async (prompt: string) => {
+          console.log("prompt:", prompt);
 
-  try {
-    const BASE_URL = getBaseUrl();
-    const res = await fetch(`${BASE_URL}/aisearch/ai-query`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: prompt }),
-    });
+          try {
+               const BASE_URL = getBaseUrl();
+               const res = await fetch(`${BASE_URL}/aisearch/ai-query`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: prompt }),
+               });
 
-    const data = await res.json();
-    console.log("AI Response:", data);
+               const data = await res.json();
+               console.log("AI Response:", data);
 
-    const filters = data.filters || {};
+               const filters = data.filters || {};
 
-    // Normalize values so state is always safe for UI
-    const parsedExperience = filters.experience
-      ? filters.experience.trim()
-      : "";
+               // Normalize values so state is always safe for UI
+               const parsedExperience = filters.experience ? filters.experience.trim() : "";
 
-    const parsedProfessional = filters.professional
-      ? filters.professional.split(",").map((p: string) => p.trim().toLowerCase())
-      : [];
+               const parsedProfessional = filters.professional
+                    ? filters.professional.split(",").map((p: string) => p.trim().toLowerCase())
+                    : [];
 
-    setFilters({
-      search: filters.search || "",
-      company: filters.company || "",
-      professional: parsedProfessional, // always an array
-      experience: parsedExperience,      // always string
-      sort: filters.sort || "",
-    });
+               setFilters({
+                    search: filters.search || "",
+                    company: filters.company || "",
+                    professional: parsedProfessional, // always an array
+                    experience: parsedExperience, // always string
+                    sort: filters.sort || "",
+               });
 
-    console.log("Filters Applied:", {
-      search: filters.search || "",
-      company: filters.company || "",
-      professional: parsedProfessional,
-      experience: parsedExperience,
-      sort: filters.sort || "",
-    });
-
-  } catch (err) {
-    console.error("Smart search failed ❌", err);
-  }
-};
-
-
+               console.log("Filters Applied:", {
+                    search: filters.search || "",
+                    company: filters.company || "",
+                    professional: parsedProfessional,
+                    experience: parsedExperience,
+                    sort: filters.sort || "",
+               });
+          } catch (err) {
+               console.error("Smart search failed ❌", err);
+          }
+     };
 
      return (
           <div className="flex mt-18">
