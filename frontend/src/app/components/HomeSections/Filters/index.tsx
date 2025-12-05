@@ -14,7 +14,7 @@ interface Filters {
      company: string;
      sort: string;
      //   hourRate: [number, number];
-     readiness: string[];
+     // readiness: string[];
 }
 
 interface LeftSidebarProps {
@@ -53,7 +53,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ filters, setFilters }) => {
      // const [hourRate, setHourRate] = useState<[number, number]>([8, 39]);
 
      const toggleFilter = (
-          category: keyof Pick<Filters, "professional" | "experience" | "readiness">,
+          category: keyof Pick<Filters, "professional" | "experience" >,
           value: string
      ): void => {
           setFilters((prev) => {
@@ -86,7 +86,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ filters, setFilters }) => {
                company: "",
                sort: "most-experienced",
 
-               readiness: [],
+               // readiness: [],
           };
           setFilters(resetFilters);
           // setHourRate([8, 39]);
@@ -104,7 +104,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ filters, setFilters }) => {
           if (filters.company) count++;
           if (filters.professional?.length) count += filters.professional.length;
           if (filters.experience?.length) count += filters.experience.length;
-          if (filters.readiness?.length) count += filters.readiness.length;
+          // if (filters.readiness?.length) count += filters.readiness.length;
           return count;
      };
 
