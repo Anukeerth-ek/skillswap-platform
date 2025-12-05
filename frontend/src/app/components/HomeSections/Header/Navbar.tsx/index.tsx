@@ -46,7 +46,7 @@ export const Navbar = () => {
                                    size="sm"
                                    className={
                                         isActive("/")
-                                             ? "text-purple-400 hover:text-purple-900 cursor-pointer border-b-2 border-purple-400 "
+                                             ? "text-[#21cab9] hover:text-[#21cab9] cursor-pointer border-b-2 border-[hsl(174_72%_46%)] "
                                              : "text-gray-300 hover:text-black cursor-pointer"
                                    }
                               >
@@ -68,7 +68,7 @@ export const Navbar = () => {
                                    size="sm"
                                    className={
                                         isActive("/frontend/connections")
-                                             ? "text-purple-400 hover:text-purple-900 cursor-pointer border-b-2 border-purple-400 "
+                                             ? "text-[#21cab9] hover:text-[#21cab9] cursor-pointer border-b-2 border-[hsl(174_72%_46%)] "
                                              : "text-gray-300 hover:text-black cursor-pointer"
                                    }
                               >
@@ -82,7 +82,7 @@ export const Navbar = () => {
                                    size="sm"
                                    className={
                                         isActive("/frontend/sessions")
-                                             ? "text-purple-400 hover:text-purple-900 cursor-pointer border-b-2 border-purple-400 "
+                                             ?  "text-[#21cab9] hover:text-[#21cab9] cursor-pointer border-b-2 border-[hsl(174_72%_46%)] "
                                              : "text-gray-300 hover:text-black cursor-pointer"
                                    }
                               >
@@ -96,7 +96,7 @@ export const Navbar = () => {
                                    size="sm"
                                    className={
                                         isActive("/frontend/chat")
-                                             ? "text-purple-400 hover:text-purple-900 cursor-pointer border-b-2 border-purple-400 "
+                                             ? "text-[#21cab9] hover:text-[#21cab9] cursor-pointer border-b-2 border-[hsl(174_72%_46%)] "
                                              : "text-gray-300 hover:text-black cursor-pointer"
                                    }
                               >

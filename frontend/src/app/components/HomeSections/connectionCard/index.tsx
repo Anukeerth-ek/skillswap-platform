@@ -39,18 +39,18 @@ export const ConnectionCard: React.FC<TeacherCardProps> = ({
           //    <div className="max-w-md mx-auto p-6 bg-gray-100">
           <div
                onClick={handleShowConnectionDetail}
-               className="group bg-gray-900 cursor-pointer rounded-2xl p-6 border border-slate-700/50 hover:border-purple-500/50 hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden"
+               className="group bg-gray-900 cursor-pointer rounded-2xl p-6 border border-slate-700/50 hover:border-[#21cab9]  hover:shadow-[#aee7e1] transition-all duration-300 transform hover:-translate-y-1 relative overflow-hidden"
           >
                {/* Subtle gradient overlay */}
-               <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+               <div className="absolute inset-0 bg-gradient-to-br from-[#1dd1bf] to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
                {/* Header with avatar and bookmark */}
                <div className="flex items-start justify-between mb-5 relative z-10">
                     <div className="flex items-center space-x-4">
                          <div className="relative">
-                              <Avatar className="w-14 h-14 ring-2 ring-purple-500/20 group-hover:ring-purple-500/40 transition-all duration-300">
+                              <Avatar className="w-14 h-14 ring-2 ring-[#21cab9] group-hover:ring-[#21cab9] transition-all duration-300">
                                    <AvatarImage src={avatar} className="object-cover" />
-                                   <AvatarFallback className="bg-gradient-to-br from-purple-600 to-purple-700 text-white font-bold text-lg">
+                                   <AvatarFallback className="bg-gradient-to-br from-[#21cab9] to-[#21cab9] text-white font-bold text-lg">
                                         {name.charAt(0).toUpperCase()}
                                    </AvatarFallback>
                               </Avatar>
@@ -73,12 +73,12 @@ export const ConnectionCard: React.FC<TeacherCardProps> = ({
                     <Button
                          variant="ghost"
                          size="icon"
-                         className="text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 rounded-full transition-all duration-200 relative z-20"
+                         className="text-gray-400 hover:text-[#21cab9] hover:bg-[#21cab9] rounded-full transition-all duration-200 relative z-20"
                          onClick={toggleBookmark}
                     >
                          <Heart
                               className={`w-5 h-5 transition-all duration-200 ${
-                                   isBookmark ? "fill-purple-500 text-purple-500 scale-110" : "hover:scale-110"
+                                   isBookmark ? "fill-[#21cab9] text-[#21cab9] scale-110" : "hover:scale-110"
                               }`}
                          />
                     </Button>

@@ -38,7 +38,7 @@ export const SearchBar = ({ handleUserSearch, smartSearch  }: SearchBarProps) =>
                          Find Mate
                          {/* <ChevronDown className="w-36 h-4 ml-2" /> */}
                     </Button>
-                    <Button onClick={() => setOpen(true)} className=" w-52 cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-16">
+                    <Button onClick={() => setOpen(true)} className=" w-52 cursor-pointer bg-[#21cab9] hover:bg-[#21cab9] text-white px-16">
                          Use Smart Search
                          <Sparkles />
                     </Button>

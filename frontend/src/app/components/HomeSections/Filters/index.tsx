@@ -131,10 +131,10 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ filters, setFilters }) => {
                <div className="p-6 border-b border-gray-700">
                     <div className="flex items-center justify-between mb-2">
                          <div className="flex items-center gap-2">
-                              <Filter className="w-5 h-5 text-purple-400" />
+                              <Filter className="w-5 h-5 text-[#21cab9]" />
                               <h2 className="text-lg font-semibold">Filters</h2>
                               {getActiveFiltersCount() > 0 && (
-                                   <span className="bg-purple-600 text-white text-xs px-2 py-1 rounded-full">
+                                   <span className="bg-[#21cab9] text-white text-xs px-2 py-1 rounded-full">
                                         {getActiveFiltersCount()}
                                    </span>
                               )}
@@ -143,7 +143,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ filters, setFilters }) => {
                               onClick={handleReset}
                               variant="ghost"
                               size="sm"
-                              className="text-purple-400 cursor-pointer hover:text-white bg-purple-600/20 hover:bg-purple-600/30 text-xs"
+                              className="text-[#21cab9] cursor-pointer hover:text-white bg-purple-[#21cab9] hover:bg-[#21cab9] text-xs"
                          >
                               {/* <X className="w-3 h-3 mr-1" /> */}
                               Reset All
@@ -158,7 +158,7 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ filters, setFilters }) => {
                          <div className="relative">
                               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                               <input
-                                   className="w-full pl-10 pr-4 py-3 rounded-lg text-sm bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:border-purple-500 focus:ring-2 focus:ring-purple-500/20 focus:outline-none transition-all"
+                                   className="w-full pl-10 pr-4 py-3 rounded-lg text-sm bg-gray-800 border border-gray-600 text-white placeholder-gray-400 focus:border-[#21cab9] focus:ring-2 focus:ring-[#21cab9] focus:outline-none transition-all"
                                    placeholder="Search company name..."
                                    value={filters.company}
                                    onChange={handleSearchCompany}
@@ -214,11 +214,11 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ filters, setFilters }) => {
                                         <RadioGroupItem
                                              value={option.value}
                                              id={option.value}
-                                             className="border-purple-400 text-purple-400 data-[state=checked]:border-purple-500 data-[state=checked]:bg-purple-500"
+                                             className="border-[#21cab9] text-[#21cab9] data-[state=checked]:border-[#21cab9] data-[state=checked]:bg-[#21cab9]"
                                         />
                                         <Label
                                              htmlFor={option.value}
-                                             className="text-sm cursor-pointer hover:text-purple-300"
+                                             className="text-sm cursor-pointer hover:text-[#21cab9]"
                                         >
                                              {option.label}
                                         </Label>
@@ -288,9 +288,9 @@ const LeftSidebar: React.FC<LeftSidebarProps> = ({ filters, setFilters }) => {
                                              id={exp.value}
                                              checked={filters.experience?.includes(exp.value)}
                                              onCheckedChange={() => toggleFilter("experience", exp.value)}
-                                             className="border-purple-400 data-[state=checked]:bg-purple-600 data-[state=checked]:border-purple-600"
+                                             className="border-[#21cab9] data-[state=checked]:bg-[#21cab9] data-[state=checked]:border-[#21cab9]"
                                         />
-                                        <Label htmlFor={exp.value} className="text-sm cursor-pointer hover:text-purple-300">
+                                        <Label htmlFor={exp.value} className="text-sm cursor-pointer hover:text-[#21cab9]">
                                              {exp.label}
                                         </Label>
                                    </div>
