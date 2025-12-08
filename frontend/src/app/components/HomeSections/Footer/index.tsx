@@ -54,7 +54,7 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-sm text-muted-foreground">
-            © 2024 Swapper. All rights reserved.
+            © 2025 Swapper. All rights reserved.
           </p>
           
           {/* Social Links */}

@@ -10,7 +10,7 @@ const Hero = () => {
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-6 py-20 overflow-hidden">
+    <section className="relative min-h-screen flex items-center justify-center px-6 py-20 ">
       {/* Gradient Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-background via-background to-primary/10"></div>
       
@@ -35,7 +35,7 @@ const Hero = () => {
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Button onClick={()=> goToFindConnectionPage()} size="lg" className=" cursor-pointer bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-6 text-lg rounded-xl shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/40 hover:scale-105">
             Get Started Free
             <ArrowRight className="ml-2 h-5 w-5" />
@@ -46,7 +46,7 @@ const Hero = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+        {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
           <div className="flex flex-col items-center p-6 rounded-2xl bg-card/50 backdrop-blur border border-border/50 hover:border-primary/50 transition-all hover:scale-105">
             <Users className="w-10 h-10 text-primary mb-3" />
             <div className="text-3xl font-bold text-foreground mb-1">10,000+</div>
@@ -64,7 +64,7 @@ const Hero = () => {
             <div className="text-3xl font-bold text-foreground mb-1">95%</div>
             <div className="text-sm text-muted-foreground">Success Rate</div>
           </div>
-        </div>
+        </div> */}
       </div>
     </section>
   );
