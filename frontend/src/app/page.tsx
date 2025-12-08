@@ -3,6 +3,7 @@ import Features from "./components/HomeSections/Features";
 import HowItWorks from "./components/HomeSections/HowItWorks";
 import Footer from "./components/HomeSections/Footer";
 import HomeCTA from "./components/HomeSections/HomeCTA";
+import ProblemSolutionSection from "./components/problemSolution";
 
 export default function Home() {
 
@@ -10,6 +11,7 @@ export default function Home() {
           <div className="min-h-screen bg-gray-900">
                <Hero />
                <Features />
+               <ProblemSolutionSection/>
                <HowItWorks/>
                <HomeCTA/>
                <Footer />
