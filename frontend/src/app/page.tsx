@@ -4,6 +4,7 @@ import HowItWorks from "./components/HomeSections/HowItWorks";
 import Footer from "./components/HomeSections/Footer";
 import HomeCTA from "./components/HomeSections/HomeCTA";
 import ProblemSolutionSection from "./components/problemSolution";
+import VisionSection from "./components/visionSection";
 
 export default function Home() {
 
@@ -12,7 +13,8 @@ export default function Home() {
                <Hero />
                <Features />
                <ProblemSolutionSection/>
-               <HowItWorks/>
+               <HowItWorks />
+               <VisionSection/>
                <HomeCTA/>
                <Footer />
           </div>
