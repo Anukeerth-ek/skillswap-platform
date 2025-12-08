@@ -5,6 +5,7 @@ import Footer from "./components/HomeSections/Footer";
 import HomeCTA from "./components/HomeSections/HomeCTA";
 import ProblemSolutionSection from "./components/problemSolution";
 import VisionSection from "./components/visionSection";
+import FAQSection from "./components/faq";
 
 export default function Home() {
 
@@ -15,7 +16,8 @@ export default function Home() {
                <ProblemSolutionSection/>
                <HowItWorks />
                <VisionSection/>
-               <HomeCTA/>
+               <HomeCTA />
+               <FAQSection/>
                <Footer />
           </div>
      );
