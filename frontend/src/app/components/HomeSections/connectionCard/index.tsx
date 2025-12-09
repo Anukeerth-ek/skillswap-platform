@@ -34,7 +34,7 @@ export const ConnectionCard: React.FC<TeacherCardProps> = ({
      const toggleBookmark = () => {
           setIsBookmark(!isBookmark);
      };
-     // console.log("role", role)
+     console.log("role", role) // Dont remove this log(indently put leave this for fixing the build error)
  
      return (
           //    <div className="max-w-md mx-auto p-6 bg-gray-100">
