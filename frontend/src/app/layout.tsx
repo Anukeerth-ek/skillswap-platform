@@ -5,7 +5,7 @@ import { Navbar } from "./components/HomeSections/Header/Navbar.tsx";
 // import { Toaster } from "sonner";
 import { ClientProviders } from "./components/ClientProvider";
 // import { SessionProvider } from "next-auth/react";
-import { SessionWrapper } from "./components/SessionWrapper";
+import  SessionWrapper  from "./components/SessionWrapper";
 // import useSocket from "../app/hooks/useSocket";
 // import { useSession } from "next-auth/react";
 
