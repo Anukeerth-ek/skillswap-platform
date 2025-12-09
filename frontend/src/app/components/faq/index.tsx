@@ -48,7 +48,7 @@ const FAQSection = () => {
             Got <span className="text-gradient">Questions?</span>
           </h2>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Here are some common questions about our platform. Can't find what you're looking for? 
+            Here are some common questions about our platform. Can&apos;t find what you&apos;re looking for? 
             Reach out to us directly.
           </p>
         </div>

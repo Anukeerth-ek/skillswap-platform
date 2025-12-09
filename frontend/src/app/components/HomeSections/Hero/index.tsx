@@ -1,6 +1,6 @@
 "use client"
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Users, MessageSquare, TrendingUp } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 const Hero = () => {
