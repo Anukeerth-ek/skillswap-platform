@@ -35,7 +35,7 @@ const ProblemSolutionSection = () => {
                     <div className="grid md:grid-cols-2 gap-8 lg:gap-16 max-w-5xl mx-auto">
                          {/* Problem Side */}
                          <div className="glass-card rounded-2xl p-8 relative group">
-                              <div className="absolute inset-0 rounded-2xl bg-destructive/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                              <div className="absolute inset-0 rounded-2xl bg-destructive/5 opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
                               <div className="relative z-10">
                                    <div className="flex items-center gap-3 mb-6">
                                         <div className="w-12 h-12 rounded-xl bg-destructive/20 flex items-center justify-center">
@@ -60,7 +60,7 @@ const ProblemSolutionSection = () => {
 
                          {/* Solution Side */}
                          <div className="glass-card rounded-2xl p-8 relative group glow-border">
-                              <div className="absolute inset-0 rounded-2xl bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                              <div className="absolute inset-0 rounded-2xl bg-primary/5 opacity-80 group-hover:opacity-100 transition-opacity duration-300" />
                               <div className="relative z-10">
                                    <div className="flex items-center gap-3 mb-6">
                                         <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
