@@ -129,8 +129,6 @@ const FindConnections = () => {
      const visibleUsers = users?.filter((user) => !connectedIds.has(user.id));
 
      const smartSearch = async (prompt: string) => {
-          console.log("prompt:", prompt);
-
           try {
                const BASE_URL = getBaseUrl();
                const res = await fetch(`${BASE_URL}/aisearch/ai-query`, {
@@ -140,31 +138,20 @@ const FindConnections = () => {
                });
 
                const data = await res.json();
-               console.log("AI Response:", data);
+               const aiFilters = data.filters || {};
 
-               const filters = data.filters || {};
-
-               // Normalize values so state is always safe for UI
-               const parsedExperience = filters.experience ? filters.experience.trim() : "";
-
-               const parsedProfessional = filters.professional
-                    ? filters.professional.split(",").map((p: string) => p.trim().toLowerCase())
+               const parsedProfessional = Array.isArray(aiFilters.professional)
+                    ? aiFilters.professional.map((p: string) => p.toLowerCase())
                     : [];
 
-               setFilters({
-                    search: filters.search || "",
-                    company: filters.company || "",
-                    professional: parsedProfessional, // always an array
-                    experience: parsedExperience, // always string
-                    sort: filters.sort || "",
-               });
+               const parsedExperience = aiFilters.experience ? [aiFilters.experience] : [];
 
-               console.log("Filters Applied:", {
-                    search: filters.search || "",
-                    company: filters.company || "",
+               setFilters({
+                    search: aiFilters.search || "",
+                    company: aiFilters.company || "",
                     professional: parsedProfessional,
                     experience: parsedExperience,
-                    sort: filters.sort || "",
+                    sort: aiFilters.sort || "most-experienced",
                });
           } catch (err) {
                console.error("Smart search failed ❌", err);
